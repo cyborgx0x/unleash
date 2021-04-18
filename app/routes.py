@@ -4,7 +4,7 @@ from flask import request, redirect
 from app.models import Fiction, Chapter, Quote, Author
 from app import app
 from app.form import LoginForm, RegistrationForm, Quiz_answer, AuthorForm, FictionForm
-from flask import flash, url_for
+from flask import flash, url_for, send_file
 from flask_login import current_user, login_user
 from app.models import User
 from flask_login import logout_user, login_required
@@ -14,7 +14,7 @@ from flask import Markup
 from database import view_all_post
 import json
 from werkzeug.datastructures import ImmutableMultiDict
-
+from img_crop import return_img
 
 @app.route("/")
 def index():
@@ -22,6 +22,16 @@ def index():
     top_authors = Author.query.order_by(Author.fiction_count.desc()).limit(12).all()
     
     return  render_template("home.html", top_view_fictions = top_view_fictions, top_authors=top_authors)
+
+
+
+@app.route("/img-cover/<path:link>")
+def img_proxy(link):
+    url="http://skybooks.vn/wp-content/uploads/2021/03/chung-ta-khong-the-la-ban-tang-kem-bookmark-so-tay-1.jpg"
+    print(link)
+    img = return_img(link)
+    img.seek(0)
+    return  send_file(img, mimetype='image/jpeg')
 
 @app.route("/test/new/", methods=['GET', 'POST'])
 def test():

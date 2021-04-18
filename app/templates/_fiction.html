@@ -1,7 +1,7 @@
 <div class="card" style="margin:5px" >
   <div class="crop">
   
-    <img src="{% if fiction.cover %}http://skybooks.vn/wp-content/themes/skybooks/thumb.php?src={{ fiction.cover}}&w=300&h=480&q=100{% else %} http://localhost/upload/sample.jpg{% endif %}" alt="{{fiction.name}}">
+    <img src="{% if fiction.cover %}{{url_for('img_proxy', link=fiction.cover)}}{% else %} http://localhost/upload/sample.jpg{% endif %}" alt="{{fiction.name}}">
   </div>
   
   <div class="card-body">
