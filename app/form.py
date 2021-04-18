@@ -1,12 +1,15 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField,  BooleanField, SubmitField, RadioField, TextAreaField
+from wtforms import StringField, PasswordField,  BooleanField, SubmitField, RadioField, TextAreaField,DateField
 from wtforms.validators import DataRequired, ValidationError, Email, EqualTo
 from app.models import User
 
 class FictionForm(FlaskForm):
     name = StringField('Fiction Name', validators=[DataRequired()])
     cover = StringField('Cover', validators=[DataRequired()])
-    desc = StringField('Description', validators=[DataRequired()])
+    desc = StringField('Thông tin mô tả', validators=[DataRequired()])
+    status = BooleanField('Trạng thái', validators=[DataRequired()])
+    author = StringField('Tác giả', validators=[DataRequired()])
+    year = StringField('Năm xuất bản', validators=[DataRequired()])
     submit =  SubmitField('Save')
 
 

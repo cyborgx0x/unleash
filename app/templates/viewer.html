@@ -40,6 +40,7 @@
                     {% include '_formeditfiction.html'  %} 
                     </div>
                     <a href="{{url_for("edit_specific_post", fiction_id=fiction.id)}} ">Edit</a>
+                    <a href="{{url_for("delete_fiction", fiction_id=fiction.id)}}" type="button" class="btn">Delete this fiction</a>
                     {% if editable %}
                     
                     <button id="saveButton" class="btn btn-success">
@@ -110,6 +111,7 @@
             <div class="card-header">Danh sách chương </div>
             <div class="card-body">
                 
+                <a href="/editor/new-chapter/" class="dropdown-item btn" type="button">Create New Chapter</a>
                 {% for chapter in chapters %}
                 {% include '_chapter_list.html'  %}   
                     

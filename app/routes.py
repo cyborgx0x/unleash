@@ -13,6 +13,8 @@ from app import db
 from flask import Markup
 from database import view_all_post
 import json
+from werkzeug.datastructures import ImmutableMultiDict
+
 
 @app.route("/")
 def index():
@@ -36,8 +38,20 @@ def test():
 @app.route("/new-fiction/", methods=['GET', 'POST'])
 def new_fiction():
     if request.method=='POST':
-        print(request.form['example-text-input'])
-    return request.form
+        data = request.form.to_dict(flat=True)
+        name=data["fiction-name"]
+        cover=data["cover-image"]
+        status=bool(data["publish-status"])
+        desc=data["description"]
+        publish_year=data["publishted-date"]
+        author=data["author"]
+        new_fiction = Fiction(name=name, cover=cover, status=status,desc=desc, publish_year=publish_year, author_id=author)
+        db.session.add(new_fiction)
+        db.session.commit()
+        db.session.refresh(new_fiction)
+        print(new_fiction)
+        return redirect(url_for('index')) 
+    return new_data
 
 @app.route("/test/new-fiction/", methods=['GET', 'POST'])
 def test_new_fiction():
@@ -53,7 +67,7 @@ def test_new_fiction():
             ],
             "version": "2.20.1",
         }
-        new_fiction=Fiction(name=form.name.data, cover=form.cover.data, desc=str(desc))
+        new_fiction=Fiction(name=form.name.data, cover=form.cover.data, desc=str(desc), status=form.status.data, author_id=form.author.data, publish_year=form.year.data)
         db.session.add(new_fiction)
         db.session.commit()
         db.session.refresh(new_fiction)
@@ -61,11 +75,36 @@ def test_new_fiction():
         return redirect(url_for("edit_specific_post", fiction_id=new_fiction.id))
     return  render_template("new_fiction.html", form=form)
 
-@app.route("/author/<author_name>")
+@app.route("/author/<author_name>", methods=['GET', 'POST'])
 def author_page(author_name):
     author = Author.query.filter_by(name=author_name).first()
     fictions = Fiction.query.filter_by(author_id=author.id)
-    return render_template("author.html", author = author, fictions =fictions)
+    form = AuthorForm()
+    if form.validate_on_submit():
+        author.name = form.author_name.data
+        author.img=form.img.data 
+        about = { 
+            "time": 1618735370183,
+            "blocks": [
+                {
+                "type": "paragraph",
+                "data": {"text": form.about.data}
+                }
+            ],
+            "version": "2.20.1",
+        }
+        author.about=str(about)
+        db.session.commit()
+        flash("Update completed")
+        return redirect(url_for('author_page', author_name=author.name))
+    return render_template("author.html", author = author, fictions =fictions, form=form)
+
+@app.route("/author/<int:author_id>/delete")
+def delete_author(author_id):
+    fictions = Fiction.query.filter_by(author_id=author_id).delete()
+    author = Author.query.filter_by(id=author_id).delete()
+    db.session.commit()
+    return redirect(url_for('all_authors'))
 
 @app.route("/authors/")
 def all_authors():
@@ -88,6 +127,7 @@ def specific_post(fiction_id):
     chapters = Chapter.query.filter_by(fiction=fiction_id).limit(10)
     quote = Quote.query.filter_by(fiction=fiction_id)
     form = FictionForm()
+    
     if form.validate_on_submit():
         fiction.name=form.name.data
         fiction.cover=form.cover.data
@@ -101,10 +141,14 @@ def specific_post(fiction_id):
             ],
             "version": "2.20.1",
         }
-        fiction.desc=str(desc)
+        fiction.desc=form.desc.data
+        fiction.author_id=form.author.data
+        fiction.status=bool(form.status.data)
+        fiction.publish_year=form.year.data
         db.session.commit()
         flash("Data is saved")
         return redirect(url_for("specific_post", fiction_id=fiction.id))
+    print(form.errors)
     return  render_template("viewer.html",form=form, fiction = fiction, chapters = chapters, quote = quote, author =author, chapter=chapter, dsc=dsc)
 
 
@@ -117,13 +161,21 @@ def edit_specific_post(fiction_id):
     chapters = Chapter.query.filter_by(fiction=fiction_id).limit(10)
     quote = Quote.query.filter_by(fiction=fiction_id)
     if request.method == 'POST':
-        incoming_data= json.loads(request.data.decode('UTF=8'))
+        incoming_data= json.loads(request.data.decode('UTF-8'))
         fiction.name = str(incoming_data['title'])
         fiction.desc = str(incoming_data['desc'])
         print(fiction.name, fiction.desc )
         db.session.commit()
         flash("Data saved")
     return  render_template("viewer_clone.html", fiction = fiction, chapters = chapters, quote = quote, author =author, chapter=chapter, editable=editable)
+
+
+@app.route("/fiction/<int:fiction_id>/delete", methods=['GET', 'POST'])
+def delete_fiction(fiction_id):
+    chapters = Chapter.query.filter_by(fiction=fiction_id).delete()
+    fiction = Fiction.query.filter_by(id=fiction_id).delete()
+    db.session.commit()
+    return  redirect(url_for("fictions"))
 
 
 @app.route("/fiction/<fiction_name>/")
