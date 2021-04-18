@@ -33,9 +33,14 @@ def test():
     print (form.errors)   
     return  render_template("test.html", form=form)
 
+@app.route("/new-fiction/", methods=['GET', 'POST'])
+def new_fiction():
+    if request.method=='POST':
+        print(request.form['example-text-input'])
+    return request.form
 
 @app.route("/test/new-fiction/", methods=['GET', 'POST'])
-def new_fiction():
+def test_new_fiction():
     form = FictionForm()
     if form.validate_on_submit():
         desc = { 
