@@ -78,7 +78,7 @@ def fictions():
     fictions = Fiction.query.all()
     return  render_template("fictions.html", fictions = fictions)
 
-@app.route("/fiction/<int:fiction_id>/")
+@app.route("/fiction/<int:fiction_id>/", methods=['GET', 'POST'])
 def specific_post(fiction_id):
     fiction = Fiction.query.filter_by(id=fiction_id).first()
     author = Author.query.filter_by(id=fiction.author_id).first()
@@ -87,7 +87,25 @@ def specific_post(fiction_id):
     dsc = fiction.desc
     chapters = Chapter.query.filter_by(fiction=fiction_id).limit(10)
     quote = Quote.query.filter_by(fiction=fiction_id)
-    return  render_template("viewer.html", fiction = fiction, chapters = chapters, quote = quote, author =author, chapter=chapter, dsc=dsc)
+    form = FictionForm()
+    if form.validate_on_submit():
+        fiction.name=form.name.data
+        fiction.cover=form.cover.data
+        desc = { 
+            "time": 1618735370183,
+            "blocks": [
+                {
+                "type": "paragraph",
+                "data": {"text": form.desc.data}
+                }
+            ],
+            "version": "2.20.1",
+        }
+        fiction.desc=str(desc)
+        db.session.commit()
+        flash("Data is saved")
+        return redirect(url_for("specific_post", fiction_id=fiction.id))
+    return  render_template("viewer.html",form=form, fiction = fiction, chapters = chapters, quote = quote, author =author, chapter=chapter, dsc=dsc)
 
 
 @app.route("/fiction/<int:fiction_id>/edit", methods=['GET', 'POST'])

@@ -19,7 +19,14 @@
   <!-- <script src="https://unpkg.com/@tabler/core@1.0.0-beta/dist/js/tabler.min.js"></script> -->
   <link rel="stylesheet" href="https://unpkg.com/@tabler/core@1.0.0-beta/dist/css/tabler.min.css">
   <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
-
+  <style>
+    .card:hover {
+      box-shadow: 0 0 11px rgba(54, 28, 28, 0.2); 
+    }
+    .crop {
+      object-fit: cover;
+    }
+    </style>
 </head>
 
 <body>
