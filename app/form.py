@@ -3,6 +3,14 @@ from wtforms import StringField, PasswordField,  BooleanField, SubmitField, Radi
 from wtforms.validators import DataRequired, ValidationError, Email, EqualTo
 from app.models import User
 
+class FictionForm(FlaskForm):
+    name = StringField('Fiction Name', validators=[DataRequired()])
+    cover = StringField('Cover', validators=[DataRequired()])
+    desc = StringField('Description', validators=[DataRequired()])
+    submit =  SubmitField('Save')
+
+
+
 class AuthorForm(FlaskForm):
     author_name = StringField('Author Name', validators=[DataRequired()])
     img = StringField('img link', validators=[DataRequired()])
