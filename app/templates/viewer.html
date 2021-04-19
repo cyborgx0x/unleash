@@ -111,7 +111,7 @@
             <div class="card-header">Danh sách chương </div>
             <div class="card-body">
                 
-                <a href="/editor/new-chapter/" class="dropdown-item btn" type="button">Create New Chapter</a>
+                <a href="{{url_for('new_chapter', fiction_id=fiction.id)}}" class="dropdown-item btn" type="button">Create New Chapter</a>
                 {% for chapter in chapters %}
                 {% include '_chapter_list.html'  %}   
                     

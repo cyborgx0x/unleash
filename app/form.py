@@ -12,7 +12,11 @@ class FictionForm(FlaskForm):
     year = StringField('Năm xuất bản', validators=[DataRequired()])
     submit =  SubmitField('Save')
 
-
+class ChapterForm(FlaskForm):
+    name = StringField('Chapter Name', validators=[DataRequired()])
+    content = TextAreaField('Content', validators=[DataRequired()])
+    chapter_order = StringField('Order', validators=[DataRequired()])
+    submit =  SubmitField('Save')
 
 class AuthorForm(FlaskForm):
     author_name = StringField('Author Name', validators=[DataRequired()])
