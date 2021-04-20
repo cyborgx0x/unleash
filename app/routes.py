@@ -1,7 +1,7 @@
 from flask import Flask, jsonify
 from flask import render_template
 from flask import request, redirect
-from app.models import Fiction, Chapter, Quote, Author, FictionIndex, Like
+from app.models import Fiction, Chapter, Quote, Author, FictionIndex, Like, Media
 from app import app
 from app.form import LoginForm, RegistrationForm, Quiz_answer, AuthorForm, FictionForm, ChapterForm
 from flask import flash, url_for, send_file
@@ -216,7 +216,7 @@ def specific_post(fiction_id):
     chapters = Chapter.query.filter_by(fiction=fiction_id).order_by(Chapter.chapter_order.asc())
     quote = Quote.query.filter_by(fiction=fiction_id)
     form = FictionForm()
-    
+    youtube_video = Media.query.filter_by(fiction_id=fiction.id, media_type="youtube").first()
     if form.validate_on_submit():
         fiction.name=form.name.data
         fiction.cover=form.cover.data
@@ -238,7 +238,7 @@ def specific_post(fiction_id):
         flash("Data is saved")
         return redirect(url_for("specific_post", fiction_id=fiction.id))
     print(form.errors)
-    return  render_template("viewer.html",like=like, form=form, fiction = fiction, chapters = chapters, quote = quote, author =author, chapter=chapter, dsc=dsc)
+    return  render_template("viewer.html",like=like, youtube_video = youtube_video, form=form, fiction = fiction, chapters = chapters, quote = quote, author =author, chapter=chapter, dsc=dsc)
 
 
 @app.route("/fiction/<int:fiction_id>/edit", methods=['GET', 'POST'])

@@ -36,6 +36,7 @@ class Fiction(db.Model):
     chapter = db.relationship('Chapter')
     tag = db.Column(db.Unicode(300))
     like = db.relationship('Like', backref ='fiction')
+    media = db.relationship('Media', backref='fiction')
 
     def set_count(self, chapter_count):
         self.chapter_count = chapter_count
@@ -93,7 +94,8 @@ class Author(db.Model):
     author_page = db.Column(db.String(160))
     about = db.Column(db.Text)
     view = db.Column(db.Integer)
-    fiction = db.relationship('Fiction', backref ='fiction')
+    fiction = db.relationship('Fiction', backref ='author')
+    media = db.relationship('Media', backref ='author')
     email = db.Column('email', db.String(120))
     img = db.Column(db.String(240))
     fiction_count = db.Column(db.Integer)
@@ -113,6 +115,16 @@ class Quote(db.Model):
     author_id = db.Column(db.Integer, db.ForeignKey('author.id'))
     img = db.Column(db.Text)
 
+class Media(db.Model):
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    title = db.Column(db.Unicode(300))
+    content = db.Column(db.Text)
+    media_type = db.Column(db.Unicode(300))
+    fiction_id = db.Column(db.Integer, db.ForeignKey('fiction.id'))
+    author_id = db.Column(db.Integer, db.ForeignKey('author.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+
+
 class Like(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
     fiction_id = db.Column(db.Integer, db.ForeignKey('fiction.id'), primary_key=True)
@@ -126,6 +138,7 @@ class User(UserMixin, db.Model):
     email = db.Column('email', db.String(120))
     password_hash = db.Column(db.String(128))
     like = db.relationship('Like', backref ='user')
+    media = db.relationship('Media', backref ='user')
     # post = db.relationship('Post', backref ='author', lazy='dynamic')
     about_me = db.Column(db.String(140))
     last_seen = db.Column (db.DateTime, default = datetime.utcnow)
