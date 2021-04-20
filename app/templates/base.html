@@ -189,8 +189,10 @@
           function createParent(main) {
             let finalcard = document.createElement('div')
             finalcard.className="col-3"
+            
             let parents = document.createElement('div')
             parents.className = "card"
+
             document.getElementById(main).appendChild(finalcard)
             finalcard.appendChild(parents)
             return parents
@@ -199,9 +201,11 @@
           searchbar = document.getElementById('searchbar')
           var keyword;
           searchbar.addEventListener('input', function(e) {
-              keyword=e.target.value
-              document.getElementById('searchresult').innerHTML=''
-              var search = idx.search(keyword)
+              let keyword=e.target.value
+              if (keyword == '') {document.getElementById('searchresult').innerHTML=''}
+              else {
+                document.getElementById('searchresult').innerHTML=''
+                var search = idx.search(keyword)
               search.forEach(function(searchresult) {
               console.log(searchresult)
               
@@ -218,6 +222,8 @@
               createCardBody(href,text, parents)
               
               })
+              }
+              
           })
           
       })
