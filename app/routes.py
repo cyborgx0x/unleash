@@ -1,20 +1,19 @@
-from flask import Flask, jsonify
-from flask import render_template
-from flask import request, redirect
-from app.models import Fiction, Chapter, Quote, Author, FictionIndex, Like, Media
-from app import app
-from app.form import LoginForm, RegistrationForm, Quiz_answer, AuthorForm, FictionForm, ChapterForm
-from flask import flash, url_for, send_file
-from flask_login import current_user, login_user
-from app.models import User
-from flask_login import logout_user, login_required
-from werkzeug.urls import url_parse
-from app import db
-from flask import Markup
-from database import view_all_post
 import json
-from werkzeug.datastructures import ImmutableMultiDict
+
+from database import view_all_post
+from flask import (Flask, Markup, flash, jsonify, redirect, render_template,
+                   request, send_file, url_for)
+from flask_login import current_user, login_required, login_user, logout_user
 from img_crop import return_img
+from werkzeug.datastructures import ImmutableMultiDict
+from werkzeug.urls import url_parse
+
+from app import app, db
+from app.form import (AuthorForm, ChapterForm, FictionForm, LoginForm,
+                      Quiz_answer, RegistrationForm)
+from app.models import (Author, Chapter, Fiction, FictionIndex, Like, Media,
+                        Quote, User)
+
 
 @app.route("/")
 def index():
@@ -432,6 +431,7 @@ def user(username):
         like = anonymous
     else: 
         like = Like.query.filter_by(user_id=current_user.id)
-    return render_template('user.html', user=user, fictions=fictions, like=like)
+    medias = Media.query.filter_by(user_id=user.id)
+    return render_template('user.html', user=user, fictions=fictions, like=like, medias=medias)
 
 

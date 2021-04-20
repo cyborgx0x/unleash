@@ -123,7 +123,9 @@ class Media(db.Model):
     fiction_id = db.Column(db.Integer, db.ForeignKey('fiction.id'))
     author_id = db.Column(db.Integer, db.ForeignKey('author.id'))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-
+    
+    def youtube(self):
+        return "media type {}".format(self.media_type)
 
 class Like(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)

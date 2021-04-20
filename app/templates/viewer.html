@@ -85,18 +85,12 @@
                     {% if youtube_video %}
                     <div class="card-text">
                         <h5>{{youtube_video.title}}</h5>
-                        <video
-                            id="vid1"
-                            class="video-js vjs-default-skin"
-                            controls
-                            autoplay
-                            width="480" height="264"
-                            data-setup='{ "techOrder": ["youtube"], "sources": [{ "type": "video/youtube", "src": "{{ youtube_video.content }}"}] }'
-                        >
-                        </video>
+                        {% with %}
+                            {% set url = youtube_video.content %}
+                            {% include '_youtubeplayer.html'%}
+                        {% endwith %}
                     </div>
-                    <script src="https://vjs.zencdn.net/7.11.4/video.min.js"></script>
-                    <script src="{{url_for('static', filename='Youtube.min.js')}}"></script>
+                    
                     {% else %}
                     {% endif %}
                     <div class="card-text" id="detailInfomation"></div>
