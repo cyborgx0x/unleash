@@ -150,7 +150,7 @@
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script>
 
-  var indexfile =  getindexing('http://127.0.0.1:5000/build_indexing/')
+  var indexfile =  getindexing('{{url_for("build_indexing")}}')
   async function getindexing(url) {
       return (
           axios.get(url).then(function(response) {
@@ -161,7 +161,7 @@
           this.ref('id')
           this.field('desc')
           this.field('name')
-          this.field('cover')
+          this.field('tag')
           
           data.forEach(function (doc) {
               this.add(doc)

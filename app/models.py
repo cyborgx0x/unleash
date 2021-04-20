@@ -15,6 +15,7 @@ class Fiction(db.Model):
     name: str
     desc: str
     cover: str
+    tag: str
 
     __tablename__ = "fiction"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -33,6 +34,7 @@ class Fiction(db.Model):
     chapter_count = db.Column(db.Integer)
     quote_count = db.Column(db.Integer)
     chapter = db.relationship('Chapter')
+    tag = db.Column(db.Unicode(300))
 
     def set_count(self, chapter_count):
         self.chapter_count = chapter_count

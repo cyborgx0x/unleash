@@ -192,8 +192,15 @@ def delete_fiction(fiction_id):
     chapters = Chapter.query.filter_by(fiction=fiction_id).delete()
     fiction = Fiction.query.filter_by(id=fiction_id).delete()
     db.session.commit()
-    return  redirect(url_for("fictions"))
+    return  redirect(url_for("specific_post", fiction_id=fiction.id))
 
+@app.route("/chapter/<int:chapter_id>/delete", methods=['GET', 'POST'])
+def delete_chapter(chapter_id):
+    chapter = Chapter.query.filter_by(id=chapter_id).first()
+    fiction = Fiction.query.filter_by(id=chapter.fiction).first()
+    chapter = Chapter.query.filter_by(id=chapter_id).delete()
+    db.session.commit()
+    return  redirect(url_for("specific_post", fiction_id=fiction.id))
 
 @app.route("/fiction/<fiction_name>/")
 def specific_fiction_name(fiction_name):
