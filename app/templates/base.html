@@ -147,10 +147,14 @@
 </div>
 <div id="searchresult"class="row row-card"></div>
 <script src="https://unpkg.com/lunr/lunr.js"></script>
+<script src="{{url_for('static', filename='lunr.stemmer.support.js')}}"></script>
+<script src="{{url_for('static', filename='lunr.vi.js')}}"></script> 
+
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script>
 
   var indexfile =  getindexing('{{url_for("build_indexing")}}')
+
   async function getindexing(url) {
       return (
           axios.get(url).then(function(response) {
@@ -158,6 +162,7 @@
       })).then(function(data){
          console.log(data)
           var idx = lunr( function () {
+          this.use(lunr.vi)
           this.ref('id')
           this.field('desc')
           this.field('name')
