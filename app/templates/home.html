@@ -2,7 +2,18 @@
 {% block title %}Khám Phá{% endblock %}
 {% block content %}
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<div class="container-fluid" style="display:grid;place-items: center;height: 300px; background-image: url(https://i.pinimg.com/originals/09/24/4c/09244c7f7dd4d17b0484370f32db6641.gif);  background-position: center;">
+  {% if user.id ==0 %}
 
+    <h3 class="navbar-dark ">Chúc bạn một ngày tốt lành</h3>
+
+
+  {% else%}
+
+    <h3 class="navbar-dark ">Welcome back {{user.user_name}}</h3>
+
+  {% endif %}
+</div>
 <div class="row row-deck">
   <div class="col-md-8">
     <div class="card" style="height: calc(24rem + 10px)">

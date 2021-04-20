@@ -20,6 +20,8 @@ from img_crop import return_img
 def index():
     top_view_fictions = Fiction.query.order_by(Fiction.view.desc()).limit(12).all()
     top_authors = Author.query.order_by(Author.fiction_count.desc()).limit(12).all()
+    
+    
     if current_user.is_anonymous:
         anonymous = [
             {
@@ -31,9 +33,13 @@ def index():
                 "fiction_id":0
             }]
         like = anonymous
+        user = {
+            "id": 0
+        }
     else: 
         like = Like.query.filter_by(user_id=current_user.id)
-    return  render_template("home.html", top_view_fictions = top_view_fictions, top_authors=top_authors, like=like)
+        user = User.query.filter_by(id=current_user.id).first_or_404()
+    return  render_template("home.html", top_view_fictions = top_view_fictions, top_authors=top_authors, like=like, user=user)
 
 @app.route("/test/search/", methods=['GET', 'POST'])
 def test_search():
