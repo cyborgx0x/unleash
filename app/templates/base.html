@@ -26,6 +26,11 @@
       --reaction: #ff0000;
       --white: #ffffff;
     }
+    .blog-title{
+      margin: 0;
+      padding-top: 1rem;
+      padding-left: 1rem;
+    }
     .card:hover {
       box-shadow: 0 0 11px rgba(41, 27, 27, 0.2); 
     }
@@ -97,6 +102,7 @@
                             New Fic
                     </button>
                           
+                    
                   </li>
                 <li class="nav-item">
                   <a class="nav-link" href="{{ url_for('fictions') }}">
@@ -112,7 +118,20 @@
                     </span>
                   </a>
                 </li>
-
+                <li class="nav-item">
+                  <a class="nav-link" href="{{ url_for('view_all_media') }}">
+                    <span class="nav-link-title">
+                      Media
+                    </span>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="{{ url_for('guide') }}">
+                    <span class="nav-link-title">
+                      Hướng dẫn sử dụng
+                    </span>
+                  </a>
+                </li>
               </ul>
 
             </div>

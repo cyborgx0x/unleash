@@ -1,11 +1,14 @@
-from app import db
-from datetime import datetime
-from sqlalchemy import MetaData, Text
-from werkzeug.security import generate_password_hash, check_password_hash
-from flask_login import UserMixin
-from app import login
-from hashlib import md5
 from dataclasses import dataclass
+from datetime import datetime
+from hashlib import md5
+
+import json
+from flask_login import UserMixin
+from sqlalchemy import MetaData, Text
+from werkzeug.security import check_password_hash, generate_password_hash
+
+from app import db, login
+
 meta = MetaData()
 
 @dataclass
@@ -38,6 +41,9 @@ class Fiction(db.Model):
     like = db.relationship('Like', backref ='fiction')
     media = db.relationship('Media', backref='fiction')
 
+    def cutText(self):
+        text = json.loads(self.desc)
+        return text
     def set_count(self, chapter_count):
         self.chapter_count = chapter_count
         print("update completed")    
@@ -99,6 +105,8 @@ class Author(db.Model):
     email = db.Column('email', db.String(120))
     img = db.Column(db.String(240))
     fiction_count = db.Column(db.Integer)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+
     def set_count(self, fiction_number):
         self.fiction_count = fiction_number
         print("update completed")
@@ -115,6 +123,24 @@ class Quote(db.Model):
     author_id = db.Column(db.Integer, db.ForeignKey('author.id'))
     img = db.Column(db.Text)
 
+
+class Post(db.Model):
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    title = db.Column(db.Unicode(300))
+    content = db.Column(db.Text)
+    post_type = db.Column(db.Unicode(300))
+    template = db.Column(db.Unicode(200))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    def cutText(self):
+        text = json.loads(self.content)
+        return text
+    def getFiction(self, id):
+        fic = Fiction.query.filter_by(id=id).first()
+        return fic
+    def getMedia(self, id):
+        getdata = Media.query.filter_by(id=id).first()
+        return getdata
+
 class Media(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     title = db.Column(db.Unicode(300))
@@ -123,9 +149,22 @@ class Media(db.Model):
     fiction_id = db.Column(db.Integer, db.ForeignKey('fiction.id'))
     author_id = db.Column(db.Integer, db.ForeignKey('author.id'))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    
-    def youtube(self):
-        return "media type {}".format(self.media_type)
+    def cutText(self):
+        text = json.loads(self.content)
+        return text
+    def getUser(self, id):
+        user = User.query.filter_by(id=id).first()
+        return user
+    def getAuthor(self, id):
+        author = Author.query.filter_by(id=id).first()
+        return author
+
+    def getFiction(self, id):
+        fic = Fiction.query.filter_by(id=id).first()
+        return fic
+    def getMedia(self, id):
+        getdata = Media.query.filter_by(id=id).first()
+        return getdata
 
 class Like(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
@@ -140,7 +179,9 @@ class User(UserMixin, db.Model):
     email = db.Column('email', db.String(120))
     password_hash = db.Column(db.String(128))
     like = db.relationship('Like', backref ='user')
+    post = db.relationship('Post', backref ='user')
     media = db.relationship('Media', backref ='user')
+    author = db.relationship('Author', backref ='user')
     # post = db.relationship('Post', backref ='author', lazy='dynamic')
     about_me = db.Column(db.String(140))
     last_seen = db.Column (db.DateTime, default = datetime.utcnow)

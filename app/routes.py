@@ -12,7 +12,7 @@ from app import app, db
 from app.form import (AuthorForm, ChapterForm, FictionForm, LoginForm,
                       Quiz_answer, RegistrationForm)
 from app.models import (Author, Chapter, Fiction, FictionIndex, Like, Media,
-                        Quote, User)
+                        Quote, User, Post)
 
 
 @app.route("/")
@@ -39,6 +39,27 @@ def index():
         like = Like.query.filter_by(user_id=current_user.id)
         user = User.query.filter_by(id=current_user.id).first_or_404()
     return  render_template("home.html", top_view_fictions = top_view_fictions, top_authors=top_authors, like=like, user=user)
+
+@app.route('/u/<user_name>/<int:post_id>')
+def view_post(user_name, post_id):
+    post = Post.query.filter_by(id=post_id).first()
+    owner = User.query.filter_by(user_name=user_name).first()
+    owningauthors = Author.query.filter_by(user_id=owner.id).first()
+    return render_template('post.html', post=post, owner = owner, owning = owningauthors, user=owner)
+
+
+@app.route('/guide/')
+def guide():
+    post = Post.query.filter_by(id=2).first()
+    owner = User.query.filter_by(user_name='noname2').first()
+    owningauthors = Author.query.filter_by(user_id=4).first()
+    return render_template('post.html', post=post, owner = owner, owning = owningauthors, user=owner)
+
+@app.route('/media/')
+def view_all_media():
+    medias = Media.query.all()
+    return render_template('media.html', medias = medias)
+
 
 @app.route("/test/search/", methods=['GET', 'POST'])
 def test_search():
@@ -412,7 +433,7 @@ def register():
         return redirect(url_for('login'))
     return render_template('reg.html', title='Register', form=form)
 
-@app.route('/user/<username>')
+@app.route('/u/<username>')
 @login_required
 def user(username):
     user = User.query.filter_by(user_name=username).first_or_404()
@@ -432,6 +453,9 @@ def user(username):
     else: 
         like = Like.query.filter_by(user_id=current_user.id)
     medias = Media.query.filter_by(user_id=user.id)
-    return render_template('user.html', user=user, fictions=fictions, like=like, medias=medias)
+    posts=Post.query.filter_by(user_id=user.id)
+    owningauthors = Author.query.filter_by(user_id=user.id).first()
+   
+    return render_template('user.html', user=user, fictions=fictions, like=like, medias=medias, posts=posts, owning = owningauthors)
 
 

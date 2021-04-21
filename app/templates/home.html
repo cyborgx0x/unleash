@@ -10,7 +10,7 @@
 
   {% else%}
 
-    <h3 class="navbar-dark ">Welcome back {{user.user_name}}</h3>
+    <h3 class="navbar-dark ">Welcome back <a href="{{url_for('user', username=current_user.user_name)}}">{{user.user_name}}</a></h3>
 
   {% endif %}
 </div>
