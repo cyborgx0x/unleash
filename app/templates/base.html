@@ -6,7 +6,7 @@
   <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous"> -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous">
   <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
     integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous">
   </script>
@@ -37,6 +37,11 @@
     }
     .crop {
       object-fit: cover;
+      width: 100%;
+      height: auto;
+      display: grid;
+      color: var(--white);
+      background-color:tomato;
     }
     .navbar-nav  {
       flex-direction: inherit;
@@ -44,7 +49,24 @@
     .nav-item {
       padding: 3px;
     }
+
+    .blend-over{
+      position: absolute;
+      padding: 5px;
+      font-weight: bolder;
+      background: #0e2e5647;
+
+    }
+
+    @media screen and (max-width: 500px) {
+      .dropdown-menu {
+        position: static;
+        transform: translateX(-100px);
+      }
+  }
     </style>
+
+
     {% endblock %} 
 </head>
 

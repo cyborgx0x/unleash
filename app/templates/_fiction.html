@@ -1,12 +1,16 @@
 <div class="card" style="margin:5px" >
   <div class="crop">
-  
     <img src="{% if fiction.cover %}{{url_for('img_proxy', link=fiction.cover)}}{% else %} http://localhost/upload/sample.jpg{% endif %}" alt="{{fiction.name}}" style="width:100%; height:auto">
+    <div class="blend-over">
+      <h2><a href="/fiction/{{fiction.id}}">{{fiction.name}}</a></h2>
+      <p>{{fiction.view}} lượt đọc</p>
+
+    </div>
+    
   </div>
   
   <div class="card-body">
-    <h5 class="card-title"><a href="/fiction/{{fiction.id}}">{{fiction.name}}</a></h5>
-    <p>{{fiction.view}} lượt đọc</p>
+    
   </div>
   <div class="d-flex" id="fulldiv">
 
