@@ -42,6 +42,10 @@
       display: grid;
       color: var(--white);
       background-color:tomato;
+      transition: transform 500ms ease;
+    }
+    .crop:hover {
+      transform: scale(1.2);
     }
     .navbar-nav  {
       flex-direction: inherit;
@@ -55,7 +59,25 @@
       padding: 5px;
       font-weight: bolder;
       background: #0e2e5647;
+      width: 100%;
+      transition: transform 500ms ease;
+      transform: scale(0);
+    }
 
+    .crop:hover .blend-over {
+      transform: scale(1);
+    }
+    .blend-over > h2 > a:hover{
+      text-decoration: none !important;
+      color: white
+    }
+    .blend-over:hover{
+      display: grid;
+      position: absolute;
+      padding: 5px;
+      font-weight: bolder;
+      background: #0e2e5647;
+      color: white;
     }
 
     @media screen and (max-width: 500px) {
