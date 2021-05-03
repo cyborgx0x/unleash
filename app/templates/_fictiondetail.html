@@ -5,10 +5,13 @@
     </div>
     <div class="col-xl-8 col-sm-8">
         <h3 class="card-title"><a href="/fiction/{{fiction.id}}">{{fiction.name}}</a></h3>
-        <p>{{fiction.desc}}</p>
+        {% set chapters = author.getChapter(fiction.id) %}
+        {% for chapter in chapters %}
+        {% include "_chapter_list.html" %}
+        {% endfor %}
     </div>
 </div>
-      
+
 
     
   

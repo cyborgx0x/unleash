@@ -1,49 +1,91 @@
 {% extends "base.html" %}
 {% block title %}{{ author.name}}: All fictions{% endblock %}
+{% block style %} 
+{{super()}}
+<style>
+    .fiction-zone{
+        padding-left: 20px;
+    }
+</style>
+{% endblock %}
 {% block content%}
 
 <div class="row justify-content-start">
     <div class="col-md-4">
-        {% include '_author.html'  %}
-        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#Editable">
-            Edit this author
-        </button>
+        
+        
+        <div class="card" style="margin:5px">
+            
+            <div class="card-img-top img-responsive img-responsive-16by9" style="background-image: url({% if author.img %}{{ author.img}}{% else %} http://localhost/upload/sample.jpg{% endif %})"></div>
+            <a type="button" class="btn dropdown-toggle" data-bs-toggle="dropdown">
+                ⚙ Tùy chọn
+            </a>
+            <div class="dropdown-menu dropdown-menu-demo dropdown-menu-arrow bg-dark text-white">
+                <a class="dropdown-item" href="#" data-toggle="modal" data-target="#Editable">
+                    Edit this author 🍓🍓🍓
+                </a>
+                <a href="/author/{{author.id}}/delete" type="button" class="dropdown-item">Delete this author</a> 
+                <a href="#" type="button" class="dropdown-item">Thêm Media 📷</a> 
+                <a href="#" class="dropdown-item" type="button">
+                    Xác nhận sở hữu ✔
+                </a>
+            </div>
+            <div class="card-body">
+                <a href="/author/{{ author.name}}"><h3 class="card-title">{{ author.name}}</h3>
+                </a>
+                <p>Số tác phẩm được cập nhật: {{ author.fiction_count}}</p>
+                <p>Năm sinh: {{ author.birth_year}}</p>
+                <a href={{ author.author_page}}> Author website</a>
+            </div>
+            <div class="d-flex">
+                <a href="#" type="button" class="card-btn">💎💎💎 Theo dõi </a>
+                <a href="#" type="button" class="card-btn">✉ nhắn tin </a>
+            </div>
+        </div>
+        
         <div class="modal fade" id="Editable" tabindex="-1" role="dialog"
         aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
         {% include '_formeditauthor.html'  %} 
         </div>
-        <a href="/author/{{author.id}}/delete" type="button" class="btn">Delete this author</a> 
+        
     </div>
     
-    <div class="col-md-8 card">
-        <div class="card-body" id="authorInformation">  </div>
-                    <script>
-                        let desc={{ author.about | safe}}
-                        let par = document.getElementById('authorInformation')
-                        for (i in desc.blocks) {
-                            let para = document.createElement('p')
-                            para.innerHTML=desc.blocks[i].data.text
-                            par.appendChild(para)
-                        }
-                    </script>
-<div class="row row-deck">
+    <div class="col-md-8">
 
-    {% for fiction in fictions %}
-
-    <div class="col-6 col-md-4">
-        {% include '_fiction.html'  %}   
+        <div class="card">
+            <div class="card-header">Tác giả: {{author.name}}</div>
+            <div class="card-body" id="authorInformation">
+                📄 Tiểu sử tác giả: 
+                {{author.about}}
+            </div>
+            <hr>
+            <div class="fiction-zone">
+                
+                <h2 style="align-items: center;">
+                    Tác phẩm theo thời gian
+                </h2>
+                {% for fiction in fictions %}
+            
+                <h3>Năm xuất bản: {{fiction.publish_year}}</h3>
+                <div class="row">
+                    <div class="col-xl-4 col-sm-4">
+                        <img src={{url_for("img_proxy", link=fiction.cover )}} alt={{fiction.name}}>
+                    </div>
+                    <div class="col-xl-8 col-sm-8">
+                        <h3 class="card-title"><a href="/fiction/{{fiction.id}}">{{fiction.name}}</a></h3>
+                        {% set chapters = author.getChapter(fiction.id) %}
+                        {% for chapter in chapters %}
+                            {% include "_chapter_list.html" %}
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endfor %}
+            </div>
+        </div>
     </div>
-
-    {% endfor %}
 </div>
 
 
-    </div>
-</div>
-
-<div class="row row-deck">
-
-</div>
 
 
 

@@ -167,17 +167,7 @@ def author_page(author_name):
     if form.validate_on_submit():
         author.name = form.author_name.data
         author.img=form.img.data 
-        about = { 
-            "time": 1618735370183,
-            "blocks": [
-                {
-                "type": "paragraph",
-                "data": {"text": form.about.data}
-                }
-            ],
-            "version": "2.20.1",
-        }
-        author.about=str(about)
+        author.about=form.about.data
         db.session.commit()
         flash("Update completed")
         return redirect(url_for('author_page', author_name=author.name))

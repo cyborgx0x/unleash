@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from datetime import datetime
 from hashlib import md5
-
+import ast
 import json
 from flask_login import UserMixin
 from sqlalchemy import MetaData, Text
@@ -107,6 +107,9 @@ class Author(db.Model):
     fiction_count = db.Column(db.Integer)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
+    def cutText(self):
+        text = ast.literal_eval(self.about)
+        return text
     def set_count(self, fiction_number):
         self.fiction_count = fiction_number
         print("update completed")
@@ -115,6 +118,9 @@ class Author(db.Model):
         self.fiction_count = fiction_number
         print (self.name, fiction_number)
         db.session.commit()
+    def getChapter(self, fiction_id):
+        chapters = Chapter.query.filter_by(fiction=fiction_id)
+        return chapters
 
 class Quote(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
