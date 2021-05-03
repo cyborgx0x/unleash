@@ -30,7 +30,6 @@ WTForms
 flask-login
 email-validator
 python-dotenv
-mysqlclient
 flask_cors
 numpy
 pillow

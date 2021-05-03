@@ -1,7 +1,7 @@
 <div class="card" style="margin:5px" >
   <div class="crop">
   
-    <img src="{% if fiction.cover %}{{url_for('img_proxy', link=fiction.cover)}}{% else %} http://localhost/upload/sample.jpg{% endif %}" alt="{{fiction.name}}">
+    <img src="{% if fiction.cover %}{{url_for('img_proxy', link=fiction.cover)}}{% else %} http://localhost/upload/sample.jpg{% endif %}" alt="{{fiction.name}}" style="width:100%; height:auto">
   </div>
   
   <div class="card-body">

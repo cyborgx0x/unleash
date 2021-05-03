@@ -19,7 +19,7 @@ def resizecrop(src, width, height):
 
 def return_img(link):
     response = getimage(link)
-    img = resizecrop(response, 300, 480)
+    img = resizecrop(response, 450, 720)
     return img
 
 if __name__ =="__main__":

@@ -1,51 +1,59 @@
 {% extends "base.html" %}
 {% block title %}{{ fiction.name }} by {{ author.name }}{% endblock %}
+{% block nav %} 
+    
+    <li>
+
+    </li>
+
+    {{ super() }}
+
+{% endblock %}
 {% block content%}
 
 <div class="row">
     <div class="col-lg-8 ">
         <div class="row">
-        <div class="col-4 col-md-4">
-            {% include "_fiction.html"  %}
-
-            <a href="/author/{{ author.name }}" class="btn">
-                <span class="avatar" style="background-image: url({{ author.img }})"></span>
-                {{ author.name }}
-              </a>
-
-        </div>
-        <div class="col-8 col-md-8">
-            <div class="card-body">
-                <div class="alert alert-success" role="alert">
-                    <h4 class="alert-heading">{% if fiction.status %} Full {% else %} On Going {% endif %}</h4>
-                    <p>Tác phẩm xuất bản vào năm {{ fiction.publish_year}}</p>
-                    <hr>
-                    <p class="card-text">
-                        Tổng số lượt đọc cộng dồn theo chương: <b>{{fiction.view}}</b>
-                     </p>
-                    <p class="mb-0">Số chương <b>{{ fiction.chapter_count }}</b></p>
+        <div class="col-md-4">
+            <div  style="margin:5px">
+                <a href="/author/{{ author.name }}" class="btn">
+                    <span class="avatar" style="background-image: url({{ author.img }})"></span>
+                    {{ author.name }}
+                </a>
+                <a type="button" class="btn dropdown-toggle" data-bs-toggle="dropdown">
+                    Tùy chọn 
+                </a>
+                <div class="dropdown-menu dropdown-menu-demo dropdown-menu-arrow bg-dark text-white">
+                    <a href="{{url_for('new_chapter', fiction_id=fiction.id)}}" class="dropdown-item btn  btn-primary" type="button">Thêm chương mới</a>
+                    <a href="{{url_for("edit_specific_post", fiction_id=fiction.id)}}" class="dropdown-item">Chỉnh sửa sách</a>
+                    <a href="{{url_for("delete_fiction", fiction_id=fiction.id)}}" class="dropdown-item">Xóa sách này</a>
+            
                 </div>
-                <!-- <button type="button" class="btn btn-success" href="{{ fiction.mediafire_link }}">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M19 18a3.5 3.5 0 0 0 0 -7h-1a5 4.5 0 0 0 -11 -2a4.6 4.4 0 0 0 -2.1 8.4" /><line x1="12" y1="13" x2="12" y2="22" /><polyline points="9 19 12 22 15 19" /></svg>
+            </div>
 
-                    Tải ebook {{ fiction.name }}
-                </button> -->
-                <hr>
+            {% include "_fiction.html"  %}
+            
+        </div>
+        <div class="col-md-8">
+            <div class="alert alert-success" role="alert">
+                <h4 class="alert-heading"> Thông tin về: {{fiction.name}} </h4>
+                <p>Trạng thái: {% if fiction.status %} Full {% else %} On Going {% endif %}</p>
+                <p>Xuất bản: {{ fiction.publish_year}}</p>
+                <p>Chương mới nhất:</p>
+                <p class="card-text">
+                    Lượt đọc: <b>{{fiction.view}}</b>
+                 </p>
+                <p class="mb-0">Số chương <b>{{ fiction.chapter_count }}</b></p>
+            </div>
+            <div style="margin-top: 30px; background: white">
+                <div class="card-header">Lời tựa của tác giả</div>
                 <div class="card-body">
-                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#Editable">
-                        Edit
-                    </button>
-                    <div class="modal fade" id="Editable" tabindex="-1" role="dialog"
-                    aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-                    {% include '_formeditfiction.html'  %} 
-                    </div>
-                    <a href="{{url_for("edit_specific_post", fiction_id=fiction.id)}} ">Edit</a>
-                    <a href="{{url_for("delete_fiction", fiction_id=fiction.id)}}" type="button" class="btn">Delete this fiction</a>
+
                     {% if editable %}
                     
                     <button id="saveButton" class="btn btn-success">
                         <!-- Download SVG icon from http://tabler-icons.io/i/send -->
-    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><line x1="10" y1="14" x2="21" y2="3" /><path d="M21 3l-6.5 18a0.55 .55 0 0 1 -1 0l-3.5 -7l-7 -3.5a0.55 .55 0 0 1 0 -1l18 -6.5" /></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><line x1="10" y1="14" x2="21" y2="3" /><path d="M21 3l-6.5 18a0.55 .55 0 0 1 -1 0l-3.5 -7l-7 -3.5a0.55 .55 0 0 1 0 -1l18 -6.5" /></svg>
                         Save
                     </button>
 
@@ -82,19 +90,7 @@
                     </script>
                     
                     {% else %}
-                    {% if youtube_video %}
-                    <div class="card-text">
-                        <h5>{{youtube_video.title}}</h5>
-                        {% with %}
-                            {% set url = youtube_video.content %}
-                            {% include '_youtubeplayer.html'%}
-                        {% endwith %}
-                    </div>
-                    
-                    {% else %}
-                    {% endif %}
                     <div class="card-text" id="detailInfomation">
-
                     </div>
 
                     <script>
@@ -109,9 +105,8 @@
                     {% endif %}
                     
                 </div>
-                
-
             </div>
+
         </div>
         </div>
         
@@ -125,7 +120,7 @@
             <div class="card-header">Danh sách chương </div>
             <div class="card-body">
                 
-                <a href="{{url_for('new_chapter', fiction_id=fiction.id)}}" class="dropdown-item btn" type="button">Create New Chapter</a>
+                
                 {% for chapter in chapters %}
                 {% include '_chapter_list.html'  %}   
                     

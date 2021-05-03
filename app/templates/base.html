@@ -20,8 +20,9 @@
   <link rel="stylesheet" href="https://unpkg.com/@tabler/core@1.0.0-beta/dist/css/tabler.min.css">
   <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
   <link href="https://vjs.zencdn.net/7.11.4/video-js.css" rel="stylesheet" />
-
+  {% block style %}
   <style>
+
     :root {
       --reaction: #ff0000;
       --white: #ffffff;
@@ -37,7 +38,14 @@
     .crop {
       object-fit: cover;
     }
+    .navbar-nav  {
+      flex-direction: inherit;
+    }
+    .nav-item {
+      padding: 3px;
+    }
     </style>
+    {% endblock %} 
 </head>
 
 
@@ -47,7 +55,7 @@
       integrity="sha384-b5kHyXgcpbZJO/tY9Ul7kGkf1S0CWuKcCD38l8YkeH8z8QjE0GmW1gYU5S9FOnJ0" crossorigin="anonymous">
     </script>
 
-    {% block nav %}{% endblock %}
+
     <header class="navbar navbar-expand-md navbar-dark navbar-overlap d-print-none">
       <div class="container-xl" >
         <div class="navbar-expand-md">
@@ -64,11 +72,36 @@
         </div>
         
         <div class="navbar-nav order-md-last">
+   
           
-         
+          <ul class="navbar-nav" >
+            {% block nav %}
+            <li class="nav-link">
+              <!-- Download SVG icon from http://tabler-icons.io/i/bell -->
+              <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M10 5a2 2 0 0 1 4 0a7 7 0 0 1 4 6v3a4 4 0 0 0 2 3h-16a4 4 0 0 0 2 -3v-3a7 7 0 0 1 4 -6" /><path d="M9 17v1a3 3 0 0 0 6 0v-1" /></svg>
+            </li>
             
-            
-         
+            <li class="nav-link">
+              <a data-bs-toggle="dropdown">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 19a9 9 0 0 1 9 0a9 9 0 0 1 9 0" /><path d="M3 6a9 9 0 0 1 9 0a9 9 0 0 1 9 0" /><line x1="3" y1="6" x2="3" y2="19" /><line x1="12" y1="6" x2="12" y2="19" /><line x1="21" y1="6" x2="21" y2="19" /></svg>
+              </a>
+              <div class="dropdown-menu dropdown-menu-demo dropdown-menu-arrow bg-dark text-white">
+                  <a href="#" class="dropdown-item btn  btn-primary" type="button">
+                  Chương đánh dấu #1
+                  </a>
+                  <a href="#" class="dropdown-item">
+                    Chương đánh dấu #2
+                  </a>
+                  <a href="#" class="dropdown-item">
+                    Chương đánh dấu #3
+                  </a>
+
+              </div>
+            </li>
+
+            {% endblock %} 
+          </ul>
+          
           <ul class='navbar-nav'>
             
               {% if current_user.is_anonymous %}
@@ -94,16 +127,7 @@
               
 
               <ul class="navbar-nav">
-                <li class="nav-link">
                 
-                  <button type="button" class="btn" data-toggle="modal" data-target="#exampleModalCenter">
-                            <!-- Download SVG icon from http://tabler-icons.io/i/circle-plus -->
-                    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><circle cx="12" cy="12" r="9" /><line x1="9" y1="12" x2="15" y2="12" /><line x1="12" y1="9" x2="12" y2="15" /></svg>
-                            New Fic
-                    </button>
-                          
-                    
-                  </li>
                 <li class="nav-item">
                   <a class="nav-link" href="{{ url_for('fictions') }}">
                     <span class="nav-link-title">
@@ -132,6 +156,7 @@
                     </span>
                   </a>
                 </li>
+                
               </ul>
 
             </div>
@@ -155,111 +180,10 @@
     <div class="content"> 
       
       <div class="container-xl">
-        
-        <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog"
-    aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-    {% include '_form.html'  %} 
-  </div>
-        
-<div class="input-icon" style="margin: 10;">
-  <span class="input-icon-addon">
-    <!-- Download SVG icon from http://tabler-icons.io/i/search -->
-    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><circle cx="10" cy="10" r="7"></circle><line x1="21" y1="21" x2="15" y2="15"></line></svg>
-  </span>
-  <input id="searchbar" type="text" placeholder="Nhập từ khóa cần tìm kiếm" aria-placeholder="Bất cứ từ khóa nào" class="form-control"/>
-  
-</div>
-<div id="searchresult"class="row row-card"></div>
-<script src="https://unpkg.com/lunr/lunr.js"></script>
-<script src="{{url_for('static', filename='lunr.stemmer.support.js')}}"></script>
-<script src="{{url_for('static', filename='lunr.vi.js')}}"></script> 
-
-<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-<script>
-
-  var indexfile =  getindexing('{{url_for("build_indexing")}}')
-
-  async function getindexing(url) {
-      return (
-          axios.get(url).then(function(response) {
-          return response.data;
-      })).then(function(data){
-         console.log(data)
-          var idx = lunr( function () {
-          this.use(lunr.vi)
-          this.ref('id')
-          this.field('desc')
-          this.field('name')
-          this.field('tag')
-          
-          data.forEach(function (doc) {
-              this.add(doc)
-          }, this)
-          })
-
-          function createCover(src, alt, parents) {
-              let cover = document.createElement('img')
-              cover.src = "/img-cover/"+src
-              cover.alt = alt
-              parents.appendChild(cover)
-          }
-          function createCardBody(href, text, parents) {
-            let displaysearch = document.createElement('div')
-            displaysearch.className="card-body"
-            let header = document.createElement('h5')
-            header.className = "card-title"
-            let link = document.createElement('a')
-            link.href =  href
-            link.textContent = text
-            header.appendChild(link)
-            displaysearch.appendChild(header)
-            parents.appendChild(displaysearch)
-          }
-          function createParent(main) {
-            let finalcard = document.createElement('div')
-            finalcard.className="col-3"
-            
-            let parents = document.createElement('div')
-            parents.className = "card"
-
-            document.getElementById(main).appendChild(finalcard)
-            finalcard.appendChild(parents)
-            return parents
-          }
-          console.log(idx)
-          searchbar = document.getElementById('searchbar')
-          var keyword;
-          searchbar.addEventListener('input', function(e) {
-              let keyword=e.target.value
-              if (keyword == '') {document.getElementById('searchresult').innerHTML=''}
-              else {
-                document.getElementById('searchresult').innerHTML=''
-                var search = idx.search(keyword)
-              search.forEach(function(searchresult) {
-              console.log(searchresult)
-              
-              var indexitem;
-              data.forEach(function(index) {
-                  if (index.id == searchresult.ref) {
-                      indexitem = index;
-                  }
-              })
-              let href="/fiction/" + searchresult.ref;
-              let text = indexitem.name
-              let parents = createParent('searchresult')
-              createCover(indexitem.cover, indexitem.name, parents)
-              createCardBody(href,text, parents)
-              
-              })
-              }
-              
-          })
-          
-      })
-  }
-  
-
-</script>
+      
+        {% block search%} 
+        {% include "_search.html" %}
+        {% endblock %}
 
         {% block content %}{% endblock %}
       </div>
