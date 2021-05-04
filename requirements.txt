@@ -34,3 +34,4 @@ flask_cors
 numpy
 pillow
 mysqlclient
+Flask-Markdown
