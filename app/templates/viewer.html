@@ -1,14 +1,5 @@
 {% extends "base.html" %}
 {% block title %}{{ fiction.name }} by {{ author.name }}{% endblock %}
-{% block nav %} 
-    
-    <li>
-
-    </li>
-
-    {{ super() }}
-
-{% endblock %}
 {% block content%}
 
 <div class="row">
@@ -24,9 +15,7 @@
                     Tùy chọn 
                 </a>
                 <div class="dropdown-menu dropdown-menu-demo dropdown-menu-arrow bg-dark text-white">
-                    <a href="{{url_for('new_chapter', fiction_id=fiction.id)}}" class="dropdown-item btn  btn-primary" type="button">Thêm chương mới</a>
-                    <a href="{{url_for("edit_specific_post", fiction_id=fiction.id)}}" class="dropdown-item">Chỉnh sửa sách</a>
-                    <a href="{{url_for("delete_fiction", fiction_id=fiction.id)}}" class="dropdown-item">Xóa sách này</a>
+                    <a href="{{url_for("edit_specific_post", fiction_id=fiction.id)}}" class="dropdown-item">Quản lý tác phẩm</a>
                     <a href="{{url_for("delete_fiction", fiction_id=fiction.id)}}" class="dropdown-item">Yêu cầu cập nhật 🥩</a>
             
                 </div>
@@ -35,9 +24,11 @@
             {% include "_fiction.html"  %}
             
         </div>
-        <div class="col-md-8">
+            
+            <div class="col-md-8">
+            
             <div class="alert alert-success" role="alert">
-                <h4 class="alert-heading"> Thông tin về: {{fiction.name}} </h4>
+                <h4 class="alert-heading"> Thông tin tác phẩm {{fiction.name}} </h4>
                 <p>Trạng thái: {% if fiction.status %} Full {% else %} On Going {% endif %}</p>
                 <p>Xuất bản: {{ fiction.publish_year}}</p>
                 <p>Chương mới nhất:</p>
@@ -46,77 +37,32 @@
                  </p>
                 <p class="mb-0">Số chương <b>{{ fiction.chapter_count }}</b></p>
             </div>
+            
             <div style="margin-top: 30px; background: white">
                 <div class="card-header">Lời tựa của tác giả</div>
                 <div class="card-body">
 
-                    {% if editable %}
                     
-                    <button id="saveButton" class="btn btn-success">
-                        <!-- Download SVG icon from http://tabler-icons.io/i/send -->
-                        <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><line x1="10" y1="14" x2="21" y2="3" /><path d="M21 3l-6.5 18a0.55 .55 0 0 1 -1 0l-3.5 -7l-7 -3.5a0.55 .55 0 0 1 0 -1l18 -6.5" /></svg>
-                        Save
-                    </button>
-
-                    <input type="text" value="{{ fiction.name }}" id="new_title">    
-                    <div id="editorjs"></div>
-                    <!-- <script src="{{url_for('static', filename='main.js')}}"></script> -->
-                    <script src="https://cdn.jsdelivr.net/npm/@editorjs/editorjs@latest"></script>
-                    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-
-                    <script>
-                        console.log(axios.get('/'))
-                        let title;
-                        let new_title = document.getElementById("new_title")
-                        new_title.addEventListener('change', function(e) {
-                            title = e.target.value;
-                            console.log(title)
-                        })
-                        let data={{fiction.desc | safe}}
-                        const editor = new EditorJS({data:data});
-                        saveButton = document.getElementById('saveButton')
-                        saveButton.addEventListener('click', function() {editor.save().then((output)=>{
-                            console.log(output);
-                            console.log(title);
-                            let upload = {
-                                "title":title,
-                                "desc":output
-                            }
-                            axios.post('', upload).then(function(response) {
-                                console.log("work!")
-                            })
-                        })
-
-                        });
-                    </script>
-                    
-                    {% else %}
                     <div class="card-text" id="detailInfomation">
+                        {% set elements = fiction.cutText() %}
+                        {% for element in elements.blocks %}
+                            {% if element.type == "paragraph" %}
+                            <p>{{ element.data.text | safe}}</p>
+                            {% endif %}
+                            
+                            
+                        {% endfor %}
                     </div>
-
-                    <script>
-                        let desc={{ dsc | safe}}
-                        let par = document.getElementById('detailInfomation')
-                        for (i in desc.blocks) {
-                            let para = document.createElement('p')
-                            para.innerHTML=desc.blocks[i].data.text
-                            par.appendChild(para)
-                        }
-                    </script>
-                    {% endif %}
                     
                 </div>
             </div>
-
         </div>
         </div>
         
     </div>
 
     <div class="col-lg-4">
-        {% if editable %}
         
-        {% else %}
         <div class="card">
             <div class="card-header">Danh sách chương </div>
             <div class="card-body" style="overflow: hidden;">
@@ -145,7 +91,7 @@
         </div>
         {% else %}
         {% endif %}
-        {% endif %}
+        
     </div>
 </div>
 

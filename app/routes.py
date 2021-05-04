@@ -7,6 +7,7 @@ from flask_login import current_user, login_required, login_user, logout_user
 from img_crop import return_img
 from werkzeug.datastructures import ImmutableMultiDict
 from werkzeug.urls import url_parse
+import ast
 
 from app import app, db
 from app.form import (AuthorForm, ChapterForm, FictionForm, LoginForm,
@@ -281,12 +282,26 @@ def edit_specific_post(fiction_id):
     quote = Quote.query.filter_by(fiction=fiction_id)
     if request.method == 'POST':
         incoming_data= json.loads(request.data.decode('UTF-8'))
-        fiction.name = str(incoming_data['title'])
-        fiction.desc = str(incoming_data['desc'])
-        print(fiction.name, fiction.desc )
-        db.session.commit()
-        flash("Data saved")
-    return  render_template("viewer_clone.html", fiction = fiction, chapters = chapters, quote = quote, author =author, chapter=chapter, editable=editable)
+        print(json.dumps(incoming_data))
+        if incoming_data["data"] == "content":
+            return jsonify(fiction.desc)
+        elif incoming_data["data"] == "upload":
+            try: 
+                fiction.desc = json.dumps(incoming_data["desc"])
+                print(fiction.desc)
+                db.session.commit()
+                return "success"
+            except:
+                return "incoming data invalid"
+        elif incoming_data["data"] == "year":
+            fiction.publish_year = incoming_data["year"]
+            db.session.commit()
+            return "year updated"
+        elif incoming_data["data"] == "name":
+            fiction.name = incoming_data["name"]
+            db.session.commit()
+            return "name updated"
+    return  render_template("editor.html", fiction = fiction, chapters = chapters, quote = quote, author =author, chapter=chapter, editable=editable)
 
 
 @app.route("/fiction/<int:fiction_id>/delete", methods=['GET', 'POST'])

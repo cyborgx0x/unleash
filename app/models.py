@@ -42,7 +42,7 @@ class Fiction(db.Model):
     media = db.relationship('Media', backref='fiction')
 
     def cutText(self):
-        text = json.loads(self.desc)
+        text = ast.literal_eval(self.desc)
         return text
     def set_count(self, chapter_count):
         self.chapter_count = chapter_count

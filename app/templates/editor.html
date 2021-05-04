@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+{% block title %}{{ fiction.name }} by {{ author.name }}{% endblock %}
+{% block nav %} 
+    
+    <li class="nav-link">
+        Hello
+    </li>
+
+    {{ super() }}
+
+{% endblock %}
+{% block content%}
+
+<div class="row">
+    <div class="col-lg-8 ">
+        <div class="row">
+        <div class="col-md-4">
+            <div  style="margin:5px">
+                <div class="bg-dark text-white">
+                    <button class="dropdown-item" type="button" onmouseover="addNewChapter(this)" onclick="addNewChapter(this)">Thêm chương mới 🆕</button>
+                    <button onmouseover="editFiction(this)" class="dropdown-item">Chỉnh sửa thông tin</button>
+                    <button onmouseover="editForeword(this)" class="dropdown-item">Chỉnh sửa lời tựa</button>
+                    <a href="#" class="dropdown-item">Quản lý chương</a>
+                    <button class="dropdown-item">Xóa sách này</button>
+                    <button class="dropdown-item">Bìa sách</button>
+                    <button class="dropdown-item">Link tải sách</button>
+                    <button class="dropdown-item">Hiển thị</button>
+                    <button class="dropdown-item">Page and Media</button>
+                    <button class="dropdown-item">Thống kê</button>
+                    <button class="dropdown-item">Lịch sử chỉnh sửa</button>
+                </div>
+            </div>
+        </div>
+            <div class="col-md-8">
+                <div class="card" id="new-chapter" style="display: none;">
+                    <div class="card-header" id="title-editor">Thêm chương mới</div>
+                    <div class="card-body" id="main-editor">
+                        <label for="add-title">Tiêu đề chương</label>
+                        <input type="text" name="add-title" id="add-title" class="form-control">
+                    </div>
+                </div>
+                <div class="card" id="edit-foreword" style="display: none;">
+                    <div class="card-header" id="title-editor">Chỉnh sửa Lời tựa</div>
+                    <div class="card-body" id="main-editor">
+                        <button id="saveButton" class="btn btn-success">
+                            <!-- Download SVG icon from http://tabler-icons.io/i/send -->
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><line x1="10" y1="14" x2="21" y2="3" /><path d="M21 3l-6.5 18a0.55 .55 0 0 1 -1 0l-3.5 -7l-7 -3.5a0.55 .55 0 0 1 0 -1l18 -6.5" /></svg>
+                            Save
+                        </button>
+                        <div id="editorjs"></div>
+                        <!-- <script src="{{url_for('static', filename='main.js')}}"></script> -->
+                        <script src="https://cdn.jsdelivr.net/npm/@editorjs/editorjs@latest"></script>
+                        <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    
+                        <script>
+                            axios.post('', {data:"content"})
+                            .then((response) => {
+                                try {
+                                    let data = JSON.parse(response.data);
+                                    const editor = new EditorJS({data: data});
+                                    let saveButton = document.getElementById('saveButton');
+                                    saveButton.addEventListener('click', function() {editor.save().then((output)=>{
+                                        console.log(output);
+                                        let upload = {
+                                            data:"upload",
+                                            desc:output
+                                        }
+                                        axios.post('', upload).then(function(response) {
+                                            console.log(response)
+                                        })
+                                    })
+    
+                                    });
+                                }
+                                catch (err) {
+                                    console.log(err.message)
+                                    console.log("your content is missing, create new one")
+                                    let data = {"time": 1620131235504, "blocks": [ {"id": "yIvyfJ0l8Y", "type": "paragraph", "data": {"text": "Vui lòng tạo mới nội dung"}}], "version": "2.21.0"}
+                                    const editor = new EditorJS({data:data});
+                                    let saveButton = document.getElementById('saveButton');
+                                    saveButton.addEventListener('click', function() {editor.save()
+                                        .then((output)=>{
+                                            console.log(output);
+                                            let upload = {
+                                                data:"upload",
+                                                desc:output
+                                            }
+                                            axios.post('', upload).then(function(response) {
+                                                console.log(response)
+                                            })
+                                    })
+    
+                                    });
+                                }
+                            })
+                            .catch((err)=>console.log(err.message))
+                            
+                        </script>
+                    </div>
+                </div>
+        
+            <div style="background-color: white; padding:1em; display:none" id="edit-fiction">
+                <div class="alert" role="alert" id="alert-theme">
+                <h4 class="alert-heading"  id="alert-information"> Mỗi mục đều riêng biệt. Khi chỉnh sửa xong vui lòng nhấn enter </h4>
+                </div>
+                <div class="form-group">
+                    <label for="fiction_name">Tiêu đề tác phẩm</label>
+                    <input type="text" class="form-control" name="fiction_name" id="fiction_name" value="{{fiction.name}}" oninput="console.log(this.value)" onchange="axios.post('', {data:'name', name:this.value})
+                    .then((res)=>{
+                        console.log(res);
+                        document.getElementById('alert-information').textContent='Đã lưu tên tác phẩm'
+                        document.getElementById('alert-theme').className = 'alert alert-success'
+                    })
+                    .catch((err)=>{
+                        console.log(err.message);
+                        document.getElementById('alert-information').textContent=err.message
+                        document.getElementById('alert-theme').className = 'alert alert-danger'
+                    })">
+                    <label for="publist_year">Năm xuất bản</label>
+                    <input type="text" class="form-control" name="publish_year" id="publish_year" value="{{fiction.publish_year}}" oninput="console.log(this.value)" onchange="axios.post('', {data:'year', year:this.value})
+                    .then((res)=>{
+                        console.log(res);
+                        document.getElementById('alert-information').textContent='Đã lưu năm xuất bản'
+                        document.getElementById('alert-theme').className = 'alert alert-success'
+                    })
+                    .catch((err)=>{
+                        console.log(err.message);
+                        document.getElementById('alert-information').textContent=err.message
+                        document.getElementById('alert-theme').className = 'alert alert-danger'
+                    })">
+                    <label for="tag-manage">Thể loại</label>
+                    <input type="text" name="tag-manage" id="tag-manage" value="{{fiction.tag}}" class="form-control">
+                </div>
+            </div>
+            
+        </div>
+        </div>
+        
+    </div>
+    <div class="col-lg-4">
+        {% include "_fiction.html"  %}
+    </div>
+</div>
+
+<script>
+    function addNewChapter(context) {
+        document.getElementById('new-chapter').style.display = 'block';
+        document.getElementById('edit-foreword').style.display = 'none';
+        document.getElementById('edit-fiction').style.display = 'none';
+    }
+    function editForeword(context) {
+        document.getElementById('edit-foreword').style.display = 'block';
+        document.getElementById('new-chapter').style.display = 'none';
+        document.getElementById('edit-fiction').style.display = 'none';
+    }
+    function editFiction(context) {
+        document.getElementById('edit-fiction').style.display = 'block';
+        document.getElementById('new-chapter').style.display = 'none';
+        document.getElementById('edit-foreword').style.display = 'none';
+    }
+</script>
+{% endblock %}
