@@ -73,6 +73,7 @@ class Chapter(db.Model):
     content = db.Column(db.Text)
     view_count = db.Column(db.Integer)
     fiction = db.Column(db.Integer, db.ForeignKey('fiction.id'))
+    bookmark = db.relationship('Bookmark', backref ='chapter')
     chapter_order = db.Column(db.Integer)
     def update_view(self):
         if self.view_count:
@@ -84,6 +85,9 @@ class Chapter(db.Model):
     def update_chapter_count_zero(self, count):
         self.view_count = count
         db.session.commit()
+    def cutText(self):
+        text = ast.literal_eval(self.content)
+        return text
 
 
 @dataclass
@@ -176,6 +180,7 @@ class Like(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
     fiction_id = db.Column(db.Integer, db.ForeignKey('fiction.id'), primary_key=True)
 
+
 class User(UserMixin, db.Model):
     'users', meta
     id = db.Column('id', db.Integer, primary_key=True)
@@ -203,3 +208,7 @@ class User(UserMixin, db.Model):
     def avatar(self, size):
         digest = md5(self.email.lower().encode('utf-8')).hexdigest()
         return 'https://www.gravatar.com/avatar/{}?d=identicon&s={}'.format(digest, size)
+
+class Bookmark(db.Model):
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
+    chapter_id = db.Column(db.Integer, db.ForeignKey('chapter.id'), primary_key=True)

@@ -79,7 +79,9 @@
       background: #0e2e5647;
       color: white;
     }
-
+    .dropdown-menu {
+      transform: translateX(-300px);
+    }
     @media screen and (max-width: 500px) {
       .dropdown-menu {
         position: static;
@@ -121,25 +123,25 @@
           <ul class="navbar-nav" >
             {% block nav %}
             <li class="nav-link">
-              <!-- Download SVG icon from http://tabler-icons.io/i/bell -->
-              <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M10 5a2 2 0 0 1 4 0a7 7 0 0 1 4 6v3a4 4 0 0 0 2 3h-16a4 4 0 0 0 2 -3v-3a7 7 0 0 1 4 -6" /><path d="M9 17v1a3 3 0 0 0 6 0v-1" /></svg>
+              <a href="#" class="text-white">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M10 5a2 2 0 0 1 4 0a7 7 0 0 1 4 6v3a4 4 0 0 0 2 3h-16a4 4 0 0 0 2 -3v-3a7 7 0 0 1 4 -6" /><path d="M9 17v1a3 3 0 0 0 6 0v-1" /></svg>
+              </a>
             </li>
-            
             <li class="nav-link">
               <button type="button" data-bs-toggle="dropdown" style="padding: 5px;">
                 <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 19a9 9 0 0 1 9 0a9 9 0 0 1 9 0" /><path d="M3 6a9 9 0 0 1 9 0a9 9 0 0 1 9 0" /><line x1="3" y1="6" x2="3" y2="19" /><line x1="12" y1="6" x2="12" y2="19" /><line x1="21" y1="6" x2="21" y2="19" /></svg>
               </button>
               <div class="dropdown-menu dropdown-menu-demo dropdown-menu-arrow bg-dark text-white">
-                  <a href="#" class="dropdown-item btn  btn-primary" type="button">
-                  Chương đánh dấu #1
-                  </a>
-                  <a href="#" class="dropdown-item">
-                    Chương đánh dấu #2
-                  </a>
-                  <a href="#" class="dropdown-item">
-                    Chương đánh dấu #3
-                  </a>
-
+                {% with %}
+                    {% set bookmarks = current_user.id | bookmark %}
+                    {% for bookmark in bookmarks %}
+                      
+                      {% set chapter = bookmark.chapter_id | get_chapter %}
+                      <a href={{url_for('chapter_viewer', chapter_id=chapter.id)}} class="dropdown-item">
+                        {{chapter.name}} - {{ chapter.fiction | get_fiction_name }}
+                      </a>  
+                    {% endfor %}
+                {% endwith %}  
               </div>
             </li>
 

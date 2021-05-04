@@ -12,8 +12,27 @@ from app import app, db
 from app.form import (AuthorForm, ChapterForm, FictionForm, LoginForm,
                       Quiz_answer, RegistrationForm)
 from app.models import (Author, Chapter, Fiction, FictionIndex, Like, Media,
-                        Quote, User, Post)
+                        Quote, User, Post, Bookmark)
 
+def bookmark(id):
+    files = Bookmark.query.filter_by(user_id=id)
+    return files
+def get_chapter(id):
+    file = Chapter.query.filter_by(id=id).first()
+    return file
+def get_fiction_name(id):
+    file = Fiction.query.filter_by(id=id).first()
+    return file.name
+def is_bookmarked(id):
+    file = Bookmark.query.filter_by(chapter_id=id).first()
+    if file == None:
+        return None
+    else:
+        return "checked"
+app.add_template_filter(bookmark)
+app.add_template_filter(get_chapter)
+app.add_template_filter(get_fiction_name)
+app.add_template_filter(is_bookmarked)
 
 @app.route("/")
 def index():
@@ -39,6 +58,7 @@ def index():
         like = Like.query.filter_by(user_id=current_user.id)
         user = User.query.filter_by(id=current_user.id).first_or_404()
     return  render_template("home.html", top_view_fictions = top_view_fictions, top_authors=top_authors, like=like, user=user)
+
 
 @app.route('/u/<user_name>/<int:post_id>')
 def view_post(user_name, post_id):
@@ -308,6 +328,17 @@ def specific_fiction_name(fiction_name):
 
 @app.route("/chapter/<int:chapter_id>/", methods=['GET', 'POST'])
 def chapter_viewer(chapter_id):
+    if request.method == 'POST':
+
+        if request.data == b'':
+            itemdelete = Bookmark.query.filter_by(chapter_id=chapter_id).delete()
+            db.session.commit()
+            return "remove bookmark successfully"
+        else:
+            newitem = Bookmark(user_id=current_user.id, chapter_id=chapter_id)
+            db.session.add(newitem)
+            db.session.commit()
+            return "added bookmark successfully"
     chapter = Chapter.query.filter_by(id=chapter_id).first()
     chapter.update_view()
     fiction = Fiction.query.filter_by(id=chapter.fiction).first()
