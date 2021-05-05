@@ -1,6 +1,6 @@
 <div class="row" style="margin:5px">
     <div class="col-auto">
-      <span class="avatar" style="background-image: url({{fiction.cover}})"></span>
+      <span class="avatar" style="background-image: url({% if fiction.cover %}{{url_for('img_proxy', link=fiction.cover)}}{% else %} https://firebasestorage.googleapis.com/v0/b/ngot-technology.appspot.com/o/book-cover%2Fsample.jpg?alt=media&token=4c780b66-0c22-41eb-9fde-51973b421815{% endif %})"></span>
     </div>
     <div class="col">
       <div class="text-truncate">
