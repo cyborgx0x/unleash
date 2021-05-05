@@ -1,10 +1,11 @@
-{% extends "base.html" %}
+{% extends "layout.html" %}
 {% block title %}{{post.title}}{% endblock %}
-{% block content%}
+{% block layoutleft %}
 <div class="card">
     <div class="card-body p-4 text-center"  style="background-image: url(https://i.pinimg.com/originals/09/24/4c/09244c7f7dd4d17b0484370f32db6641.gif);  background-position: center;">
-      
-      <span class="avatar avatar-xl mb-3 avatar-rounded" style="background-image: url({{ user.avatar(128) }})"></span>
+      <span class="avatar avatar-xl mb-3 avatar-rounded">
+          <img src="{{ user.avatar(128) }}" alt="{{user.user_name}} avatar" style="width:100%;height:auto" >
+      </span>
       <h3 class="m-0 mb-1" style="height: 30; color:white;"><a href="{{url_for('user', username=user.user_name)}}">{{user.user_name}}</a></h3>
       
       <div class="text-muted" style="height: 30; color:white;">Năm sinh</div>
@@ -19,8 +20,11 @@
       </div>
     </div>
         
-  </div>
-<div class="container-fluid">
+</div>
+{% endblock %}
+{% block layoutcenter %}
+
+<div class="card">
     <div class="blog-title">
         <h1>
             {{post.title}}

@@ -42,8 +42,11 @@ class Fiction(db.Model):
     media = db.relationship('Media', backref='fiction')
 
     def cutText(self):
-        text = ast.literal_eval(self.desc)
-        return text
+        try: 
+            file = ast.literal_eval(self.desc)
+            return file
+        except:
+            return 'nội dung chứa ký tự không hợp lệ'
     def set_count(self, chapter_count):
         self.chapter_count = chapter_count
         print("update completed")    
@@ -74,7 +77,7 @@ class Chapter(db.Model):
     view_count = db.Column(db.Integer)
     fiction = db.Column(db.Integer, db.ForeignKey('fiction.id'))
     bookmark = db.relationship('Bookmark', backref ='chapter')
-    chapter_order = db.Column(db.Integer)
+    chapter_order = db.Column(db.Integer, autoincrement=True)
     def update_view(self):
         if self.view_count:
             self.view_count=self.view_count+1
@@ -86,8 +89,11 @@ class Chapter(db.Model):
         self.view_count = count
         db.session.commit()
     def cutText(self):
-        text = ast.literal_eval(self.content)
-        return text
+        try: 
+            file = ast.literal_eval(self.content)
+            return file
+        except:
+            return 'nội dung chứa ký tự không hợp lệ'
 
 
 @dataclass

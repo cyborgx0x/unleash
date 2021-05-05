@@ -1,6 +1,6 @@
-{% extends "base.html" %}
+{% extends "layout.html" %}
 {% block title %}All media{% endblock %}
-{% block content%}
+{% block layoutcenter%}
 <div class="row row-deck">
     {% for media in medias%}
         <div class="card" style="padding: 2rem; margin:1rem;">
@@ -39,3 +39,6 @@
     {% endfor %}
   </div>
   {% endblock %}
+  {% block layoutright %}
+
+  {% endblock%}

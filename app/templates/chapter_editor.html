@@ -1,0 +1,69 @@
+{% extends "layout.html" %}
+{% block title %}Edit Chapter{% endblock %}
+
+{% block layoutleft %}
+<div  style="margin:5px">
+    <div class="bg-dark text-white">
+        <a class="dropdown-item" href="{{url_for('edit_specific_post', fiction_id=fiction.id)}}#manage-chapter">Trở về quản lý tác phẩm</a>
+        <button class="dropdown-item" onclick="showMedia(this)" value="edit_chapter">Chỉnh sửa thông tin</button>
+        <button class="dropdown-item" onclick="showMedia(this)" value="chapter_content">Chỉnh sửa nội dung chương 📝</button>
+    </div>
+</div>
+{% endblock %}
+{% block layoutcenter %}
+<div class="card"> 
+    <div class="card-body">
+        <div class="tab-content" id="tab-content">
+            <div class="tab-pane" id="chapter_content">
+                <div class="toast-body" id="update_message">
+                    Vui lòng nhấn nút để lưu
+                </div>
+                <button id="saveButton" class="btn btn-success">
+                    <!-- Download SVG icon from http://tabler-icons.io/i/send -->
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><line x1="10" y1="14" x2="21" y2="3" /><path d="M21 3l-6.5 18a0.55 .55 0 0 1 -1 0l-3.5 -7l-7 -3.5a0.55 .55 0 0 1 0 -1l18 -6.5" /></svg>
+                    Save
+                </button>
+                {% include "_editorjs.html" %}
+            </div>
+            <div class="tab-pane active show" id="edit_chapter">
+                <div class="alert" role="alert" id="alert-theme">
+                    <h4 class="alert-heading"  id="alert-information"> Mỗi mục đều riêng biệt. Khi chỉnh sửa xong vui lòng nhấn enter </h4>
+                </div>
+                <div class="form-group">
+                    <label for="chapter_name">Tiêu đề chương</label>
+                    <input type="text" class="form-control" name="chapter_name" id="chapter_name" value="{{chapter.name}}">
+                    <label for="chapter_order">Thứ tự</label>
+                    <input type="text" class="form-control" name="chapter_order" id="chapter_order" value="{{chapter.chapter_order}}">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    let input = document.getElementById('edit_chapter').querySelectorAll('.form-control')
+    console.log(input)
+    for (let i=0; i<input.length;i++) {
+        console.log(input[i])
+        input[i].addEventListener('change', (e)=>{
+            console.log(e.target.name)
+            axios.post('', {type:e.target.name, value:e.target.value})
+            .then((res)=>{
+                console.log(res);
+                document.getElementById('alert-information').textContent='Result: ' + res.data;
+                document.getElementById('alert-theme').className = 'alert alert-success';
+            })
+            .catch((err)=>{
+                console.log(err.message);
+                document.getElementById('alert-information').textContent=err.message
+                document.getElementById('alert-theme').className = 'alert alert-danger'
+            })
+        })
+    }
+    function saveContent(context) {
+        console.log('test')
+    }
+</script>
+{% endblock %}
+{% block layoutright %}
+
+{% endblock %}

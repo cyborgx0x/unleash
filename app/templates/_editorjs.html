@@ -1,0 +1,48 @@
+<div id="editorjs"></div>
+    <script src="https://cdn.jsdelivr.net/npm/@editorjs/editorjs@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+    <script>
+        axios.post('', {type:"content"})
+        .then((response) => {
+            try {
+                let data = JSON.parse(response.data);
+                const editor = new EditorJS({data: data});
+                let saveButton = document.getElementById('saveButton');
+                saveButton.addEventListener('click', function() {editor.save().then((output)=>{
+                    console.log(output);
+                    let upload = {
+                        type:"upload",
+                        value:output
+                    }
+                    axios.post('', upload).then(function(response) {
+                        document.getElementById('update_message').textContent=response.data;
+                    })
+                })
+
+                });
+            }
+            catch (err) {
+                console.log(err.message)
+                console.log("your content is missing, create new one")
+                let data = {"time": 1620131235504, "blocks": [ {"id": "yIvyfJ0l8Y", "type": "paragraph", "data": {"text": "Vui lòng tạo mới nội dung"}}], "version": "2.21.0"}
+                const editor = new EditorJS({data:data});
+                let saveButton = document.getElementById('saveButton');
+                saveButton.addEventListener('click', function() {editor.save()
+                    .then((output)=>{
+                        console.log(output);
+                        let upload = {
+                            type:"upload",
+                            value:output
+                        }
+                        axios.post('', upload).then(function(response) {
+                            document.getElementById('update_message').textContent=response.data;
+                        })
+                })
+
+                });
+            }
+        })
+        .catch((err)=>console.log(err.message))
+        
+    </script>

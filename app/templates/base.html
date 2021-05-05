@@ -2,7 +2,7 @@
 
 <head>
 
-  <title>{% block title %}{% endblock %} | Dreamer House</title>
+  <title>{% block title %}| Dreamer House{% endblock %} </title>
   <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
@@ -136,16 +136,18 @@
                 <a href="{{url_for('login')}}" class="dropdown-item" >To using bookmark you need to login</a>
                 
                 {% else %}
+                {% block bookmark %}
                 {% with %}
                     {% set bookmarks = current_user.id | bookmark %}
                     {% for bookmark in bookmarks %}
                       
                       {% set chapter = bookmark.chapter_id | get_chapter %}
                       <a href={{url_for('chapter_viewer', chapter_id=chapter.id)}} class="dropdown-item">
-                        {{chapter.name}} - {{ chapter.fiction | get_fiction_name }}
+                       {{ loop.index }} - {{chapter.name}} - {{ chapter.fiction | get_fiction_name }}
                       </a>  
                     {% endfor %}
                 {% endwith %} 
+                {% endblock %}
                 {% endif %}
               </div>
             </li>
@@ -161,7 +163,7 @@
               </li>
               {% else %}
               <li class="nav-item">
-              <a class="nav-link" href="{{ url_for('user', username=current_user.user_name) }}">Profile</a>
+              <a class="nav-link" href="{{ url_for('user', username=current_user.user_name) }}">Dashboard</a>
               </li>
               <li class="nav-item">
                 <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
@@ -237,6 +239,7 @@
         {% endblock %}
 
         {% block content %}{% endblock %}
+        {% block editor %}{% endblock %}
       </div>
     </div>
 </body>

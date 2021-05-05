@@ -129,6 +129,7 @@ def test():
 
 @app.route("/new-fiction/", methods=['GET', 'POST'])
 def new_fiction():
+    form=FictionForm()
     if request.method=='POST':
         data = request.form.to_dict(flat=True)
         name=data["fiction-name"]
@@ -143,7 +144,11 @@ def new_fiction():
         db.session.refresh(new_fiction)
         print(new_fiction)
         return redirect(url_for('index')) 
-    return new_data
+    new_fiction = Fiction(name="Tác phẩm mới")
+    db.session.add(new_fiction)
+    db.session.commit()
+    db.session.refresh(new_fiction)
+    return redirect(url_for('edit_specific_post', fiction_id=new_fiction.id))
 
 @app.route("/test/new-fiction/", methods=['GET', 'POST'])
 def test_new_fiction():
@@ -283,24 +288,36 @@ def edit_specific_post(fiction_id):
     if request.method == 'POST':
         incoming_data= json.loads(request.data.decode('UTF-8'))
         print(json.dumps(incoming_data))
-        if incoming_data["data"] == "content":
+        if incoming_data["type"] == "content":
             return jsonify(fiction.desc)
-        elif incoming_data["data"] == "upload":
+        elif incoming_data["type"] == "upload":
             try: 
-                fiction.desc = json.dumps(incoming_data["desc"])
+                fiction.desc = json.dumps(incoming_data["value"])
                 print(fiction.desc)
                 db.session.commit()
-                return "success"
+                return "Đã cập nhật lời tựa"
             except:
                 return "incoming data invalid"
-        elif incoming_data["data"] == "year":
-            fiction.publish_year = incoming_data["year"]
+        elif incoming_data["type"] == "publish_year":
+            fiction.publish_year = incoming_data["value"]
             db.session.commit()
             return "year updated"
-        elif incoming_data["data"] == "name":
-            fiction.name = incoming_data["name"]
+        elif incoming_data["type"] == "fiction_name":
+            fiction.name = incoming_data["value"]
             db.session.commit()
             return "name updated"
+        elif incoming_data["type"] == "tag-manage":
+            fiction.tag = incoming_data["value"]
+            db.session.commit()
+            return "tag updated"
+        elif incoming_data["type"] == "link-download":
+            fiction.mediafire_link = incoming_data["value"]
+            db.session.commit()
+            return "link download updated"
+        elif incoming_data["type"] == "book-cover":
+            fiction.cover = incoming_data["value"]
+            db.session.commit()
+            return "cover updated"
     return  render_template("editor.html", fiction = fiction, chapters = chapters, quote = quote, author =author, chapter=chapter, editable=editable)
 
 
@@ -344,7 +361,6 @@ def specific_fiction_name(fiction_name):
 @app.route("/chapter/<int:chapter_id>/", methods=['GET', 'POST'])
 def chapter_viewer(chapter_id):
     if request.method == 'POST':
-
         if request.data == b'':
             itemdelete = Bookmark.query.filter_by(chapter_id=chapter_id).delete()
             db.session.commit()
@@ -358,18 +374,16 @@ def chapter_viewer(chapter_id):
     chapter.update_view()
     fiction = Fiction.query.filter_by(id=chapter.fiction).first()
     chapters = Chapter.query.filter_by(fiction=fiction.id).order_by(Chapter.chapter_order.asc())
-    plus = chapter.chapter_order+1
-    minus = chapter.chapter_order-1
-    
     try:
+        plus = chapter.chapter_order+1
         next_chapter = Chapter.query.filter_by(chapter_order=plus, fiction = fiction.id).first()
-        nct = next_chapter.id
+        nct = next_chapter
     except:
         nct = None
-    
     try:
+        minus = chapter.chapter_order-1
         previous_chapter = Chapter.query.filter_by(chapter_order=minus, fiction = fiction.id).first()
-        pre = previous_chapter.id
+        pre = previous_chapter
     except:
         pre = None
     form=ChapterForm()
@@ -393,7 +407,33 @@ def new_chapter(fiction_id):
         db.session.commit()
         db.session.refresh(new_chapter)
         return redirect(url_for('chapter_viewer', chapter_id=new_chapter.id))
-    return render_template('new_chapter.html', form=form)
+    new_chapter = Chapter(name="New Chapter", fiction=fiction_id)
+    db.session.add(new_chapter)
+    db.session.commit()
+    db.session.refresh(new_chapter)
+    return redirect(url_for('edit_chapter', chapter_id=new_chapter.id))
+
+@app.route("/editor/<int:chapter_id>/edit", methods=['GET', 'POST'])
+def edit_chapter(chapter_id):
+    chapter = Chapter.query.filter_by(id=chapter_id).first()
+    fiction = Fiction.query.filter_by(id=chapter.fiction).first()
+    if request.method == 'POST':
+        incoming_data = json.loads(request.data.decode('UTF-8'))
+        if incoming_data["type"] == "chapter_name":
+            chapter.name = incoming_data["value"]
+            db.session.commit()
+            return "Đã cập nhật tên chương"
+        if incoming_data["type"] == "chapter_order":
+            chapter.chapter_order = incoming_data["value"]
+            db.session.commit()
+            return "Đã cập nhật thứ tự"
+        elif incoming_data["type"] == "content":
+            return jsonify(chapter.content)
+        elif incoming_data["type"] == "upload":
+            chapter.content = json.dumps(incoming_data["value"])
+            db.session.commit()
+            return "Đã cập nhật nội dung chương"
+    return render_template('chapter_editor.html', chapter=chapter, fiction=fiction)
 
 @app.route("/api/all_authors/", methods = ['GET'])
 def api_all_authors():
@@ -492,6 +532,5 @@ def user(username):
     posts=Post.query.filter_by(user_id=user.id)
     owningauthors = Author.query.filter_by(user_id=user.id).first()
    
-    return render_template('user.html', user=user, fictions=fictions, like=like, medias=medias, posts=posts, owning = owningauthors)
-
+    return render_template('dash.html', user=user, fictions=fictions, like=like, medias=medias, posts=posts, owning = owningauthors)
 

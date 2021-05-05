@@ -1,10 +1,10 @@
 <div class="dropdown">
     {% if previous_chapter %}
-    <a type="button" class='btn btn-primary' href="/chapter/{{previous_chapter}}">Trước</a>
+    <a type="button" class='btn btn-primary' href="{{url_for("chapter_viewer", chapter_id = previous_chapter.id )}}">Trước</a>
     {% else %}
     <a type="button" class ='btn btn-secondary'disabled href="#">Trước</a>
     {% endif %}
-        <select class="form-select" onchange="location = this.options[this.selectedIndex].value;">
+        <select class="form-select" onchange="location = this.options[this.selectedIndex].value;" id="chapter_list">
         {% for c in chapters %}   
             {% if c.id == chapter.id %}
             <option value={{url_for("chapter_viewer", chapter_id = c.id )}} selected>{{c.name}}</option>   
@@ -13,9 +13,9 @@
             {% endif %}
         {% endfor %}
         </select>
-
+    
     {% if next_chapter %}
-    <a type="button" class='btn btn-primary' href="/chapter/{{next_chapter}}">Sau</a>
+    <a type="button" class='btn btn-primary' href="{{url_for("chapter_viewer", chapter_id = next_chapter.id )}}">Sau</a>
     {% else %}
     <a type="button" class ='btn btn-secondary'disabled href="#">Sau</a>
     {% endif %}
