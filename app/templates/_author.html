@@ -1,10 +1,21 @@
-<div class="card" style="margin:5px">
-    <div class="card-img-top img-responsive img-responsive-16by9" style="background-image: url({% if author.img %}{{ author.img}}{% else %} http://localhost/upload/sample.jpg{% endif %})"></div>
-    <div class="card-body">
+<div class="author-item card">           
+    
+    <div class="card-body text-center">
+        <span class="avatar avatar-xl mb-3 avatar-rounded" style="background-image: url({{author.img}})"></span>
         <a href="/author/{{ author.name}}"><h3 class="card-title">{{ author.name}}</h3>
         </a>
-        <p>Birth Year: {{ author.birth_year}}</p>
-        <p>Link: {{ author.author_page}}</p>
-        <p>Số tác phẩm: {{ author.fiction_count}}</p>
+        <div class="author-infor">
+            <p>Số tác phẩm: {{ author.fiction | count}}</p>
+            <p>Năm sinh: {{ author.birth_year}}</p>
+        </div>
+        {% set value = "follow" %}
+        {% set buttonContent = "Theo dõi 💎💎💎" %}
+        {% set idset =  author.follower | map(attribute='user_id') | list %}
+        {% if current_user.id in idset %}
+            {% set value= "followed" %}
+            {% set buttonContent= "Đã theo dõi 💁‍♂️" %}
+        {% endif %}
+        <div id="follower-count" class="follower badge bg-blue" style="padding: 5px;"><strong>{{author.follower | count }} follower 🧑</strong></div>
+        <button href="#" type="button" class="btn button-follower" onclick="changeState(this)" value={{value}} name="{{author.id}}">{{buttonContent}}</button>
     </div>
 </div>

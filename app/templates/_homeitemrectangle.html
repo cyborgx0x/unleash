@@ -4,20 +4,27 @@
             <div class="row align-items-center">
                 <div class="col-auto">
                 <span class="bg-white text-white avatar"><!-- Download SVG icon from http://tabler-icons.io/i/currency-dollar -->
-                    <img src="{{avatar}}" alt="">
+                    <img src="{{author.img}}" alt="">
                 </span>
                 </div>
                 <div class="col">
                 <div class="font-weight-medium">
-                    {{name}}
+                    {{author.name}}
                 </div>
+                {% set value = "follow" %}
+                {% set buttonContent = "Theo dõi 💎💎💎" %}
+                {% set idset =  author.follower | map(attribute='user_id') | list %}
+                {% if current_user.id in idset %}
+                    {% set value= "followed" %}
+                    {% set buttonContent= "Đã theo dõi 💁‍♂️" %}
+                {% endif %}
+                <div id="follower-count" class="follower badge bg-blue" style="padding: 5px;"><strong>{{author.follower | count }} follower 🧑</strong></div>
+                <button href="#" type="button" class="btn button-follower" onclick="changeState(this)" value={{value}} name="{{author.id}}">{{buttonContent}}</button>
                 <div class="text-muted">
                     <p>
-                    Số tác phẩm: {{count}}
+                    Số tác phẩm: {{author.fiction | count}}
                     <br>
-                    Thể loại: văn học, thơ ca
-                    <br>
-                    Dựa theo bạn đã "user action"
+                    Ngữ cảnh đề xuất
                     </p>
                 </div>
                 </div>

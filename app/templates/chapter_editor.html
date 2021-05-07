@@ -4,9 +4,11 @@
 {% block layoutleft %}
 <div  style="margin:5px">
     <div class="bg-dark text-white">
-        <a class="dropdown-item" href="{{url_for('edit_specific_post', fiction_id=fiction.id)}}#manage-chapter">Trở về quản lý tác phẩm</a>
+        <a class="dropdown-item" href="{{url_for('edit_specific_post', fiction_id=chapter.fiction)}}#manage-chapter">Trở về quản lý tác phẩm</a>
+        <a class="dropdown-item" href="{{url_for('chapter_viewer', chapter_id=chapter.id)}}#manage-chapter">Đọc chương này</a>
         <button class="dropdown-item" onclick="showMedia(this)" value="edit_chapter">Chỉnh sửa thông tin</button>
         <button class="dropdown-item" onclick="showMedia(this)" value="chapter_content">Chỉnh sửa nội dung chương 📝</button>
+        <button class="dropdown-item" onclick="showMedia(this)" value="chapter_statistic">Thông tin thống kê</button>
     </div>
 </div>
 {% endblock %}
@@ -36,24 +38,26 @@
                     <input type="text" class="form-control" name="chapter_order" id="chapter_order" value="{{chapter.chapter_order}}">
                 </div>
             </div>
+            <div class="tab-pane" id="chapter_statistic">
+                <h1> Số liệu chương </h1>
+                Lượt đọc: 
+                <span class="badge bg-cyan">
+                    {{chapter.view_count}} 🐱‍👤 views, {{chapter.bookmark| count}} 📜 đánh dấu
+                </span> </a> 
+            </div>
         </div>
     </div>
 </div>
 <script>
     let input = document.getElementById('edit_chapter').querySelectorAll('.form-control')
-    console.log(input)
     for (let i=0; i<input.length;i++) {
-        console.log(input[i])
         input[i].addEventListener('change', (e)=>{
-            console.log(e.target.name)
             axios.post('', {type:e.target.name, value:e.target.value})
             .then((res)=>{
-                console.log(res);
                 document.getElementById('alert-information').textContent='Result: ' + res.data;
                 document.getElementById('alert-theme').className = 'alert alert-success';
             })
             .catch((err)=>{
-                console.log(err.message);
                 document.getElementById('alert-information').textContent=err.message
                 document.getElementById('alert-theme').className = 'alert alert-danger'
             })

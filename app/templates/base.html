@@ -79,6 +79,7 @@
       background: #0e2e5647;
       color: white;
     }
+
     .dropdown-menu {
       transform: translateX(-300px);
     }
@@ -129,27 +130,21 @@
             </li>
             <li class="nav-link">
               <button type="button" data-bs-toggle="dropdown" style="padding-left: 10px; padding-right:0px" class="btn">
-
-                  <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 19a9 9 0 0 1 9 0a9 9 0 0 1 9 0" /><path d="M3 6a9 9 0 0 1 9 0a9 9 0 0 1 9 0" /><line x1="3" y1="6" x2="3" y2="19" /><line x1="12" y1="6" x2="12" y2="19" /><line x1="21" y1="6" x2="21" y2="19" /></svg>
-
-
+              <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M13 7a2 2 0 0 1 2 2v12l-5 -3l-5 3v-12a2 2 0 0 1 2 -2h6z" /><path d="M9.265 4a2 2 0 0 1 1.735 -1h6a2 2 0 0 1 2 2v12l-1 -.6" /></svg>
               </button>
               <div class="dropdown-menu dropdown-menu-demo dropdown-menu-arrow bg-dark text-white">
+
                 {% if current_user.is_anonymous %}
-                <a href="{{url_for('login')}}" class="dropdown-item" >To using bookmark you need to login</a>
+                <span class="badge bg-red"><a href="{{url_for('login')}}" class="dropdown-item" >To using bookmark you need to login</a></span>
                 
                 {% else %}
                 {% block bookmark %}
-                {% with %}
-                    {% set bookmarks = current_user.id | bookmark %}
-                    {% for bookmark in bookmarks %}
-                      
-                      {% set chapter = bookmark.chapter_id | get_chapter %}
-                      <a href={{url_for('chapter_viewer', chapter_id=chapter.id)}} class="dropdown-item">
-                       {{ loop.index }} - {{chapter.name}} - {{ chapter.fiction | get_fiction_name }}
-                      </a>  
-                    {% endfor %}
-                {% endwith %} 
+                {% for bookmark in current_user.bookmark %}
+                  
+                <a href="{{url_for('chapter_viewer', chapter_id=bookmark.chapter_id)}}" class="dropdown-item">
+                  {{ bookmark.chapter.name }}
+                </a>
+                {% endfor %}
                 {% endblock %}
                 {% endif %}
               </div>
@@ -199,13 +194,6 @@
                   </a>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link" href="{{ url_for('view_all_media') }}">
-                    <span class="nav-link-title">
-                      Media
-                    </span>
-                  </a>
-                </li>
-                <li class="nav-item">
                   <a class="nav-link" href="{{ url_for('guide') }}">
                     <span class="nav-link-title">
                       Hướng dẫn sử dụng
@@ -236,7 +224,7 @@
     <div class="content"> 
       
       <div class="container-xl">
-      
+     
         {% block search%} 
         {% include "_search.html" %}
         {% endblock %}
@@ -245,6 +233,8 @@
         {% block editor %}{% endblock %}
       </div>
     </div>
+    
+
 </body>
 
 </html>

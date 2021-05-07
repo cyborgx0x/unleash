@@ -1,16 +1,36 @@
-<div class="row" style="margin:5px">
+<div class="card" style="overflow: visible; margin:1em; width: 100%">
+<div class="row" type="button" style="margin:5px" onclick="location.href='/fiction/{{fiction.id}}'">
     <div class="col-auto">
-      <span class="avatar" style="background-image: url({% if fiction.cover %}{{url_for('img_proxy', link=fiction.cover)}}{% else %} https://firebasestorage.googleapis.com/v0/b/ngot-technology.appspot.com/o/book-cover%2Fsample.jpg?alt=media&token=4c780b66-0c22-41eb-9fde-51973b421815{% endif %})"></span>
+      <span class="avatar">
+        <img style="padding-top: 30px;" src="{{url_for('img_proxy', link=fiction.cover)}}" alt="{{fiction.name}} cover">
+      </span>
     </div>
     <div class="col">
       <div class="text-truncate">
-        <a href="/fiction/{{fiction.id}}">{{fiction.name}}</a>
+        <strong>
+          <a href="/fiction/{{fiction.id}}">{{fiction.name}}</a>
+        </strong>
+        <span class="badge bg-green">
+          has {{ fiction.like | count }} ❤
+        </span>
+        <span class="badge bg-yellow">
+          {{ fiction.chapter|sum(attribute='view_count') }} views 💁‍♂️
+        </span>
       </div>
       <div class="text-muted">
-        Tên tác giả <br> Thể loại <br> Chỗ này để mô tả siêu ngắn
+        <p>
+          {{ fiction.author.name }}
+          
+
+          <br> 
+          {{ fiction.short_desc }}
+          <br>
+          Thể loại: {{fiction.tag}} 
+        </p>
       </div>
     </div>
-    <div class="col-auto align-self-center">
-      <div class="badge bg-red"></div>
+    <div class="col-auto col-md-2 col-12 align-self-center">
+      <div class="badge bg-red">{{ range(100) | random }} người đang đọc</div>
     </div>
   </div>
+</div>

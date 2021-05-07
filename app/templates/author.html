@@ -14,15 +14,11 @@
     <div class="col-md-4">
         
         <div style="display:flex">
-            <a type="button" class="btn dropdown-toggle" data-bs-toggle="dropdown" >
+            <a type="button" class="btn dropdown" data-bs-toggle="dropdown" >
                 ⚙ Tùy chọn
             </a>
             <div class="dropdown-menu dropdown-menu-demo dropdown-menu-arrow bg-dark text-white">
-                <a class="dropdown-item" href="#" data-toggle="modal" data-target="#Editable">
-                    Edit this author 🍓🍓🍓
-                </a>
-                <a href="/author/{{author.id}}/delete" class="dropdown-item">Delete this author</a> 
-                <a href="#" class="dropdown-item">Thêm Media 📷</a> 
+                <a href="{{url_for('edit_author', author_id=author.id)}}" class="dropdown-item">Chỉnh sửa tác giả 🔥</a> 
                 <a href="#" class="dropdown-item">
                     Xác nhận sở hữu ✔
                 </a>
@@ -30,8 +26,10 @@
         </div>
         <div class="card" style="margin:5px">
             
-            <div class="card-img-top img-responsive img-responsive-16by9" style="background-image: url({% if author.img %}{{ author.img}}{% else %} http://localhost/upload/sample.jpg{% endif %})"></div>
-            
+            <div class="card-img-top">
+                <img src="{% if author.img %}{{ author.img}}{% else %} http://localhost/upload/sample.jpg{% endif %}" alt="{{author.name}}">
+
+            </div>
             <div class="card-body">
                 <a href="/author/{{ author.name}}"><h3 class="card-title">{{ author.name}}</h3>
                 </a>
@@ -39,16 +37,46 @@
                 <p>Năm sinh: {{ author.birth_year}}</p>
                 <a href={{ author.author_page}}> Author website</a>
             </div>
-            <div class="d-flex">
-                <a href="#" type="button" class="card-btn">💎💎💎 Theo dõi </a>
+            <div>
+                {% set value = "follow" %}
+                {% set buttonContent = "Theo dõi 💎💎💎" %}
+                {% set idset =  author.follower | map(attribute='user_id') | list %}
+                {% if current_user.id in idset %}
+                {% set value= "followed" %}
+                {% set buttonContent= "Đã theo dõi 💁‍♂️" %}
+                {% endif %}
+                <span id="follower-count" class="badge bg-red" style="margin: 10px;"><strong>{{author.follower | count }} follower 🧑</strong></span>
+                <button href="#" type="button" class="btn" onclick="changeState(this)" value={{value}} name="{{author.id}}">{{buttonContent}}</button>
                 <a href="#" type="button" class="card-btn">✉ nhắn tin </a>
             </div>
+            <script>
+                function changeState(context) {  
+                    if (context.value=="follow") {
+                        context.value="followed"
+                        context.textContent = "Đã theo dõi 💁‍♂️"
+                        uploadData(context)
+                    }
+                    else {
+                        context.value="follow"
+                        context.textContent = "Theo dõi 💎💎💎"
+                        uploadData(context)
+                    }
+                }
+                function uploadData(context) {
+                    let data = {type:"author-follow", value:context.value, author:context.name}
+                    console.log(data)
+                    axios.post('/api/following/author/', {data:data}).then((res)=>{
+                        console.log(res)
+                        context.previousSibling.previousSibling.innerHTML = res.data
+                    }).catch((err)=>{
+                        context.textContent = "Đã có lỗi xảy ra"
+                        context.disabled = true
+                    })
+                            
+                }
+            </script>
         </div>
         
-        <div class="modal fade" id="Editable" tabindex="-1" role="dialog"
-        aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-        {% include '_formeditauthor.html'  %} 
-        </div>
         
     </div>
     
@@ -73,10 +101,11 @@
                     <div class="col-xl-4 col-sm-4">
                         <img src={{url_for("img_proxy", link=fiction.cover )}} alt={{fiction.name}}>
                     </div>
+                    
                     <div class="col-xl-8 col-sm-8">
+                        
                         <h3 class="card-title"><a href="/fiction/{{fiction.id}}">{{fiction.name}}</a></h3>
-                        {% set chapters = author.getChapter(fiction.id) %}
-                        {% for chapter in chapters %}
+                        {% for chapter in fiction.chapter %}
                             {% include "_chapter_list.html" %}
                         {% endfor %}
                     </div>

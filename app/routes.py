@@ -2,7 +2,7 @@ import json
 
 from database import view_all_post
 from flask import (Flask, Markup, flash, jsonify, redirect, render_template,
-                   request, send_file, url_for)
+                   request, send_file, url_for, session)
 from flask_login import current_user, login_required, login_user, logout_user
 from img_crop import return_img
 from werkzeug.datastructures import ImmutableMultiDict
@@ -13,60 +13,14 @@ from app import app, db
 from app.form import (AuthorForm, ChapterForm, FictionForm, LoginForm,
                       Quiz_answer, RegistrationForm)
 from app.models import (Author, Chapter, Fiction, FictionIndex, Like, Media,
-                        Quote, User, Post, Bookmark)
+                        Quote, User, Post, Bookmark, AuthorFollowing)
 
-def bookmark(id):
-    files = Bookmark.query.filter_by(user_id=id)
-    return files
-def get_chapter(id):
-    file = Chapter.query.filter_by(id=id).first()
-    return file
-def get_fiction_name(id):
-    file = Fiction.query.filter_by(id=id).first()
-    return file.name
-def is_bookmarked(id):
-    file = Bookmark.query.filter_by(chapter_id=id).first()
-    if file == None:
-        return None
-    else:
-        return "checked"
-app.add_template_filter(bookmark)
-app.add_template_filter(get_chapter)
-app.add_template_filter(get_fiction_name)
-app.add_template_filter(is_bookmarked)
 
 @app.route("/")
 def index():
-    top_view_fictions = Fiction.query.order_by(Fiction.view.desc()).limit(12).all()
+    top_view_fictions = Fiction.query.order_by(Fiction.view.desc()).limit(100).all()
     top_authors = Author.query.order_by(Author.fiction_count.desc()).limit(12).all()
-    
-    
-    if current_user.is_anonymous:
-        anonymous = [
-            {
-                "user_id": 0,
-                "fiction_id":0
-            },
-            {
-                "user_id": 0,
-                "fiction_id":0
-            }]
-        like = anonymous
-        user = {
-            "id": 0
-        }
-    else: 
-        like = Like.query.filter_by(user_id=current_user.id)
-        user = User.query.filter_by(id=current_user.id).first_or_404()
-    return  render_template("home.html", top_view_fictions = top_view_fictions, top_authors=top_authors, like=like, user=user)
-
-
-@app.route('/u/<user_name>/<int:post_id>')
-def view_post(user_name, post_id):
-    post = Post.query.filter_by(id=post_id).first()
-    owner = User.query.filter_by(user_name=user_name).first()
-    owningauthors = Author.query.filter_by(user_id=owner.id).first()
-    return render_template('post.html', post=post, owner = owner, owning = owningauthors, user=owner)
+    return  render_template("home.html", top_view_fictions = top_view_fictions, top_authors=top_authors)
 
 
 @app.route('/guide/')
@@ -84,23 +38,8 @@ def view_all_media():
 
 @app.route("/test/search/", methods=['GET', 'POST'])
 def test_search():
-    return render_template('search.html')
+    return render_template('_search.html')
 
-
-@app.route("/user/fiction/<int:fiction_id>/",methods=['GET', 'POST'])
-def update_like(fiction_id):
-    if request.method == 'POST':
-        incoming_data= json.loads(request.data.decode('UTF-8'))
-        print(type(incoming_data))
-        print(incoming_data)
-        if incoming_data[str(fiction_id)] == 1:
-            like = Like(user_id=current_user.id, fiction_id=fiction_id)
-            db.session.add(like)
-            db.session.commit()
-        else:
-            itemdelete = Like.query.filter_by(fiction_id=fiction_id).delete()
-            db.session.commit()
-    return {"message":"like updated"}
 
 @app.route("/build_indexing/")
 def build_indexing():
@@ -115,17 +54,174 @@ def img_proxy(link):
     img.seek(0)
     return  send_file(img, mimetype='image/jpeg')
 
-@app.route("/test/new/", methods=['GET', 'POST'])
-def test():
+
+@app.route("/author/<author_name>", methods=['GET', 'POST'])
+def author_page(author_name):
+    author = Author.query.filter_by(name=author_name).first()
+    fictions = Fiction.query.filter_by(author_id=author.id)
+    return render_template("author.html", author = author, fictions =fictions)
+
+@app.route("/editor/author/<int:author_id>", methods=['GET', 'POST'])
+def edit_author(author_id):
+    author = Author.query.filter_by(id=author_id).first()
     form = AuthorForm()
     if form.validate_on_submit():
-        author = Author(name=form.author_name.data, img=form.img.data, about=form.about.data)
-        db.session.add(author)
+        author.name = form.author_name.data
+        author.img=form.img.data 
+        author.about=form.about.data
         db.session.commit()
-        flash('New Author created')
-        return redirect(url_for('test'))  
-    print (form.errors)   
-    return  render_template("test.html", form=form)
+        flash("Update completed")
+        return redirect(url_for('author_page', author_name=author.name))
+    return render_template("author_editor.html", author = author,form=form)
+
+
+@app.route("/authors/")
+def all_authors():
+    authors = Author.query.all()
+    top_authors = Author.query.order_by(Author.fiction_count.desc()).limit(12).all()
+    return render_template("authors.html", authors = authors, top_authors=top_authors)
+
+
+@app.route("/fictions")
+def fictions():
+    fictions = Fiction.query.all()
+    return  render_template("fictions.html", fictions = fictions)
+
+
+@app.route("/fiction/<int:fiction_id>/", methods=['GET', 'POST'])
+def specific_post(fiction_id):
+    fiction = Fiction.query.filter_by(id=fiction_id).first()
+    return  render_template("viewer.html", fiction = fiction)
+
+
+@app.route("/fiction/<int:fiction_id>/edit", methods=['GET', 'POST'])
+def edit_specific_post(fiction_id):
+    fiction = Fiction.query.filter_by(id=fiction_id).first()
+    author = Author.query.filter_by(id=fiction.author_id).first()
+    editable = True
+    quote = Quote.query.filter_by(fiction=fiction_id)
+    if request.method == 'POST':
+        print(request.data)
+        incoming_data= json.loads(request.data.decode('UTF-8'))
+        print(json.dumps(incoming_data))
+        if incoming_data["type"] == "content":
+            return jsonify(fiction.desc)
+        elif incoming_data["type"] == "upload":
+            try: 
+                fiction.desc = json.dumps(incoming_data["value"])
+                print(fiction.desc)
+                db.session.commit()
+                return "Đã cập nhật lời tựa"
+            except:
+                return "incoming data invalid"
+        elif incoming_data["type"] == "init":
+            return render_template("_editorjs.html")
+        elif incoming_data["type"] == "publish_year":
+            fiction.publish_year = incoming_data["value"]
+            db.session.commit()
+            return "year updated"
+        elif incoming_data["type"] == "fiction_name":
+            fiction.name = incoming_data["value"]
+            db.session.commit()
+            return "name updated"
+        elif incoming_data["type"] == "tag-manage":
+            fiction.tag = incoming_data["value"]
+            db.session.commit()
+            return "tag updated"
+        elif incoming_data["type"] == "link-download":
+            fiction.mediafire_link = incoming_data["value"]
+            db.session.commit()
+            return "link download updated"
+        elif incoming_data["type"] == "book-cover":
+            fiction.cover = incoming_data["value"]
+            db.session.commit()
+            return "Đã cập nhật ảnh bìa"
+        elif incoming_data["type"] == "short-desc":
+            fiction.short_desc = incoming_data["value"]
+            db.session.commit()
+            return "Mô tả ngắn được cập nhật"
+    return  render_template("editor.html", fiction = fiction, quote = quote, author =author, editable=editable)
+
+
+@app.route("/fiction/<fiction_name>/")
+def specific_fiction_name(fiction_name):
+    fiction = Fiction.query.filter_by(name=fiction_name).first()
+    return  render_template("viewer.html", fiction = fiction)
+
+
+@app.route("/chapter/<int:chapter_id>/", methods=['GET', 'POST'])
+def chapter_viewer(chapter_id):
+    if request.method == 'POST':
+        if request.data == b'':
+            itemdelete = Bookmark.query.filter_by(chapter_id=chapter_id).delete()
+            db.session.commit()
+            return "remove bookmark successfully"
+        else:
+            newitem = Bookmark(user_id=current_user.id, chapter_id=chapter_id)
+            db.session.add(newitem)
+            db.session.commit()
+            return "added bookmark successfully"
+    chapter = Chapter.query.filter_by(id=chapter_id).first()
+    chapter.update_view()
+    fiction = Fiction.query.filter_by(id=chapter.fiction).first()
+    chapters = Chapter.query.filter_by(fiction=fiction.id).order_by(Chapter.chapter_order.asc())
+    return render_template('chapter.html', chapter = chapter, fiction=fiction, chapters = chapters)
+
+
+
+@app.route("/editor/<int:chapter_id>/edit", methods=['GET', 'POST'])
+def edit_chapter(chapter_id):
+    chapter = Chapter.query.filter_by(id=chapter_id).first()
+    if request.method == 'POST':
+        incoming_data = json.loads(request.data.decode('UTF-8'))
+        if incoming_data["type"] == "chapter_name":
+            chapter.name = incoming_data["value"]
+            db.session.commit()
+            return "Đã cập nhật tên chương"
+        if incoming_data["type"] == "chapter_order":
+            chapter.chapter_order = incoming_data["value"]
+            db.session.commit()
+            return "Đã cập nhật thứ tự"
+        elif incoming_data["type"] == "content":
+            return jsonify(chapter.content)
+        elif incoming_data["type"] == "upload":
+            chapter.content = json.dumps(incoming_data["value"])
+            print(chapter.content)
+            db.session.commit()
+            return "Đã cập nhật nội dung chương"
+    return render_template('chapter_editor.html', chapter=chapter)
+
+
+@app.route("/quote/<int:quote_id>", methods = ['GET'])
+def get_quote(quote_id):
+    quote = Quote.query.filter_by(id=quote_id).first()
+    author = Author.query.filter_by(id=quote.author_id).first()
+    fiction = Fiction.query.filter_by(id=quote.fiction).first()
+    return render_template("quote.html", quote = quote, author = author, fiction = fiction)
+
+
+'''
+API SESSION
+Contain interaction with the request from client
+'''
+
+
+@app.route("/editor/<int:fiction_id>/new-chapter/", methods=['GET', 'POST'])
+def new_chapter(fiction_id):
+    form=ChapterForm()
+    if form.validate_on_submit():
+        content = form.content.data 
+        content.replace("\/r\/n",'</p><p>')
+        new_chapter = Chapter(name=form.name.data, content=content, chapter_order=form.chapter_order.data, fiction=fiction_id)
+        db.session.add(new_chapter)
+        db.session.commit()
+        db.session.refresh(new_chapter)
+        return redirect(url_for('chapter_viewer', chapter_id=new_chapter.id))
+    new_chapter = Chapter(name="New Chapter", fiction=fiction_id)
+    db.session.add(new_chapter)
+    db.session.commit()
+    db.session.refresh(new_chapter)
+    return redirect(url_for('edit_chapter', chapter_id=new_chapter.id))
 
 @app.route("/new-fiction/", methods=['GET', 'POST'])
 def new_fiction():
@@ -150,290 +246,48 @@ def new_fiction():
     db.session.refresh(new_fiction)
     return redirect(url_for('edit_specific_post', fiction_id=new_fiction.id))
 
-@app.route("/test/new-fiction/", methods=['GET', 'POST'])
-def test_new_fiction():
-    form = FictionForm()
-    if form.validate_on_submit():
-        desc = { 
-            "time": 1618735370183,
-            "blocks": [
-                {
-                "type": "paragraph",
-                "data": {"text": form.desc.data}
-                }
-            ],
-            "version": "2.20.1",
-        }
-        new_fiction=Fiction(name=form.name.data, cover=form.cover.data, desc=str(desc), status=form.status.data, author_id=form.author.data, publish_year=form.year.data)
-        db.session.add(new_fiction)
-        db.session.commit()
-        db.session.refresh(new_fiction)
-        flash("Data is saved")
-        return redirect(url_for("edit_specific_post", fiction_id=new_fiction.id))
-    return  render_template("new_fiction.html", form=form)
 
-@app.route("/author/<author_name>", methods=['GET', 'POST'])
-def author_page(author_name):
-    author = Author.query.filter_by(name=author_name).first()
-    fictions = Fiction.query.filter_by(author_id=author.id)
-    if current_user.is_anonymous:
-        anonymous = [
-            {
-                "user_id": 0,
-                "fiction_id":0
-            },
-            {
-                "user_id": 0,
-                "fiction_id":0
-            }]
-        like = anonymous
-    else: 
-        like = Like.query.filter_by(user_id=current_user.id)
-    form = AuthorForm()
-    if form.validate_on_submit():
-        author.name = form.author_name.data
-        author.img=form.img.data 
-        author.about=form.about.data
-        db.session.commit()
-        flash("Update completed")
-        return redirect(url_for('author_page', author_name=author.name))
-    return render_template("author.html", author = author, fictions =fictions, form=form, like=like)
-
-@app.route("/author/<int:author_id>/delete")
-def delete_author(author_id):
-    fictions = Fiction.query.filter_by(author_id=author_id).delete()
-    author = Author.query.filter_by(id=author_id).delete()
-    db.session.commit()
-    return redirect(url_for('all_authors'))
-
-@app.route("/authors/")
-def all_authors():
-    authors = Author.query.all()
-    return render_template("authors.html", authors = authors)
-
-
-@app.route("/fictions")
-def fictions():
-    fictions = Fiction.query.all()
-    if current_user.is_anonymous:
-        anonymous = [
-            {
-                "user_id": 0,
-                "fiction_id":0
-            },
-            {
-                "user_id": 0,
-                "fiction_id":0
-            }]
-        like = anonymous
-    else: 
-        like = Like.query.filter_by(user_id=current_user.id)
-    return  render_template("fictions.html", fictions = fictions, like=like)
-
-@app.route("/fiction/<int:fiction_id>/", methods=['GET', 'POST'])
-def specific_post(fiction_id):
-    fiction = Fiction.query.filter_by(id=fiction_id).first()
-    author = Author.query.filter_by(id=fiction.author_id).first()
-    chapter = Chapter.query.filter_by(fiction=fiction_id).first()
-    if current_user.is_anonymous:
-        anonymous = [
-            {
-                "user_id": 0,
-                "fiction_id":0
-            },
-            {
-                "user_id": 0,
-                "fiction_id":0
-            }]
-        like = anonymous
-    else: 
-        like = Like.query.filter_by(user_id=current_user.id)
-    dsc = fiction.desc
-    chapters = Chapter.query.filter_by(fiction=fiction_id).order_by(Chapter.chapter_order.asc())
-    quote = Quote.query.filter_by(fiction=fiction_id)
-    form = FictionForm()
-    youtube_video = Media.query.filter_by(fiction_id=fiction.id, media_type="youtube").first()
-    if form.validate_on_submit():
-        fiction.name=form.name.data
-        fiction.cover=form.cover.data
-        desc = { 
-            "time": 1618735370183,
-            "blocks": [
-                {
-                "type": "paragraph",
-                "data": {"text": form.desc.data}
-                }
-            ],
-            "version": "2.20.1",
-        }
-        fiction.desc=form.desc.data
-        fiction.author_id=form.author.data
-        fiction.status=bool(form.status.data)
-        fiction.publish_year=form.year.data
-        db.session.commit()
-        flash("Data is saved")
-        return redirect(url_for("specific_post", fiction_id=fiction.id))
-    print(form.errors)
-    return  render_template("viewer.html",like=like, youtube_video = youtube_video, form=form, fiction = fiction, chapters = chapters, quote = quote, author =author, chapter=chapter, dsc=dsc)
-
-
-@app.route("/fiction/<int:fiction_id>/edit", methods=['GET', 'POST'])
-def edit_specific_post(fiction_id):
-    fiction = Fiction.query.filter_by(id=fiction_id).first()
-    author = Author.query.filter_by(id=fiction.author_id).first()
-    chapter = Chapter.query.filter_by(fiction=fiction_id).first()
-    editable = True
-    chapters = Chapter.query.filter_by(fiction=fiction_id)
-    quote = Quote.query.filter_by(fiction=fiction_id)
+@app.route("/user/fiction/<int:fiction_id>/",methods=['GET', 'POST'])
+def update_like(fiction_id):
     if request.method == 'POST':
         incoming_data= json.loads(request.data.decode('UTF-8'))
-        print(json.dumps(incoming_data))
-        if incoming_data["type"] == "content":
-            return jsonify(fiction.desc)
-        elif incoming_data["type"] == "upload":
-            try: 
-                fiction.desc = json.dumps(incoming_data["value"])
-                print(fiction.desc)
+        print(incoming_data)
+        if incoming_data['type'] == 'heart':
+            if incoming_data['value'] == True:
+                like = Like(user_id=current_user.id, fiction_id=fiction_id)
+                db.session.add(like)
                 db.session.commit()
-                return "Đã cập nhật lời tựa"
-            except:
-                return "incoming data invalid"
-        elif incoming_data["type"] == "publish_year":
-            fiction.publish_year = incoming_data["value"]
-            db.session.commit()
-            return "year updated"
-        elif incoming_data["type"] == "fiction_name":
-            fiction.name = incoming_data["value"]
-            db.session.commit()
-            return "name updated"
-        elif incoming_data["type"] == "tag-manage":
-            fiction.tag = incoming_data["value"]
-            db.session.commit()
-            return "tag updated"
-        elif incoming_data["type"] == "link-download":
-            fiction.mediafire_link = incoming_data["value"]
-            db.session.commit()
-            return "link download updated"
-        elif incoming_data["type"] == "book-cover":
-            fiction.cover = incoming_data["value"]
-            db.session.commit()
-            return "cover updated"
-    return  render_template("editor.html", fiction = fiction, chapters = chapters, quote = quote, author =author, chapter=chapter, editable=editable)
+                fiction_like = Like.query.filter_by(fiction_id=fiction_id).count()
+                return "has " + str(fiction_like) + " ❤"
+            else:
+                itemdelete = Like.query.filter_by(user_id=current_user.id,fiction_id=fiction_id).delete()
+                db.session.commit()
+                fiction_like = Like.query.filter_by(fiction_id=fiction_id).count()
+                return "has " + str(fiction_like) + " ❤"
+    return {"message":"like updated"}
 
 
-@app.route("/fiction/<int:fiction_id>/delete", methods=['GET', 'POST'])
-def delete_fiction(fiction_id):
-    chapters = Chapter.query.filter_by(fiction=fiction_id).delete()
-    fiction = Fiction.query.filter_by(id=fiction_id).delete()
-    db.session.commit()
-    return  redirect(url_for("specific_post", fiction_id=fiction.id))
-
-@app.route("/chapter/<int:chapter_id>/delete", methods=['GET', 'POST'])
-def delete_chapter(chapter_id):
-    chapter = Chapter.query.filter_by(id=chapter_id).first()
-    fiction = Fiction.query.filter_by(id=chapter.fiction).first()
-    chapter = Chapter.query.filter_by(id=chapter_id).delete()
-    db.session.commit()
-    return  redirect(url_for("specific_post", fiction_id=fiction.id))
-
-@app.route("/fiction/<fiction_name>/")
-def specific_fiction_name(fiction_name):
-    if current_user.is_anonymous:
-        anonymous = [
-            {
-                "user_id": 0,
-                "fiction_id":0
-            },
-            {
-                "user_id": 0,
-                "fiction_id":0
-            }]
-        like = anonymous
-    else: 
-        like = Like.query.filter_by(user_id=current_user.id)
-    fiction = Fiction.query.filter_by(name=fiction_name).first()
-    author = Author.query.filter_by(id=fiction.author_id).first()
-    chapters = Chapter.query.filter_by(fiction=fiction.id)
-    quote = Quote.query.filter_by(fiction=fiction.id)
-    return  render_template("viewer.html", fiction = fiction, chapters = chapters, quote = quote, author =author, like=like)
-
-
-@app.route("/chapter/<int:chapter_id>/", methods=['GET', 'POST'])
-def chapter_viewer(chapter_id):
+@app.route("/api/following/author/",methods=['GET', 'POST'])
+def update_author_follower():
     if request.method == 'POST':
-        if request.data == b'':
-            itemdelete = Bookmark.query.filter_by(chapter_id=chapter_id).delete()
+        incoming_data= json.loads(request.data.decode('UTF-8'))
+        data = incoming_data['data']
+        print(incoming_data)
+        if data['type'] == "author-follow" and data['value'] == "follow":
+            AuthorFollowing.query.filter_by(user_id=current_user.id,author_id=int(data['author'])).delete()
             db.session.commit()
-            return "remove bookmark successfully"
-        else:
-            newitem = Bookmark(user_id=current_user.id, chapter_id=chapter_id)
-            db.session.add(newitem)
+            string = " follower 🧑"
+            follower = AuthorFollowing.query.filter_by(author_id=int(data['author'])).count()
+            return "<strong>" + str(follower) + string + "</strong>"
+        elif data['type'] == "author-follow" and data['value'] == "followed":
+            author_follower = AuthorFollowing(user_id=current_user.id, author_id=int(data['author']))
+            db.session.add(author_follower)
             db.session.commit()
-            return "added bookmark successfully"
-    chapter = Chapter.query.filter_by(id=chapter_id).first()
-    chapter.update_view()
-    fiction = Fiction.query.filter_by(id=chapter.fiction).first()
-    chapters = Chapter.query.filter_by(fiction=fiction.id).order_by(Chapter.chapter_order.asc())
-    try:
-        plus = chapter.chapter_order+1
-        next_chapter = Chapter.query.filter_by(chapter_order=plus, fiction = fiction.id).first()
-        nct = next_chapter
-    except:
-        nct = None
-    try:
-        minus = chapter.chapter_order-1
-        previous_chapter = Chapter.query.filter_by(chapter_order=minus, fiction = fiction.id).first()
-        pre = previous_chapter
-    except:
-        pre = None
-    form=ChapterForm()
-    if form.validate_on_submit():
-        chapter.name=form.name.data 
-        chapter.content=form.content.data 
-        chapter.chapter_order=form.chapter_order.data 
-        db.session.commit()
-        return redirect(url_for('chapter_viewer', chapter_id=chapter.id))
-    return render_template('chapter.html', form = form, chapter = chapter, fiction=fiction, chapters = chapters, next_chapter = nct, previous_chapter = pre)
+            string = " follower 🧑"
+            follower = AuthorFollowing.query.filter_by(author_id=int(data['author'])).count()
+            return "<strong>" + str(follower) + string + "</strong>"
+    return "no input"
 
-
-@app.route("/editor/<int:fiction_id>/new-chapter/", methods=['GET', 'POST'])
-def new_chapter(fiction_id):
-    form=ChapterForm()
-    if form.validate_on_submit():
-        content = form.content.data 
-        content.replace("\/r\/n",'</p><p>')
-        new_chapter = Chapter(name=form.name.data, content=content, chapter_order=form.chapter_order.data, fiction=fiction_id)
-        db.session.add(new_chapter)
-        db.session.commit()
-        db.session.refresh(new_chapter)
-        return redirect(url_for('chapter_viewer', chapter_id=new_chapter.id))
-    new_chapter = Chapter(name="New Chapter", fiction=fiction_id)
-    db.session.add(new_chapter)
-    db.session.commit()
-    db.session.refresh(new_chapter)
-    return redirect(url_for('edit_chapter', chapter_id=new_chapter.id))
-
-@app.route("/editor/<int:chapter_id>/edit", methods=['GET', 'POST'])
-def edit_chapter(chapter_id):
-    chapter = Chapter.query.filter_by(id=chapter_id).first()
-    fiction = Fiction.query.filter_by(id=chapter.fiction).first()
-    if request.method == 'POST':
-        incoming_data = json.loads(request.data.decode('UTF-8'))
-        if incoming_data["type"] == "chapter_name":
-            chapter.name = incoming_data["value"]
-            db.session.commit()
-            return "Đã cập nhật tên chương"
-        if incoming_data["type"] == "chapter_order":
-            chapter.chapter_order = incoming_data["value"]
-            db.session.commit()
-            return "Đã cập nhật thứ tự"
-        elif incoming_data["type"] == "content":
-            return jsonify(chapter.content)
-        elif incoming_data["type"] == "upload":
-            chapter.content = json.dumps(incoming_data["value"])
-            db.session.commit()
-            return "Đã cập nhật nội dung chương"
-    return render_template('chapter_editor.html', chapter=chapter, fiction=fiction)
 
 @app.route("/api/all_authors/", methods = ['GET'])
 def api_all_authors():
@@ -466,12 +320,38 @@ def api_send_chapter_list(fiction_id):
        newdict[c.id] = c.name
     return newdict
 
-@app.route("/quote/<int:quote_id>", methods = ['GET'])
-def get_quote(quote_id):
-    quote = Quote.query.filter_by(id=quote_id).first()
-    author = Author.query.filter_by(id=quote.author_id).first()
-    fiction = Fiction.query.filter_by(id=quote.fiction).first()
-    return render_template("quote.html", quote = quote, author = author, fiction = fiction)
+'''
+DANGER SESSION
+contain link and API for delete item
+must control it with carefully behaviour
+'''
+
+@app.route("/fiction/<int:fiction_id>/delete", methods=['GET', 'POST'])
+def delete_fiction(fiction_id):
+    chapters = Chapter.query.filter_by(fiction=fiction_id).delete()
+    fiction = Fiction.query.filter_by(id=fiction_id).delete()
+    db.session.commit()
+    return  redirect(url_for("specific_post", fiction_id=fiction.id))
+
+@app.route("/chapter/<int:chapter_id>/delete", methods=['GET', 'POST'])
+def delete_chapter(chapter_id):
+    chapter = Chapter.query.filter_by(id=chapter_id).first()
+    fiction = Fiction.query.filter_by(id=chapter.fiction).first()
+    chapter = Chapter.query.filter_by(id=chapter_id).delete()
+    db.session.commit()
+    return  redirect(url_for("specific_post", fiction_id=fiction.id))
+
+@app.route("/author/<int:author_id>/delete")
+def delete_author(author_id):
+    fictions = Fiction.query.filter_by(author_id=author_id).delete()
+    author = Author.query.filter_by(id=author_id).delete()
+    db.session.commit()
+    return redirect(url_for('all_authors'))
+
+'''
+User Session
+Contain route about user authentication, profile, configuration and dashboard
+'''
 
 @app.route('/login', methods=['GET','POST'])
 def login():
@@ -514,23 +394,13 @@ def register():
 def user(username):
     user = User.query.filter_by(user_name=username).first_or_404()
     fictions = Fiction.query.join(Fiction.like).filter_by(user_id=current_user.id)
-    print(fictions)
-    if current_user.is_anonymous:
-        anonymous = [
-            {
-                "user_id": 0,
-                "fiction_id":0
-            },
-            {
-                "user_id": 0,
-                "fiction_id":0
-            }]
-        like = anonymous
-    else: 
-        like = Like.query.filter_by(user_id=current_user.id)
-    medias = Media.query.filter_by(user_id=user.id)
-    posts=Post.query.filter_by(user_id=user.id)
-    owningauthors = Author.query.filter_by(user_id=user.id).first()
-   
-    return render_template('dash.html', user=user, fictions=fictions, like=like, medias=medias, posts=posts, owning = owningauthors)
+    all_fictions = Fiction.query.all()
+    return render_template('dash.html', user=user, fictions=fictions, all_fictions=all_fictions)
 
+
+@app.route('/u/<user_name>/<int:post_id>')
+def view_post(user_name, post_id):
+    post = Post.query.filter_by(id=post_id).first()
+    owner = User.query.filter_by(user_name=user_name).first()
+    owningauthors = Author.query.filter_by(user_id=owner.id).first()
+    return render_template('post.html', post=post, owner = owner, owning = owningauthors, user=owner)

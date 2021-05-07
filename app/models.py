@@ -23,7 +23,7 @@ class Fiction(db.Model):
     __tablename__ = "fiction"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.Unicode(300))
-    status = db.Column(db.Boolean,  default = True)
+    status = db.Column(db.Unicode(300), default ="draft")
     view = db.Column(db.Integer)
     desc = db.Column(db.Text)
     cover = db.Column(db.Text)
@@ -34,13 +34,18 @@ class Fiction(db.Model):
     mediafire_link = db.Column(db.Text)
     slug = db.Column(db.String(160))
     version = db.Column(db.Integer)
-    chapter_count = db.Column(db.Integer)
-    quote_count = db.Column(db.Integer)
     chapter = db.relationship('Chapter')
+    short_desc = db.Column(db.String(160))
     tag = db.Column(db.Unicode(300))
     like = db.relationship('Like', backref ='fiction')
     media = db.relationship('Media', backref='fiction')
+    history = db.relationship('History', backref ='fiction')
+    follower = db.relationship('FictionFollowing', backref ='fiction')
+    quote = db.relationship('Quote')
 
+    # def author(self):
+    #     output = Author.query.filter_by(id=self.fiction).first()
+    #     return output.name
     def cutText(self):
         try: 
             file = ast.literal_eval(self.desc)
@@ -55,14 +60,8 @@ class Fiction(db.Model):
         print("update completed")    
 
     def __repr__(self):
-        return 'Fiction info {}>'.format(self.name)
+        return '{}>'.format(self.name)
 
-
-@dataclass
-class FictionIndex(Fiction):
-    id:int
-    name: str
-    desc: str 
 
     
 @dataclass
@@ -77,7 +76,8 @@ class Chapter(db.Model):
     view_count = db.Column(db.Integer)
     fiction = db.Column(db.Integer, db.ForeignKey('fiction.id'))
     bookmark = db.relationship('Bookmark', backref ='chapter')
-    chapter_order = db.Column(db.Integer, autoincrement=True)
+    chapter_order = db.Column(db.Integer)
+    history = db.relationship('History', backref ='chapter')
     def update_view(self):
         if self.view_count:
             self.view_count=self.view_count+1
@@ -94,6 +94,14 @@ class Chapter(db.Model):
             return file
         except:
             return 'nội dung chứa ký tự không hợp lệ'
+    def __repr__(self):
+        return '{}>'.format(self.name)
+
+@dataclass
+class FictionIndex(Fiction):
+    id:int
+    name: str
+    desc: str 
 
 
 @dataclass
@@ -116,6 +124,9 @@ class Author(db.Model):
     img = db.Column(db.String(240))
     fiction_count = db.Column(db.Integer)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    history = db.relationship('History', backref ='author')
+    follower = db.relationship('AuthorFollowing', backref ='author')
+
 
     def cutText(self):
         text = ast.literal_eval(self.about)
@@ -128,15 +139,15 @@ class Author(db.Model):
         self.fiction_count = fiction_number
         print (self.name, fiction_number)
         db.session.commit()
-    def getChapter(self, fiction_id):
-        chapters = Chapter.query.filter_by(fiction=fiction_id)
-        return chapters
+
 
 class Quote(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     quote = db.Column(db.Text)
     fiction = db.Column(db.Integer, db.ForeignKey('fiction.id'))
     author_id = db.Column(db.Integer, db.ForeignKey('author.id'))
+    history = db.relationship('History', backref ='quote')
+
     img = db.Column(db.Text)
 
 
@@ -147,6 +158,8 @@ class Post(db.Model):
     post_type = db.Column(db.Unicode(300))
     template = db.Column(db.Unicode(200))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    history = db.relationship('History', backref ='post')
+
     def cutText(self):
         text = json.loads(self.content)
         return text
@@ -165,6 +178,8 @@ class Media(db.Model):
     fiction_id = db.Column(db.Integer, db.ForeignKey('fiction.id'))
     author_id = db.Column(db.Integer, db.ForeignKey('author.id'))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    history = db.relationship('History', backref ='media')
+
     def cutText(self):
         text = json.loads(self.content)
         return text
@@ -181,6 +196,8 @@ class Media(db.Model):
     def getMedia(self, id):
         getdata = Media.query.filter_by(id=id).first()
         return getdata
+    def __repr__(self):
+        return '{}>'.format(self.media_type)
 
 class Like(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
@@ -196,12 +213,17 @@ class User(UserMixin, db.Model):
     email = db.Column('email', db.String(120))
     password_hash = db.Column(db.String(128))
     like = db.relationship('Like', backref ='user')
+    bookmark = db.relationship('Bookmark', backref ='user')
     post = db.relationship('Post', backref ='user')
     media = db.relationship('Media', backref ='user')
     author = db.relationship('Author', backref ='user')
-    # post = db.relationship('Post', backref ='author', lazy='dynamic')
+    history = db.relationship('History', backref ='user')
     about_me = db.Column(db.String(140))
     last_seen = db.Column (db.DateTime, default = datetime.utcnow)
+    following = db.relationship('UserFollowing', foreign_keys='[UserFollowing.user_id]', backref ='user_following')
+    follower = db.relationship('UserFollowing', foreign_keys='[UserFollowing.user_following_id]', backref ='user_follower')
+    author_following = db.relationship('AuthorFollowing', foreign_keys='[AuthorFollowing.user_id]', backref ='user_following')
+    fiction_following = db.relationship('FictionFollowing', foreign_keys='[FictionFollowing.user_id]', backref ='user_following')
     def __repr__(self):
         return '<User {}>'.format(self.user_name)
     def set_password(self, password):
@@ -216,5 +238,39 @@ class User(UserMixin, db.Model):
         return 'https://www.gravatar.com/avatar/{}?d=identicon&s={}'.format(digest, size)
 
 class Bookmark(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
     chapter_id = db.Column(db.Integer, db.ForeignKey('chapter.id'), primary_key=True)
+    time = db.Column(db.DateTime, default = datetime.utcnow)
+
+
+class History(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    chapter_id = db.Column(db.Integer, db.ForeignKey('chapter.id'))
+    fiction_id = db.Column(db.Integer, db.ForeignKey('fiction.id'))
+    author_id = db.Column(db.Integer, db.ForeignKey('author.id'))
+    quote_id = db.Column(db.Integer, db.ForeignKey('quote.id'))
+    post_id = db.Column(db.Integer, db.ForeignKey('post.id'))
+    media_id = db.Column(db.Integer, db.ForeignKey('media.id'))
+    time = db.Column(db.DateTime, default = datetime.utcnow)
+    content = db.Column(db.String(300))
+    type = db.Column(db.String(30))
+
+class UserFollowing(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    user_following_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    time = db.Column(db.DateTime, default = datetime.utcnow)
+
+class AuthorFollowing(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    author_id = db.Column(db.Integer, db.ForeignKey('author.id'))
+    time = db.Column(db.DateTime, default = datetime.utcnow)
+
+class FictionFollowing(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    author_id = db.Column(db.Integer, db.ForeignKey('fiction.id'))
+    time = db.Column(db.DateTime, default = datetime.utcnow)

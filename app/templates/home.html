@@ -2,48 +2,48 @@
 {% block title %}Khám Phá{% endblock %}
 {% block content %}
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-<div class="row row-deck">
+<div class="row row-cards">
+
   <div class="col-md-8">
-    <div class="card">
-      <div class = "card-header">Tác phẩm được đề xuất</div>
-      <div class="card-body card-body-scrollable card-body-scrollable-shadow">
-        <div class="divide-y">
-            {% for fiction in top_view_fictions %}
-            <div>
-              {% include '_homeitem.html' %}
-            </div>
-            {% endfor %}
-        </div>
-      </div>
+    <div style="margin:5px;background-color:none; overflow:hidden; width:100%;">
+      {% for fiction in top_view_fictions %}
+        {% include '_homeitem.html' %}
+      {% endfor %}
     </div>
   </div>
-
   <div class="col-md-4">
     <div class="row row-cards">
       <span class="badge bg-cyan">Tác giả được đề xuất</span>
-        {% for author in top_authors %}
-          {% with %}
-            {% set avatar = author.img %}
-            {% set name = author.name %}
-            {% set count = author.fiction_count %}
+        {% for author in top_authors %} 
             {% include '_homeitemrectangle.html'  %}
-          {% endwith %}
         {% endfor %}
     </div>
   </div>
-
-<div class="row row-cards">
-  <h1>Top Authors of the week</h1>
-  {% for author in top_authors %}
-  <div class="col-6 col-md-3">  {% include '_homeitemauthor.html'  %}   </div>
-  {% endfor %}
-</div>
-<hr>
-<div class="row row-deck">
-    <h1>Featuring Fiction</h1>
-    {% for fiction in top_view_fictions %}
-    <div class="col-6 col-md-3">  {% include '_fiction.html'  %}   </div>
-    {% endfor %}
-  </div>
-  
+  <script>
+    function changeState(context) {  
+        if (context.value=="follow") {
+            context.value="followed"
+            context.textContent = "Đã theo dõi 💁‍♂️"
+            uploadData(context)
+        }
+        else {
+            context.value="follow"
+            context.textContent = "Theo dõi 💎💎💎"
+            uploadData(context)
+        }
+    }
+    function uploadData(context) {
+        let data = {type:"author-follow", value:context.value, author:context.name}
+        console.log(data)
+        axios.post('/api/following/author/', {data:data}).then((res)=>{
+            console.log(res)
+            context.previousSibling.previousSibling.innerHTML = res.data
+            console.log(context.previousSibling)
+        }).catch((err)=>{
+            context.textContent = "Đã có lỗi xảy ra"
+            context.disabled = true
+        })
+                
+    }
+  </script>
 {% endblock %}

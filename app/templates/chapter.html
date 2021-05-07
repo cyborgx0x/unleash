@@ -26,6 +26,12 @@
 .option-button{
   align-items: flex-start;
   position: absolute;
+  right:10px
+}
+.back_button{
+  align-items: flex-start;
+  position: absolute;
+  left:10px
 }
 .card-header {
   display: grid;
@@ -56,14 +62,20 @@
       <div class="col-xl-2 col-sm-4">
       </div>
       <div class="card-header justify-content-center">
-
+        <div class="back_button">
+          <a type="button" class="btn" href="/fiction/{{fiction.id}}">
+            <!-- Download SVG icon from http://tabler-icons.io/i/info-circle -->
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><circle cx="12" cy="12" r="9" /><line x1="12" y1="8" x2="12.01" y2="8" /><polyline points="11 12 12 12 12 16 13 16" /></svg>
+            Trang tác phẩm
+          </a>
+        </div>
         <div class="option-button">
-          <a type="button" class="btn dropdown-toggle" data-bs-toggle="dropdown">
+          <a type="button" class="btn" data-bs-toggle="dropdown">
             Tùy chọn 
           </a>
           <div class="dropdown-menu dropdown-menu-demo dropdown-menu-arrow bg-dark text-white">
                 <label class="form-selectgroup-item" >
-                  <input class="form-selectgroup-input" type="checkbox" {{ chapter.id | is_bookmarked }} onchange="
+                  <input class="form-selectgroup-input" type="checkbox" {{ "checked" if chapter.bookmark else  "" }} onchange="
                   if (this.checked == true ) {
                     document.getElementById('bookmarkButton').textContent='Xóa đánh dấu ❌';
                     let data = {mark:'yes'};
@@ -77,13 +89,9 @@
                     location.reload();
                     }
                   ">
-                  <script>
-                    
-                  </script>
-                  <span class="form-selectgroup-label" id="bookmarkButton">{{ "Xóa đánh dấu ❌" if chapter.id | is_bookmarked else "Đánh dấu chương 📑"}}</span>
+                  
+                  <span class="form-selectgroup-label" id="bookmarkButton">{{ "Xóa đánh dấu ❌" if chapter.bookmark else "Đánh dấu chương 📑"}}</span>
                 </label>
-                
-              <a href="{{url_for("delete_fiction", fiction_id=fiction.id)}}" class="dropdown-item">Xóa chương này</a>
               <a href="#" data-toggle="modal" data-target="#Editable" class="dropdown-item">
                 Search Function
               </a>

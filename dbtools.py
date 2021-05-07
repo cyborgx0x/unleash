@@ -49,18 +49,20 @@ def update_fiction_view():
 # update_fiction_count()
 
 
-def update_chapter_count_begin():
+def update_chapter_count_begin(input):
     fictions = Fiction.query.all()
     for fiction in fictions:
         chapters = Chapter.query.filter_by(fiction = fiction.id)
         
         for chapter in chapters:
-            chapter.view_count =+  random.randrange(10000)
+            chapter.view_count = input
         
         print(fiction.name, chapter.view_count)
     db.session.commit()
-# update_chapter_count_begin()
-# update_fiction_view()
+
+update_chapter_count_begin(1)
+update_fiction_view()
+update_fiction_count()
 # content = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
 # fictions = Fiction.query.all()
 # for fiction in fictions:
@@ -91,11 +93,3 @@ def replace_new_line(a,b):
             print("content not found, creating new one")
             c.content = "sample content"
     db.session.commit()
-# a = "</p></p>"
-# b = "</p>"
-# replace_new_line(a,b)
-
-f = Fiction.query.order_by(Fiction.id.desc()).first()
-txt = f.desc
-f.desc = txt.replace("\r\n","</p><p>")
-db.session.commit()

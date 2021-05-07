@@ -1,17 +1,26 @@
 {% extends "layout.html" %}
-{% block title %}{{ fiction.name }} by {{ author.name }}{% endblock %}
+{% block title %}{{ fiction.name }} by {{fiction.author.name }}{% endblock %}
 
 {% block layoutleft %}
 <div  style="margin:5px">
     <div class="bg-dark text-white">
+        <a class="dropdown-item" href="/u/{{current_user.user_name}}#your-fiction"> 
+            <!-- Download SVG icon from http://tabler-icons.io/i/arrow-back-up -->
+	        <button class=btn>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 13l-4 -4l4 -4m-4 4h11a4 4 0 0 1 0 8h-1" /></svg>   
+                Trang quản lý
+            </button>
+        </a>
         <a class="dropdown-item" href="/fiction/{{fiction.id}}">Xem trang tác phẩm</a>
         <button class="dropdown-item" onclick="showMedia(this)" value="edit-fiction">Chỉnh sửa thông tin</button>
         <button class="dropdown-item" onclick="showMedia(this)" value="manage-chapter">Quản lý chương</button>
         <button class="dropdown-item" onclick="showMedia(this)" value="edit-foreword">Chỉnh sửa lời tựa 📝</button>
-        <button class="dropdown-item" onclick="showMedia(this)" value="">Cài đặt chung</button>
-        <button class="dropdown-item" onclick="showMedia(this)" value="">Page and Media</button>
-        <button class="dropdown-item" onclick="showMedia(this)" value="">Thống kê</button>
-        <button class="dropdown-item" onclick="showMedia(this)" value="">Lịch sử chỉnh sửa</button>
+        <button class="dropdown-item" onclick="showMedia(this)" value="fiction-configuration">Cài đặt chung</button>
+        <button class="dropdown-item" onclick="showMedia(this)" value="fiction-media">Danh sách Media</button>
+        <button class="dropdown-item" onclick="showMedia(this)" value="fiction-statistic">Thống kê</button>
+        <button class="dropdown-item" onclick="showMedia(this)" value="fiction-history">Lịch sử chỉnh sửa</button>
+        <!-- <a href="/fiction/{{fiction.id}}/delete" class="dropdown-item">Xóa tác phẩm này</a>  -->
+
     </div>
 </div>
 {% endblock %}
@@ -26,7 +35,7 @@
                     <a  class="btn" href={{url_for('new_chapter', fiction_id=fiction.id)}}>Tạo Chương Mới</a>
                 </div>
                 <h2>Bấm vào link để chỉnh sửa chương</h2>
-                {% for chapter in chapters %}
+                {% for chapter in fiction.chapter %}
                 <li class="dropdown-item">  
                     <a href="{{url_for('edit_chapter', chapter_id=chapter.id)}}" class="link-info large">{{chapter.name}}</a> 
                     <a href="{{url_for('delete_chapter', chapter_id=chapter.id)}}" style="position: relative; padding-left:30px ">Xóa chương này</a>
@@ -34,16 +43,8 @@
                 {% endfor %}
             </div>
             <div class="tab-pane" id="edit-foreword">
-                <div class="toast-body" id="update_message">
-                    Vui lòng nhấn nút để lưu
-                </div>
-                <button id="saveButton" class="btn btn-success">
-                    <!-- Download SVG icon from http://tabler-icons.io/i/send -->
-                    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><line x1="10" y1="14" x2="21" y2="3" /><path d="M21 3l-6.5 18a0.55 .55 0 0 1 -1 0l-3.5 -7l-7 -3.5a0.55 .55 0 0 1 0 -1l18 -6.5" /></svg>
-                    Save
-                </button>
-                <div id="editorjs"></div>
-                {% include "_editorjs.html" %} 
+                <!-- <button type="button" class="btn btn-danger" onclick="loadEditor(this)" name="init-button" value="init">Load Editor</button> -->
+                {% include "_editorjs.html"%}
             </div>
             <div class="tab-pane active show" id="edit-fiction">
                 <div class="alert" role="alert" id="alert-theme">
@@ -60,13 +61,103 @@
                     <input type="text" name="link-download" id="link-download" value="{{fiction.mediafire_link}}" class="form-control">
                     <label for="book-cover">Bìa sách</label>
                     <input type="text" name="book-cover" id="book-cover" value="{{fiction.cover}}" class="form-control">
+                    <label for="short-desc">Mô tả ngắn</label>
+                    <input type="text" name="short-desc" id="short-desc" value="{{fiction.short_desc}}" class="form-control">
                 </div>
+            </div>
+            <div class="tab-pane" id="fiction-media">
+                <h1>Danh sách media</h1>
+                <ul>
+                    {% for media in fiction.media %}
+                    <li>
+                        {{media.title}}
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="tab-pane" id="fiction-configuration">
+                <h1>Cài đặt chung</h1>
+                <span>Run the testing before change status</span>
+                <label for="fiction-status">Lựa chọn trạng thái</label>
+                <select name="fiction-status" id="fiction-status" class="form-control" aria-label="Fiction Status" onchange="saveContent(this)">
+                    <option value="public">Công khai</option>
+                    <option value="draft" selected>Bản nháp</option>
+                    <option value="private">Riêng tư</option>
+                </select>
+                <label for="fiction-theme">Lựa chọn hiển thị</label>
+                <select name="fiction-theme" id="fiction-theme" class="form-control" aria-label="Fiction Theme" onchange="saveContent(this)">
+                    <option value="modern">Hiện đại</option>
+                    <option value="classic" selected>Cổ điển</option>
+                    <option value="creative">Phá cách</option>
+                </select>
+            </div>
+            <div class="tab-pane" id="fiction-history">
+                <h1>Lịch sử chỉnh sửa: </h1>
+                <span class="badge bg-blue">có {{fiction.history | count}} lượt chỉnh sửa</span>
+                {{ fiction.history | pprint }}
+               
+                <table class="table table-dark">
+                    <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Day</th>
+                            <th scope="col">Who</th>
+                            <th scope="col">Content</th>
+                            <th scope="col">Type</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for history in fiction.history %}
+                        <tr>
+                            <th scope="row">{{loop.index}}</th>
+                            <td>{{history.time}}</td>
+                            <td>{{history.user.user_name}}</td>
+                            <td>{{history.content}}</td>
+                            <td>{{history.type}}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                
+            </div>
+            <div class="tab-pane" id="fiction-statistic">
+                <h1> Trực tiếp </h1>
+
+                    Bookmark Rightnow: 
+                    {% for chapter in fiction.chapter %}
+                    <span class="badge bg-pink">
+                    {{ chapter.name }} -  {{chapter.bookmark | count }} bookmark
+                    </span>
+                    {% endfor %}
+                <hr>
+                <h1> Toàn thời gian </h1>
+                {{fiction.view}} lượt xem trang
+                <br>
+                <span class="badge bg-green">
+                    has {{ fiction.like | count }} ❤ heart  
+                </span>
+                <span class="badge bg-red">
+                    has {{ fiction.media | count }} 📷 media
+                </span>
+                <span class="badge bg-blue">
+                    has {{ fiction.quote | count }} 📄 quotes
+                </span>
+                <span class="badge bg-indigo">
+                    has {{ fiction.chapter | count }} 📜 chapter
+                </span>
+
             </div>
         </div>
     </div>
 </div>
 <script>
-    
+    function loadEditor(context) {
+        axios.post('', {type:context.value}).then((res)=>{
+            let editor = res.data
+            console.log(res.data)
+            context.parentNode.innerHTML=editor
+        })
+    }
     let input = document.getElementById('edit-fiction').querySelectorAll('.form-control')
     console.log(input)
     for (let i=0; i<input.length;i++) {
@@ -87,7 +178,7 @@
         })
     }
     function saveContent(context) {
-        console.log('test')
+        console.log(context.options[context.options.selectedIndex].value)
     }
 </script>
 {% endblock %}

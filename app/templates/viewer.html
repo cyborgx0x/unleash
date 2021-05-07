@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}{{ fiction.name }} by {{ author.name }}{% endblock %}
+{% block title %}{{ fiction.name }} by {{ fiction.author.name }}{% endblock %}
 {% block content%}
 
 <div class="row">
@@ -7,52 +7,45 @@
         <div class="row">
         <div class="col-md-4">
             <div  style="margin:5px">
-                <a href="/author/{{ author.name }}" class="btn">
+                <a href="/author/{{ fiction.author.name }}" class="btn">
                     <span class="avatar">
-                        <img src="{{ author.img }}" alt="" style="width:100%;height:auto">
+                        <img src="{{ fiction.author.img }}" alt="" style="width:100%;height:auto">
                     </span>
-                    {{ author.name }}
+                    {{ fiction.author.name }}
                 </a>
-                <a type="button" class="btn dropdown-toggle" data-bs-toggle="dropdown">
+                <a type="button" class="btn" data-bs-toggle="dropdown">
                     Tùy chọn 
                 </a>
                 <div class="dropdown-menu dropdown-menu-demo dropdown-menu-arrow bg-dark text-white">
                     <a href="{{url_for("edit_specific_post", fiction_id=fiction.id)}}" class="dropdown-item">Quản lý tác phẩm</a>
-                    <a href="{{url_for("delete_fiction", fiction_id=fiction.id)}}" class="dropdown-item">Yêu cầu cập nhật 🥩</a>
-            
+                    <a href="{{fiction.mediafire_link}}" class="dropdown-item" target="_blank">Tải về</a>
+                    <a href="#donate" class="dropdown-item">Tặng thịt 🥩</a>
                 </div>
             </div>
-
             {% include "_fiction.html"  %}
             
         </div>
-            
             <div class="col-md-8">
-            
             <div class="alert alert-success" role="alert">
                 <h4 class="alert-heading"> Thông tin tác phẩm {{fiction.name}} </h4>
-                <p>Trạng thái: {% if fiction.status %} Full {% else %} On Going {% endif %}</p>
+                <strong>Tác giả: {{fiction.author.name}}</strong>
+                <p>Trạng thái: {{ fiction.status }}</p>
                 <p>Xuất bản: {{ fiction.publish_year}}</p>
-                <p>Chương mới nhất:</p>
+                <p>Chương mới nhất: {{ fiction.chapter | last }}</p>
                 <p class="card-text">
-                    Lượt đọc: <b>{{fiction.view}}</b>
+                    Lượt đọc: <strong>{{ fiction.chapter|sum(attribute='view_count') }}</strong>
                  </p>
-                <p class="mb-0">Số chương <b>{{ fiction.chapter_count }}</b></p>
+                <p class="mb-0">Số chương <b>{{ fiction.chapter | count }}</b></p>
             </div>
-            
             <div style="margin-top: 30px; background: white">
                 <div class="card-header">Lời tựa của tác giả</div>
                 <div class="card-body">
-
-                    
                     <div class="card-text" id="detailInfomation">
                         {% set elements = fiction.cutText() %}
                         {% for element in elements.blocks %}
                             {% if element.type == "paragraph" %}
                             <p>{{ element.data.text | safe}}</p>
                             {% endif %}
-                            
-                            
                         {% endfor %}
                     </div>
                     
@@ -69,30 +62,30 @@
             <div class="card-header">Danh sách chương </div>
             <div class="card-body" style="overflow: hidden;">
 
-                {% for chapter in chapters %}
+                {% for chapter in fiction.chapter %}
                 {% include '_chapter_list.html'  %}   
                     
                 {% endfor %}
             </div>
         </div>
-        {% if quote %}
+
         <div class="card">
             <div class="card-header">
                
                     Được trích dẫn 
                
             </div>
-            {% for q in quote %}
-
+            {% for quote in fiction.quote %}
+            
+            
             <div class="card-body">
-                <h5 class="card-title">{{ q.quote }}</h5>
-                <img src="{{q.img}}" alt="" class="card-img-top">
+                <h5 class="card-title">{{ quote.quote }}</h5>
+                <img src="{{quote.img}}" alt="" class="card-img-top">
             </div>
             {% endfor %}
 
         </div>
-        {% else %}
-        {% endif %}
+
         
     </div>
 </div>

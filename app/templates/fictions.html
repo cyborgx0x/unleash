@@ -1,11 +1,11 @@
 {% extends "base.html" %}
-{% block title %} All Fictions{% endblock %}
+{% block title %} Ranking {% endblock %}
 {% block content%}
 
 <div class="row row-deck">
   <h1>All Fictions</h1>
   {% for fiction in fictions %}
-  <div class="col-6 col-md-3">
+  <div class="col-6 col-md-2">
 
   {% include '_fiction.html'  %}   
   </div>

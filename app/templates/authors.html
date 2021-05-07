@@ -1,18 +1,73 @@
 {% extends "base.html" %}
 {% block title %}All Authors{% endblock %}
 {% block content%}
+<style>
+    .follower {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+    }
+
+    .button-follower {
+        position: absolute;
+        top: 30px;
+        right: 10px;
+        display: none;
+    }
+
+    .author-item {
+        margin-bottom: 30px;
+        margin-left: 20px;
+    }
+
+    .author-item:hover .button-follower {
+        display: grid;
+    }
+</style>
 
 <div class="row row-deck">
-    {% for author in authors %}
-
-    <div class="col-md-3 col-xs-4">
-        {% include '_author.html'  %}   
+    <h1 class="text-white text-center">Top Authors of the week</h1>
+    {% for author in top_authors %}
+    <div class="col-6 col-md-2">
+        {% include '_author.html' %}
     </div>
-
     {% endfor %}
-
+</div>
+<hr>
+<div class="row row-deck">
+    <h1 class="text-center">All Authors</h1>
+    {% for author in authors %}
+    <div class="col-6 col-md-2">
+        {% include '_author.html'  %}
+    </div>
+    {% endfor %}
 </div>
 
-
-
+<script>
+    function changeState(context) {  
+        if (context.value=="follow") {
+            context.value="followed"
+            context.textContent = "Đã theo dõi 💁‍♂️"
+            uploadData(context)
+        }
+        else {
+            context.value="follow"
+            context.textContent = "Theo dõi 💎💎💎"
+            uploadData(context)
+        }
+    }
+    function uploadData(context) {
+        let data = {type:"author-follow", value:context.value, author:context.name}
+        console.log(data)
+        axios.post('/api/following/author/', {data:data}).then((res)=>{
+            console.log(res)
+            context.previousSibling.previousSibling.innerHTML = res.data
+            console.log(context.previousSibling)
+        }).catch((err)=>{
+            context.textContent = "Đã có lỗi xảy ra"
+            context.disabled = true
+        })
+                
+    }
+  </script>
 {% endblock %}

@@ -4,15 +4,14 @@
 <div  style="margin:5px">
     <div class="bg-dark text-white">
         <button class="dropdown-item" onclick="showMedia(this)" value='bookmark-list'>Danh sách bookmark</button>
-        <button class="dropdown-item" onclick="showMedia(this)" value='author-followed'>Tác giả đã theo dõi</button>
+        <button class="dropdown-item" onclick="showMedia(this)" value='author-following'>Tác giả đã theo dõi</button>
         <button class="dropdown-item" onclick="showMedia(this)" value='like-fiction'>Tác phẩm yêu thích</button>
         <button class="dropdown-item" onclick="showMedia(this)" value='user-activity'>Lịch sử hoạt động</button>
         <button class="dropdown-item" onclick="showMedia(this)" value="user-media">Quản lý media</button>
         <button class="dropdown-item" onclick="showMedia(this)" value='user-posts'>Danh sách bài viết</button>
         <button class="dropdown-item" onclick="showMedia(this)" value='your-fiction'>Quản lý tác phẩm</button>
-        <button class="dropdown-item" onclick="showMedia(this)" value='configuration'>Cổng thanh toán</button>
-        <button class="dropdown-item" onclick="showMedia(this)" value='like-fiction'>Ví của bạn</button>
-        <button class="dropdown-item" onclick="showMedia(this)" value='user-activity'>Liên hệ</button>
+        <button class="dropdown-item" onclick="showMedia(this)" value='general-configuration'>Cài đặt chung</button>
+        <button class="dropdown-item" onclick="showMedia(this)" value='author-manage'>Quản lý tác giả</button>
     </div>
 </div>
 {% endblock %}
@@ -25,20 +24,30 @@
             <div class="tab-pane" id="user-activity">
                 {% include "_recent.html"%}
             </div>
+            <div class="tab-pane" id="author-following">
+                Người dùng theo dõi: {{user.following | count}} <br>
+                Người theo dõi của bạn: {{user.follower | count}} <br>
+                Fiction đang theo dõi: {{user.author_following | count}} <br>
+                Tác giả đang theo dõi: {{user.fiction_following | count}}
+            </div>
             <div class="tab-pane" id="like-fiction">
                 <div>
                     <h1>All your liked fiction</h1>
                     <div class='row row-deck'>
-                        {% for fiction in fictions %}
-                        <div class="col-6 col-md-3"> {% include '_fiction.html' %} </div>
-
-                        {% endfor %}
+                        
+                            {% for fiction in fictions %}
+                            <div class="col-md-4">
+                              {% include '_fiction.html' %}
+                            </div>
+                            {% endfor %}
+                          
+                          
                     </div>
                 </div>
             </div>
             <div class="tab-pane" id="user-media">
                 <div>
-                    {% for media in medias%}
+                    {% for media in user.media %}
                     {% if media.media_type == "youtube" %}
                     Video Extention
                     <div class="card-text">
@@ -66,12 +75,12 @@
                 </div>
             </div>
             <div class="tab-pane" id="user-posts">
-                {% for post in posts%}
+                {% for post in user.post %}
                 <a href="{{url_for('view_post', user_name=user.user_name, post_id=post.id)}}">
                     {{post.title}} - {{post.post_type}} - {{post.template}}
                 </a>
                 <hr>
-                {% endfor%}
+                {% endfor %}
             </div>
             <div class="tab-pane show active" id="bookmark-list">
                 Bookmark List
@@ -80,13 +89,30 @@
                 {% endblock %}
             </div>
             <div class="tab-pane" id="your-fiction">
+                <a href="{{url_for('new_fiction')}}" type="button" class="btn">Tạo tác phẩm mới</a>
+                <h2> Click vào link để edit tác phẩm </h2>
+                {% for fiction in all_fictions %}
+                    <a href="{{url_for('edit_specific_post', fiction_id=fiction.id)}}" class="nav-link">{{fiction.name}}</a>
+                {% endfor %}
                 
-                <a href="{{url_for('new_fiction')}}" class="nav-link">Tạo tác phẩm mới</a>
+            </div>
+            <div class="tab-pane" id="general-configuration">
+                <h1>Hello</h1>
+            </div>
+            <div class="tab-pane" id="author-manage">
+                {% for author in user.author %}
+                    <a href="{{url_for('author_page', author_name=author.name)}}">{{author.name}}</a>
+                {% endfor %}
             </div>
         </div>
     </div>
 </div>
-
+<script>
+    document.getElementById(location.hash.replace('#','')).className='tab-pane active show'
+    removeActiveState()
+    document.getElementById(location.hash.replace('#','')).className+=" active show"
+    location.hash=location.hash.replace('#','')
+</script>
 {% endblock %}
 
 {% block layoutright %}
@@ -103,7 +129,7 @@
                 Coin Amount: $10 000
             </span>
             <span class="badge bg-cyan">
-                Owner of Author: <a href="{{url_for('author_page', author_name=owning.name)}}">{{owning.name}}</a>
+                Owner of Author: <a href="{{url_for('author_page', author_name=user.author.name)}}">{{user.author.name}}</a>
             </span>
 
         </div>

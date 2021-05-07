@@ -6,7 +6,7 @@ from app.models import User
 class FictionForm(FlaskForm):
     name = StringField('Fiction Name', validators=[DataRequired()])
     cover = StringField('Cover', validators=[DataRequired()])
-    desc = StringField('Thông tin mô tả', validators=[DataRequired()])
+    desc = TextAreaField('Thông tin mô tả', validators=[DataRequired()])
     status = BooleanField('Trạng thái', validators=[DataRequired()])
     author = StringField('Tác giả', validators=[DataRequired()])
     year = StringField('Năm xuất bản', validators=[DataRequired()])
@@ -39,7 +39,7 @@ class RegistrationForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired(), Email()])
     password = PasswordField('Password', validators=[DataRequired()])
     password2 = PasswordField('Repeat Password', validators=[DataRequired(), EqualTo('password')])
-    submit = SubmitField('REG NOW')
+    submit = SubmitField('Đăng ký')
     
     def validate_username(self, username):
         user = User.query.filter_by(user_name=username.data).first()
