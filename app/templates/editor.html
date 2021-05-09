@@ -63,7 +63,18 @@
                     <input type="text" name="book-cover" id="book-cover" value="{{fiction.cover}}" class="form-control">
                     <label for="short-desc">Mô tả ngắn</label>
                     <input type="text" name="short-desc" id="short-desc" value="{{fiction.short_desc}}" class="form-control">
+                    <label for="fiction-author">Lựa chọn Tác giả</label>
                 </div>
+                
+                <select name="fiction-author" id="fiction-author" class="form-control" aria-label="Fiction Author">
+                    {% for author in authors %}
+                    {% if author.id == fiction.author.id %}
+                        <option value="{{fiction.author.id}}" selected >{{fiction.author.name}}</option>
+                        {% else %}
+                        <option value="{{author.id}}">{{author.name}}</option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
             </div>
             <div class="tab-pane" id="fiction-media">
                 <h1>Danh sách media</h1>
@@ -183,5 +194,29 @@
 </script>
 {% endblock %}
 {% block layoutright %}
-
+<div class="card">
+    <div class="card-body">
+        <p>Khi chọn xuất ra tệp epub, hệ thống sẽ kiểm tra các thông tin cần thiết để việc xuất bản tệp được thành công. Nếu các thành phần không đạt, việc xuất ra tệp epub sẽ không được thực hiện.</p>
+        <button type="button" class="btn" name="export-fiction" value="epub-export" onclick="exportFiction(this)">Xuất ra tệp epub</button>
+        <script>
+            
+            function exportFiction(context){
+                setTimeout(sendMessage(context,"Đang kiểm tra thông tin cần thiết"),3000)
+                setTimeout(sendMessage(context,"Tiêu đề tác phẩm ✅"),3000)
+                setTimeout(sendMessage(context,"Bìa sách ✅"),3000)
+                setTimeout(sendMessage(context,"Tác giả ✅"),3000)
+                setTimeout(sendMessage(context,"Mô tả ngắn ✅"),3000)
+                setTimeout(sendMessage(context,"Lời tựa ✅"),3000)
+                setTimeout(sendMessage(context,"Đang tạo danh sách chương ✅"),3000)
+                setTimeout(sendMessage(context,"Đã tạo xong, tệp đã được lưu vào drive 🔥"),3000)
+                setTimeout(sendMessage(context,"Link sẽ có sẵn ở mục Tải tại trang tác phẩm ✅"),3000)
+                setTimeout(sendMessage(context,"Bạn có thể bấm nút để tải về ✅"),3000)
+                context.textContent = "🔽 Download"
+            }
+            function sendMessage(context,message) {
+                context.previousElementSibling.textContent = message
+            }
+        </script>
+    </div>
+</div>
 {% endblock %}

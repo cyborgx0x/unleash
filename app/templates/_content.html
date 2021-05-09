@@ -1,0 +1,11 @@
+{% for element in elements.blocks %}
+    {% if element.type == "paragraph" %}
+    <p>{{ element.data.text | safe}}</p>
+    {% endif %}
+    {% if element.type == "header" %}
+        {% if element.data.level == 2 %}
+        <h2>{{ element.data.text | safe}}</h2>
+
+        {% endif %}
+    {% endif %}
+{% endfor %}

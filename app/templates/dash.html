@@ -25,9 +25,7 @@
                 {% include "_recent.html"%}
             </div>
             <div class="tab-pane" id="author-following">
-                Người dùng theo dõi: {{user.following | count}} <br>
-                Người theo dõi của bạn: {{user.follower | count}} <br>
-                Fiction đang theo dõi: {{user.author_following | count}} <br>
+                Fiction đang theo dõi: {{user.author_following | count}} 
                 Tác giả đang theo dõi: {{user.fiction_following | count}}
             </div>
             <div class="tab-pane" id="like-fiction">
@@ -100,8 +98,10 @@
                 <h1>Hello</h1>
             </div>
             <div class="tab-pane" id="author-manage">
-                {% for author in user.author %}
-                    <a href="{{url_for('author_page', author_name=author.name)}}">{{author.name}}</a>
+                <a href="{{url_for('new_author')}}" type="button" class="btn">Tạo tác giả mới</a>
+                <hr>
+                {% for author in all_authors %}
+                    <a href="{{url_for('edit_author', author_id=author.id)}}" class="nav-link">{{author.name}}</a>
                 {% endfor %}
             </div>
         </div>
@@ -123,13 +123,18 @@
         </span>
         <h3 class="m-0 mb-1" style="height: 30; color:white;"><a
                 href="{{url_for('user', username=user.user_name)}}">{{user.user_name}}</a></h3>
-        <div class="text-muted" style="height: 30; color:white;">Năm sinh</div>
+        <div class="text-muted" style="height: 30; color:white;">Lần online gần nhất: {{user.last_seen}}</div>
         <div class="mt-3">
+            <span class="badge bg-blue">
+               Số bài viết: {{user.post | count}} 
+            </span>
+
+                
             <span class="badge bg-purple">
-                Coin Amount: $10 000
+                Đang theo dõi: {{user.following | count}} 
             </span>
             <span class="badge bg-cyan">
-                Owner of Author: <a href="{{url_for('author_page', author_name=user.author.name)}}">{{user.author.name}}</a>
+                Được theo dõi: {{user.follower | count}} 
             </span>
 
         </div>

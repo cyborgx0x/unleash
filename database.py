@@ -15,3 +15,5 @@ def view_all_post():
     selected = Fiction.query.all()
     return selected
 
+
+

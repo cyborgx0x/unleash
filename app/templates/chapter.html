@@ -39,11 +39,53 @@
 .markdown {
   font-size: 1rem;
 }
+
+.easy-reading{
+  position: fixed;
+  left: 10px; 
+  top: 20px;
+  display: flex;
+  flex-direction: column;
+}
+.easy-reading button {
+  background-color: rgb(223, 223, 223/1);
+  border-width:0; 
+  font-size: 1.2em;
+  margin-top: 10px;
+  border-radius: 30px;
+  height: 30px;
+  color: black;
+}
+.main-content-classic {
+  font-size: 1.2em;
+  padding-left: 30px;
+  padding-top: 20px;
+}
+
 </style>
 
 {% endblock %}
 {% block content%}
+<div class="easy-reading">
+  <button type="button" value="main-content-classic" onclick="changeValue(this)"> 🔥 </button>
+</div>
+<script>
+  function changeValue(context) {
+    if (context.value == "main-content-classic") {
+      document.getElementById('viewerContent').className +=" main-content-classic"
+      document.getElementById('mainView').style.backgroundColor = "dimgrey"
+      document.body.style.color = "white"
+      context.value="main-content"
+    }
+    else {
+      document.getElementById('viewerContent').className = "main-content"
+      document.getElementById('mainView').style.backgroundColor = "white"
+      document.body.style.color = "black"
 
+      context.value="main-content-classic"
+    }
+  }
+</script>
 
 <div class="row justify-content-center">
   
@@ -58,7 +100,7 @@
       {% include '_searchmodal.html'  %} 
       </div>
   
-    <div class="card card-lg" style="margin: 10;">
+    <div class="card card-lg" style="margin: 10;" id="mainView">
       <div class="col-xl-2 col-sm-4">
       </div>
       <div class="card-header justify-content-center">
@@ -110,15 +152,9 @@
         <div id="currentChapter" data="{{chapter.id}}"></div>
         <div class="card-title" id="exampleModalLabel"></div>
         
-        <div class="markdown" id=viewerContent>
+        <div class="main-content" id=viewerContent>
           {% set elements = chapter.cutText() %}
-            {% for element in elements.blocks %}
-                {% if element.type == "paragraph" %}
-                <p>{{ element.data.text | safe}}</p>
-                {% endif %}
-                
-                
-            {% endfor %}
+            {% include "_content.html" %}
         </div>
       </div>
     </div>

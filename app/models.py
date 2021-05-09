@@ -20,6 +20,7 @@ class Fiction(db.Model):
     cover: str
     tag: str
 
+
     __tablename__ = "fiction"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.Unicode(300))
@@ -43,12 +44,9 @@ class Fiction(db.Model):
     follower = db.relationship('FictionFollowing', backref ='fiction')
     quote = db.relationship('Quote')
 
-    # def author(self):
-    #     output = Author.query.filter_by(id=self.fiction).first()
-    #     return output.name
     def cutText(self):
         try: 
-            file = ast.literal_eval(self.desc)
+            file = json.loads(self.desc)
             return file
         except:
             return 'nội dung chứa ký tự không hợp lệ'
@@ -69,6 +67,7 @@ class Chapter(db.Model):
     id:int
     name: str
     content: str
+    
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(160))
@@ -90,18 +89,14 @@ class Chapter(db.Model):
         db.session.commit()
     def cutText(self):
         try: 
-            file = ast.literal_eval(self.content)
+            file = json.loads(self.content)
             return file
         except:
             return 'nội dung chứa ký tự không hợp lệ'
     def __repr__(self):
         return '{}>'.format(self.name)
 
-@dataclass
-class FictionIndex(Fiction):
-    id:int
-    name: str
-    desc: str 
+
 
 
 @dataclass
@@ -109,7 +104,6 @@ class Author(db.Model):
     id: int
     name: str 
     img: str
-    fiction: Fiction
     about: str
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -129,8 +123,11 @@ class Author(db.Model):
 
 
     def cutText(self):
-        text = ast.literal_eval(self.about)
-        return text
+        try: 
+            text = json.loads(self.about)
+            return text
+        except: 
+            return {"author":"content"}
     def set_count(self, fiction_number):
         self.fiction_count = fiction_number
         print("update completed")
@@ -203,13 +200,16 @@ class Like(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
     fiction_id = db.Column(db.Integer, db.ForeignKey('fiction.id'), primary_key=True)
 
-
+@dataclass
 class User(UserMixin, db.Model):
+
     'users', meta
     id = db.Column('id', db.Integer, primary_key=True)
     first_name = db.Column('first_name',db.Unicode(50))
     last_name = db.Column('last_name',db.Unicode(50))
     user_name = db.Column('user_name', db.String(64))
+    about_me = db.Column(db.String(140))
+    last_seen = db.Column (db.DateTime, default = datetime.utcnow)
     email = db.Column('email', db.String(120))
     password_hash = db.Column(db.String(128))
     like = db.relationship('Like', backref ='user')
@@ -218,8 +218,6 @@ class User(UserMixin, db.Model):
     media = db.relationship('Media', backref ='user')
     author = db.relationship('Author', backref ='user')
     history = db.relationship('History', backref ='user')
-    about_me = db.Column(db.String(140))
-    last_seen = db.Column (db.DateTime, default = datetime.utcnow)
     following = db.relationship('UserFollowing', foreign_keys='[UserFollowing.user_id]', backref ='user_following')
     follower = db.relationship('UserFollowing', foreign_keys='[UserFollowing.user_following_id]', backref ='user_follower')
     author_following = db.relationship('AuthorFollowing', foreign_keys='[AuthorFollowing.user_id]', backref ='user_following')
@@ -236,6 +234,9 @@ class User(UserMixin, db.Model):
     def avatar(self, size):
         digest = md5(self.email.lower().encode('utf-8')).hexdigest()
         return 'https://www.gravatar.com/avatar/{}?d=identicon&s={}'.format(digest, size)
+
+
+
 
 class Bookmark(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -274,3 +275,23 @@ class FictionFollowing(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     author_id = db.Column(db.Integer, db.ForeignKey('fiction.id'))
     time = db.Column(db.DateTime, default = datetime.utcnow)
+
+
+@dataclass
+class FictionIndex(Fiction):
+    id: int
+    name: str
+    desc: str
+    cover: str
+    tag: str
+
+
+@dataclass
+class UserIndex(User):
+    id:int
+    user_name: str
+
+@dataclass
+class AuthorIndex(Author):
+    id:int
+    name: str

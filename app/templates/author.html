@@ -84,10 +84,15 @@
 
         <div class="card">
             <div class="card-header">Tác giả: {{author.name}}</div>
-            <div class="card-body" id="authorInformation">
-                📄 Tiểu sử tác giả: 
-                {{author.about}}
+            <div class="card-body" id="authorInformation" onload="loadAbout(this)">
+                <div class="main-content">
+                    📄 Tiểu sử tác giả: 
+                    {% set elements = author.cutText() %}
+                        {% include "_content.html" %}
+
+                </div>
             </div>
+
             <hr>
             <div class="fiction-zone">
                 

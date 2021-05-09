@@ -13,13 +13,18 @@ from app import app, db
 from app.form import (AuthorForm, ChapterForm, FictionForm, LoginForm,
                       Quiz_answer, RegistrationForm)
 from app.models import (Author, Chapter, Fiction, FictionIndex, Like, Media,
-                        Quote, User, Post, Bookmark, AuthorFollowing)
+                        Quote, User, Post, Bookmark, AuthorFollowing, UserIndex, AuthorIndex)
 
+def logging(function):
+    print(function)
+    return function
 
 @app.route("/")
+@logging
 def index():
     top_view_fictions = Fiction.query.order_by(Fiction.view.desc()).limit(100).all()
     top_authors = Author.query.order_by(Author.fiction_count.desc()).limit(12).all()
+
     return  render_template("home.html", top_view_fictions = top_view_fictions, top_authors=top_authors)
 
 
@@ -40,10 +45,20 @@ def view_all_media():
 def test_search():
     return render_template('_search.html')
 
+'''
+function area
+chứa những chức năng mở rộng
+'''
 
-@app.route("/build_indexing/")
+@app.route("/build_indexing/", methods=['GET', 'POST'])
 def build_indexing():
     fictions=FictionIndex.query.all()
+    users = UserIndex.query.all()
+    authors = AuthorIndex.query.all()
+    if request.method=='POST':
+        incoming_data = json.loads(request.data.decode('UTF-8'))
+        if incoming_data["query"] == "author":
+            return jsonify(authors)           
     return jsonify(fictions)
 
 @app.route("/img-cover/<path:link>")
@@ -64,15 +79,32 @@ def author_page(author_name):
 @app.route("/editor/author/<int:author_id>", methods=['GET', 'POST'])
 def edit_author(author_id):
     author = Author.query.filter_by(id=author_id).first()
-    form = AuthorForm()
-    if form.validate_on_submit():
-        author.name = form.author_name.data
-        author.img=form.img.data 
-        author.about=form.about.data
-        db.session.commit()
-        flash("Update completed")
-        return redirect(url_for('author_page', author_name=author.name))
-    return render_template("author_editor.html", author = author,form=form)
+    if request.method == 'POST':
+        incoming_data= json.loads(request.data.decode('UTF-8'))
+        print(json.dumps(incoming_data))
+        if incoming_data["type"] == "content":
+            return jsonify(author.about)
+        elif incoming_data["type"] == "upload":
+            author.about = json.dumps(incoming_data["value"])
+            db.session.commit()
+            return "success 🔥🔥🔥"
+        elif incoming_data["type"] == "author_name":
+            author.name = incoming_data["value"]
+            db.session.commit()
+            return "success 🔥🔥🔥"
+        elif incoming_data["type"] == "author_birth_year":
+            author.birth_year = incoming_data["value"]
+            db.session.commit()
+            return "success 🔥🔥🔥"
+        elif incoming_data["type"] == "author_page":
+            author.author_page = incoming_data["value"]
+            db.session.commit()
+            return "success 🔥🔥🔥"
+        elif incoming_data["type"] == "author_img":
+            author.img = incoming_data["value"]
+            db.session.commit()
+            return "success 🔥🔥🔥"
+    return render_template("author_editor.html", author = author)
 
 
 @app.route("/authors/")
@@ -97,11 +129,8 @@ def specific_post(fiction_id):
 @app.route("/fiction/<int:fiction_id>/edit", methods=['GET', 'POST'])
 def edit_specific_post(fiction_id):
     fiction = Fiction.query.filter_by(id=fiction_id).first()
-    author = Author.query.filter_by(id=fiction.author_id).first()
-    editable = True
-    quote = Quote.query.filter_by(fiction=fiction_id)
+    authors = Author.query.all()
     if request.method == 'POST':
-        print(request.data)
         incoming_data= json.loads(request.data.decode('UTF-8'))
         print(json.dumps(incoming_data))
         if incoming_data["type"] == "content":
@@ -140,7 +169,11 @@ def edit_specific_post(fiction_id):
             fiction.short_desc = incoming_data["value"]
             db.session.commit()
             return "Mô tả ngắn được cập nhật"
-    return  render_template("editor.html", fiction = fiction, quote = quote, author =author, editable=editable)
+        elif incoming_data["type"] == "fiction-author":
+            fiction.author_id = incoming_data["value"]
+            db.session.commit()
+            return "Đã cập nhật tác giả"
+    return  render_template("editor.html", fiction = fiction, authors=authors)
 
 
 @app.route("/fiction/<fiction_name>/")
@@ -222,6 +255,14 @@ def new_chapter(fiction_id):
     db.session.commit()
     db.session.refresh(new_chapter)
     return redirect(url_for('edit_chapter', chapter_id=new_chapter.id))
+
+@app.route("/new-author/")
+def new_author():
+    new_author = Author(name="Tên Tác Giả", user_id=current_user.id)
+    db.session.add(new_author)
+    db.session.commit()
+    db.session.refresh(new_author)
+    return redirect(url_for('edit_author', author_id=new_author.id))
 
 @app.route("/new-fiction/", methods=['GET', 'POST'])
 def new_fiction():
@@ -395,7 +436,8 @@ def user(username):
     user = User.query.filter_by(user_name=username).first_or_404()
     fictions = Fiction.query.join(Fiction.like).filter_by(user_id=current_user.id)
     all_fictions = Fiction.query.all()
-    return render_template('dash.html', user=user, fictions=fictions, all_fictions=all_fictions)
+    all_authors = Author.query.all()
+    return render_template('dash.html', user=user, fictions=fictions, all_fictions=all_fictions, all_authors=all_authors)
 
 
 @app.route('/u/<user_name>/<int:post_id>')

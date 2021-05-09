@@ -8,12 +8,14 @@
 </button>
 <div id="editorjs"></div>
     <script src="https://cdn.jsdelivr.net/npm/@editorjs/editorjs@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@editorjs/header@latest"></script>
+    
     <script>
         axios.post('', {type:"content"})
         .then((response) => {
             try {
                 let data = JSON.parse(response.data);
-                const editor = new EditorJS({data: data});
+                const editor = new EditorJS({data: data, tools:{header:Header}});
                 let saveButton = document.getElementById('saveButton');
                 saveButton.addEventListener('click', function(e)  {editor.save().then((output)=>{
                     let upload = {

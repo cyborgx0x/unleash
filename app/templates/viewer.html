@@ -40,13 +40,9 @@
             <div style="margin-top: 30px; background: white">
                 <div class="card-header">Lời tựa của tác giả</div>
                 <div class="card-body">
-                    <div class="card-text" id="detailInfomation">
+                    <div class="main-content" id="detailInfomation">
                         {% set elements = fiction.cutText() %}
-                        {% for element in elements.blocks %}
-                            {% if element.type == "paragraph" %}
-                            <p>{{ element.data.text | safe}}</p>
-                            {% endif %}
-                        {% endfor %}
+                        {% include "_content.html" %}
                     </div>
                     
                 </div>
