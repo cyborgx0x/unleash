@@ -10,12 +10,6 @@
         <strong>
           <a href="/fiction/{{fiction.id}}">{{fiction.name}}</a>
         </strong>
-        <span class="badge bg-green">
-          has {{ fiction.like | count }} ❤
-        </span>
-        <span class="badge bg-yellow">
-          {{ fiction.chapter|sum(attribute='view_count') }} views 💁‍♂️
-        </span>
       </div>
       <div class="text-muted">
         <p>
