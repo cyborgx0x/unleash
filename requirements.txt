@@ -35,3 +35,4 @@ numpy
 pillow
 mysqlclient
 Flask-Markdown
+psycopg2-binary

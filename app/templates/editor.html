@@ -196,6 +196,7 @@
 {% block layoutright %}
 <div class="card">
     <div class="card-body">
+        
         <p>Khi chọn xuất ra tệp epub, hệ thống sẽ kiểm tra các thông tin cần thiết để việc xuất bản tệp được thành công. Nếu các thành phần không đạt, việc xuất ra tệp epub sẽ không được thực hiện.</p>
         <button type="button" class="btn" name="export-fiction" value="epub-export" onclick="exportFiction(this)">Xuất ra tệp epub</button>
         <script>
@@ -217,6 +218,14 @@
                 context.previousElementSibling.textContent = message
             }
         </script>
+    </div>
+    <div class="card-body">
+        <label for="reminder"> Jump to session:</label>
+        <select name="reminder" id="reminder">
+            <option value="reminder1">Note from Lucas</option>
+            <option value="reminder1">Note 2 about character</option>
+            <option value="reminder1">Note 3</option>
+        </select>
     </div>
 </div>
 {% endblock %}
