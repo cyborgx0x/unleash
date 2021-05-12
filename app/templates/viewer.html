@@ -32,9 +32,7 @@
                 <p>Trạng thái: {{ fiction.status }}</p>
                 <p>Xuất bản: {{ fiction.publish_year}}</p>
                 <p>Chương mới nhất: {{ fiction.chapter | last }}</p>
-                <p class="card-text">
-                    Lượt đọc: <strong>{{ fiction.chapter|sum(attribute='view_count') }}</strong>
-                 </p>
+
                 <p class="mb-0">Số chương <b>{{ fiction.chapter | count }}</b></p>
             </div>
             <div style="margin-top: 30px; background: white">

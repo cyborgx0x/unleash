@@ -3,7 +3,6 @@
     <img src="{% if fiction.cover %}{{url_for('img_proxy', link=fiction.cover)}}{% else %} https://firebasestorage.googleapis.com/v0/b/ngot-technology.appspot.com/o/book-cover%2Fsample.jpg?alt=media&token=4c780b66-0c22-41eb-9fde-51973b421815{% endif %}" alt="{{fiction.name}}" style="width:100%; height:auto">
     <div class="blend-over">
       <h2><a href="/fiction/{{fiction.id}}">{{fiction.name}}</a></h2>
-      <p>{{ fiction.chapter|sum(attribute='view_count') }} lượt đọc</p>
       <p>{{fiction.author.name}}</p>
     </div>
    
