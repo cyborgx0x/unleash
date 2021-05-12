@@ -127,6 +127,7 @@ def specific_post(fiction_id):
 
 
 @app.route("/fiction/<int:fiction_id>/edit", methods=['GET', 'POST'])
+@login_required
 def edit_specific_post(fiction_id):
     fiction = Fiction.query.filter_by(id=fiction_id).first()
     authors = Author.query.all()
@@ -203,6 +204,7 @@ def chapter_viewer(chapter_id):
 
 
 @app.route("/editor/<int:chapter_id>/edit", methods=['GET', 'POST'])
+@login_required
 def edit_chapter(chapter_id):
     chapter = Chapter.query.filter_by(id=chapter_id).first()
     if request.method == 'POST':
