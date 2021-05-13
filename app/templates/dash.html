@@ -84,8 +84,7 @@
 {% block layoutright %}
 <div class="card">
     <div class="card-body p-4 text-center bg-dark text-white">
-        <span class="avatar avatar-xl mb-3 avatar-rounded">
-            <img src="#" alt="" style="width:100%;height:auto" class="avatar avatar-xl mb-3 avatar-rounded" id="avatar">
+        <span class="avatar avatar-xl mb-3 avatar-rounded" id="avatar">
         </span>
         <h3 class="m-0 mb-1" style="height: 30; color:white;"><a
                 {{user.name}}</h3>
@@ -103,7 +102,7 @@
                     {"redirect":"false"},
                     function(response) {
                         console.log(response)
-                        document.getElementById('avatar').src=response.data.url
+                        document.getElementById('avatar').style.backgroundImage=response.data.url
                     }
                     ); 
               } else {                                 // Not logged into your webpage or we are unable to tell.
