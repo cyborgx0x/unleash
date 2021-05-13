@@ -30,7 +30,7 @@ def pp():
 
 @app.route('/TOS')
 def tos():
-    return render_template('tos.html')
+    return render_template('TOS.html')
 
 @app.route('/media/')
 def view_all_media():
