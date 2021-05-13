@@ -415,6 +415,7 @@ def login():
         return redirect(url_for('index'))
     if request.method == "POST":
         incoming_data = json.loads(request.data.decode('UTF-8'))
+        incoming_data = incoming_data['data']
         core_url = "https://graph.facebook.com/v10.0/me?fields=id%2Cname&access_token="
         access_token = incoming_data['authResponse']['accessToken']
         facebook_id = incoming_data['authResponse']['userID']
