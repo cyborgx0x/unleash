@@ -24,11 +24,13 @@ def index():
     return  render_template("home.html", top_view_fictions = top_view_fictions, top_authors=top_authors)
 
 
-@app.route('/guide/')
-def guide():
-    owner = User.query.filter_by(user_name='noname2').first()
-    owningauthors = Author.query.filter_by(user_id=4).first()
-    return render_template('post.html', owner = owner, owning = owningauthors, user=owner)
+@app.route('/privacy-policy')
+def pp():
+    return render_template('pp.html')
+
+@app.route('/TOS')
+def tos():
+    return render_template('tos.html')
 
 @app.route('/media/')
 def view_all_media():
