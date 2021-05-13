@@ -150,7 +150,7 @@
               </li>
               {% else %}
               <li class="nav-item">
-              <a class="nav-link" href="{{ url_for('user', id=current_user.facebook) }}">Dashboard</a>
+              <a class="nav-link" href="{{ url_for('user', id=current_user.id) }}">Dashboard</a>
               </li>
               <li class="nav-item">
                 <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>

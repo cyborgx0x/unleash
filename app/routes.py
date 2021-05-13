@@ -467,10 +467,10 @@ def register():
         return redirect(url_for('login'))
     return render_template('reg.html', title='Register', form=form)
 
-@app.route('/u/<username>')
+@app.route('/u/<id>')
 @login_required
-def user(username):
-    user = User.query.filter_by(user_name=username).first_or_404()
+def user(id):
+    user = User.query.filter_by(id=id).first_or_404()
     fictions = Fiction.query.join(Fiction.like).filter_by(user_id=current_user.id)
     all_fictions = Fiction.query.all()
     all_authors = Author.query.all()
