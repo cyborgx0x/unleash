@@ -1,4 +1,5 @@
 import json
+import re
 
 from flask import (Flask, Markup, flash, jsonify, redirect, render_template,
                    request, send_file, url_for, session)
@@ -7,7 +8,7 @@ from img_crop import return_img
 from werkzeug.datastructures import ImmutableMultiDict
 from werkzeug.urls import url_parse
 import ast
-
+import requests
 from app import app, db
 from app.form import (AuthorForm, ChapterForm, FictionForm, LoginForm,
                       Quiz_answer, RegistrationForm)
@@ -412,6 +413,22 @@ Contain route about user authentication, profile, configuration and dashboard
 def login():
     if current_user.is_authenticated:
         return redirect(url_for('index'))
+    if request.method == "POST":
+        core_url = "https://graph.facebook.com/v10.0/me?fields=id%2Cname&access_token="
+        access_token = request.args.get('accessToken')
+        facebook_id=request.args.get('userID', type=int)
+        auth = requests.get(core_url + access_token)
+        if auth.status_code == 200:
+            user = User.query.filter_by(facebook_id=facebook_id).first()
+            if user is None:
+                new_user = User(facebook_id=facebook_id)
+                db.session.add(new_user)
+                db.session.commit()
+                db.session.refresh(new_user)
+                login_user(new_user,duration=request.args.get('data_access_expiration_time'))
+                return redirect(url_for('index'))
+            login_user(user,duration=request.args.get('data_access_expiration_time'))
+            return redirect(url_for('index')) 
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(user_name=form.username.data).first()
