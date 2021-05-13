@@ -1,6 +1,9 @@
 {% extends "layout.html" %}
 {% block title %} Dashboard {% endblock %}
 {% block layoutleft %}
+<div id="fb-root"></div>
+<script async defer crossorigin="anonymous" src="https://connect.facebook.net/vi_VN/sdk.js#xfbml=1&version=v10.0" nonce="6G9uuJ2a"></script>
+
 <div  style="margin:5px">
     <div class="bg-dark text-white">
         <button class="dropdown-item" onclick="showMedia(this)" value='your-fiction'>Quản lý tác phẩm</button>
@@ -84,7 +87,7 @@
 <div class="card">
     <div class="card-body p-4 text-center bg-dark text-white">
         <span class="avatar avatar-xl mb-3 avatar-rounded">
-            <img src="{{ user.avatar(128) }}" alt="" style="width:100%;height:auto" class="avatar avatar-xl mb-3 avatar-rounded">
+            <img src="#" alt="" style="width:100%;height:auto" class="avatar avatar-xl mb-3 avatar-rounded">
         </span>
         <h3 class="m-0 mb-1" style="height: 30; color:white;"><a
                 href="{{url_for('user', username=user.user_name)}}">{{user.user_name}}</a></h3>
@@ -93,7 +96,8 @@
         <a href="/u/{{user.id}}/liked">Tác phẩm đã yêu thích</a>
 
         <div class="mt-3">
-
+            <div class="fb-login-button" data-width="" data-size="large" data-button-type="continue_with" data-layout="default" data-auto-logout-link="true" data-use-continue-as="false"></div>
+            
             <span class="badge bg-purple">
                 Đang theo dõi: {{user.following | count}} 
             </span>
