@@ -94,13 +94,18 @@
                     }
                 </script>
                 <h1>Cài đặt chung</h1>
-                <span>Run the testing before change status</span>
-                <label for="fiction-status">Lựa chọn trạng thái</label>
+                <label for="fiction-status">Trạng thái xuất bản</label>
+                {% if fiction.status == "draft" %}
                 <select name="fiction-status" id="fiction-status" class="form-control" aria-label="Fiction Status" onchange="saveContent(this)">
                     <option value="public">Công khai</option>
                     <option value="draft" selected>Bản nháp</option>
-                    <option value="private">Riêng tư</option>
                 </select>
+                {% else %}
+                <select name="fiction-status" id="fiction-status" class="form-control" aria-label="Fiction Status" onchange="saveContent(this)">
+                    <option value="public" selected>Công khai</option>
+                    <option value="draft">Bản nháp</option>
+                </select>
+                {% endif %}
                 <label for="fiction-theme">Lựa chọn hiển thị</label>
                 <select name="fiction-theme" id="fiction-theme" class="form-control" aria-label="Fiction Theme" onchange="saveContent(this)">
                     <option value="modern">Hiện đại</option>
