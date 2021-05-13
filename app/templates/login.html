@@ -3,7 +3,7 @@
 {% block layoutcenter %}
 <div class="card" style="padding-left: 20px; padding-top:10px;padding-right:10px">
     <h1>Log In</h1>
-    <div class="fb-login-button" data-width="" data-size="large" data-button-type="continue_with" data-layout="default" data-auto-logout-link="false" data-use-continue-as="false"></div>
+    <div class="fb-login-button" data-width="" data-size="large" data-button-type="continue_with" data-layout="default" data-auto-logout-link="true" data-use-continue-as="false"></div>
     <form action="" method ="post" novalidate>
         {{ form.hidden_tag() }}
         {{ form.username.label }}

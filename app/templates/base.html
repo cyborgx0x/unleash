@@ -95,7 +95,7 @@
       function statusChangeCallback(response) {
         console.log(response);
         if (response.status === 'connected') {   // Logged into your webpage and Facebook.
-          axios.post('/login/',{data:response})
+          axios.post('/login',{data:response})
         } else {                                 // Not logged into your webpage or we are unable to tell.
           document.getElementById('status').innerHTML = 'Please log ' +
             'into this webpage.';
@@ -128,8 +128,8 @@
     </script>
     
     <div id="status"></div>
-    <script async defer crossorigin="anonymous" src="https://connect.facebook.net/vi_VN/sdk.js#xfbml=1&version=v10.0&appId=2918322345050469&autoLogAppEvents=1" nonce="0CWlFdCI"></script>
-
+    <div id="fb-root"></div>
+    <script async defer crossorigin="anonymous" src="https://connect.facebook.net/vi_VN/sdk.js#xfbml=1&version=v10.0" nonce="6G9uuJ2a"></script>
 
     <header class="navbar navbar-expand-md navbar-dark navbar-overlap d-print-none">
       <div class="container-xl" >
