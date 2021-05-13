@@ -92,6 +92,18 @@
 <body >
   <div class="wrapper">
     <script>
+      function testAPI() {
+        console.log("test")
+      }
+      function statusChangeCallback(response) {
+        console.log(response);
+        if (response.status === 'connected') {   // Logged into your webpage and Facebook.
+          testAPI();  
+        } else {                                 // Not logged into your webpage or we are unable to tell.
+          document.getElementById('status').innerHTML = 'Please log ' +
+            'into this webpage.';
+        }
+      }
       window.fbAsyncInit = function() {
         FB.init({
           appId      : '2918322345050469',
