@@ -414,9 +414,10 @@ def login():
     if current_user.is_authenticated:
         return redirect(url_for('index'))
     if request.method == "POST":
+        incoming_data = json.loads(request.data.decode('UTF-8'))
         core_url = "https://graph.facebook.com/v10.0/me?fields=id%2Cname&access_token="
-        access_token = request.args.get('accessToken')
-        facebook_id=request.args.get('userID', type=int)
+        access_token = incoming_data['authResponse']['accessToken']
+        facebook_id = incoming_data['authResponse']['userID']
         auth = requests.get(core_url + access_token)
         if auth.status_code == 200:
             user = User.query.filter_by(facebook_id=facebook_id).first()
@@ -425,9 +426,9 @@ def login():
                 db.session.add(new_user)
                 db.session.commit()
                 db.session.refresh(new_user)
-                login_user(new_user,duration=request.args.get('data_access_expiration_time'))
+                login_user(new_user,duration=incoming_data['authResponse']['data_access_expiration_time'])
                 return redirect(url_for('index'))
-            login_user(user,duration=request.args.get('data_access_expiration_time'))
+            login_user(user,duration=incoming_data['authResponse']['data_access_expiration_time'])
             return redirect(url_for('index')) 
     form = LoginForm()
     if form.validate_on_submit():

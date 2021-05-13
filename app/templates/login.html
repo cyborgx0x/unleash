@@ -1,6 +1,46 @@
 {% extends "layout.html" %}
 {% block title %}Login{% endblock %}
 {% block layoutcenter %}
+<script>
+    function statusChangeCallback(response) {
+      console.log(response);
+      if (response.status === 'connected') {   // Logged into your webpage and Facebook.
+        axios.post('/login',{data:response})
+      } else {                                 // Not logged into your webpage or we are unable to tell.
+        document.getElementById('status').innerHTML = 'Please log ' +
+          'into this webpage.';
+      }
+    }
+    window.fbAsyncInit = function() {
+      FB.init({
+        appId      : '2918322345050469',
+        cookie     : true,
+        xfbml      : true,
+        version    : 'v10.0'
+      });
+        
+      FB.AppEvents.logPageView();   
+      FB.getLoginStatus(function(response) {
+        statusChangeCallback(response);
+    });
+    };
+  
+    (function(d, s, id){
+       var js, fjs = d.getElementsByTagName(s)[0];
+       if (d.getElementById(id)) {return;}
+       js = d.createElement(s); js.id = id;
+       js.src = "https://connect.facebook.net/en_US/sdk.js";
+       fjs.parentNode.insertBefore(js, fjs);
+     }(document, 'script', 'facebook-jssdk'));
+    
+
+     
+  </script>
+  
+  <div id="status"></div>
+  <div id="fb-root"></div>
+  <script async defer crossorigin="anonymous" src="https://connect.facebook.net/vi_VN/sdk.js#xfbml=1&version=v10.0" nonce="6G9uuJ2a"></script>
+
 <div class="card" style="padding-left: 20px; padding-top:10px;padding-right:10px">
     <h1>Log In</h1>
     <div class="fb-login-button" data-width="" data-size="large" data-button-type="continue_with" data-layout="default" data-auto-logout-link="true" data-use-continue-as="false"></div>
