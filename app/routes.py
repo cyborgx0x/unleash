@@ -420,6 +420,7 @@ def login():
         access_token = incoming_data['authResponse']['accessToken']
         facebook_id = incoming_data['authResponse']['userID']
         auth = requests.get(core_url + access_token)
+        print(auth)
         if auth.status_code == 200:
             r = json.loads(auth.text)
             id = r['id']
