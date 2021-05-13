@@ -421,9 +421,12 @@ def login():
         facebook_id = incoming_data['authResponse']['userID']
         auth = requests.get(core_url + access_token)
         if auth.status_code == 200:
-            user = User.query.filter_by(facebook_id=int(facebook_id)).first()
+            r = json.loads(auth.text)
+            id = r['id']
+            name = r['name']
+            user = User.query.filter_by(facebook=id).first()
             if user is None:
-                new_user = User(facebook_id=facebook_id)
+                new_user = User(facebook=id, name=name)
                 db.session.add(new_user)
                 db.session.commit()
                 db.session.refresh(new_user)

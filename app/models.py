@@ -187,9 +187,8 @@ class User(UserMixin, db.Model):
 
     'users', meta
     id = db.Column('id', db.Integer, primary_key=True)
-    facebook_id = db.Column(db.Integer)
-    first_name = db.Column('first_name',db.Unicode(50))
-    last_name = db.Column('last_name',db.Unicode(50))
+    facebook = db.Column(db.String(50))
+    name = db.Column(db.Unicode(256))
     user_name = db.Column('user_name', db.String(64))
     about_me = db.Column(db.String(140))
     last_seen = db.Column (db.DateTime, default = datetime.utcnow)
