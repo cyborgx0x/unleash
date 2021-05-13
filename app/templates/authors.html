@@ -26,16 +26,7 @@
 </style>
 
 <div class="row row-deck">
-    <h1 class="text-white text-center">Top Authors of the week</h1>
-    {% for author in top_authors %}
-    <div class="col-6 col-md-2">
-        {% include '_author.html' %}
-    </div>
-    {% endfor %}
-</div>
-<hr>
-<div class="row row-deck">
-    <h1 class="text-center">All Authors</h1>
+    <h1 class="text-center text-white">{{title}}</h1>
     {% for author in authors %}
     <div class="col-6 col-md-2">
         {% include '_author.html'  %}

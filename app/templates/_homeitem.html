@@ -2,7 +2,10 @@
 <div class="row" type="button" style="margin:5px" onclick="location.href='/fiction/{{fiction.id}}'">
     <div class="col-auto">
       <span class="avatar">
+        {% if fiction.cover %}
         <img style="padding-top: 30px;" src="{{url_for('img_proxy', link=fiction.cover)}}" alt="{{fiction.name}} cover">
+        {% else %}
+        {% endif %}
       </span>
     </div>
     <div class="col">

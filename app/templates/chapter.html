@@ -117,18 +117,18 @@
           </a>
           <div class="dropdown-menu dropdown-menu-demo dropdown-menu-arrow bg-dark text-white">
                 <label class="form-selectgroup-item" >
-                  <input class="form-selectgroup-input" type="checkbox" {{ "checked" if chapter.bookmark else  "" }} onchange="
+                  <input class="form-selectgroup-input" name={{chapter.id}} type="checkbox" {{ "checked" if chapter.bookmark else  "" }} onchange="
                   if (this.checked == true ) {
                     document.getElementById('bookmarkButton').textContent='Xóa đánh dấu ❌';
-                    let data = {mark:'yes'};
-                    axios.post('', data).then((res)=>{console.log(res)})
-                    location.reload();
+                    let data = {chapter:this.name, value:'add'};
+                    axios.post('/api/bookmark/', data).then((res)=>{console.log(res)})
+
                   }  
                   else {
                     document.getElementById('bookmarkButton').textContent='Đánh dấu chương 📑';
-                    let data= true;
-                    axios.post('', data).then((res)=>{console.log(res)})
-                    location.reload();
+                    let data= {chapter:this.name, value:'remove'}
+                    axios.post('/api/bookmark/', data).then((res)=>{console.log(res)})
+
                     }
                   ">
                   

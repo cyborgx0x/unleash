@@ -31,11 +31,8 @@
 
 <div id="author-result"></div>
 <div id="searchresult" class="row row-card"></div>
-<script src="https://unpkg.com/lunr/lunr.js"></script>
-<script src="{{url_for('static', filename='lunr.stemmer.support.js')}}"></script>
-<script src="{{url_for('static', filename='lunr.vi.js')}}"></script>
 
-<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
 <script>
   let searchbar = document.getElementById('searchbar')
   fictionIndex(searchbar, getIndex)

@@ -1,6 +1,5 @@
 import json
 
-from database import view_all_post
 from flask import (Flask, Markup, flash, jsonify, redirect, render_template,
                    request, send_file, url_for, session)
 from flask_login import current_user, login_required, login_user, logout_user
@@ -12,17 +11,13 @@ import ast
 from app import app, db
 from app.form import (AuthorForm, ChapterForm, FictionForm, LoginForm,
                       Quiz_answer, RegistrationForm)
-from app.models import (Author, Chapter, Fiction, FictionIndex, Like, Media,
-                        Quote, User, Post, Bookmark, AuthorFollowing, UserIndex, AuthorIndex)
+from app.models import (Author, Chapter, Fiction, FictionIndex, History, Like, Media,
+                        Quote, User, Bookmark, AuthorFollowing, UserIndex, AuthorIndex)
 
-def logging(function):
-    print(function)
-    return function
 
 @app.route("/")
-@logging
 def index():
-    top_view_fictions = Fiction.query.order_by(Fiction.view.desc()).limit(100).all()
+    top_view_fictions = Fiction.query.filter_by(status="published").order_by(Fiction.view.desc()).limit(20).all()
     top_authors = Author.query.order_by(Author.fiction_count.desc()).limit(12).all()
 
     return  render_template("home.html", top_view_fictions = top_view_fictions, top_authors=top_authors)
@@ -30,10 +25,9 @@ def index():
 
 @app.route('/guide/')
 def guide():
-    post = Post.query.filter_by(id=2).first()
     owner = User.query.filter_by(user_name='noname2').first()
     owningauthors = Author.query.filter_by(user_id=4).first()
-    return render_template('post.html', post=post, owner = owner, owning = owningauthors, user=owner)
+    return render_template('post.html', owner = owner, owning = owningauthors, user=owner)
 
 @app.route('/media/')
 def view_all_media():
@@ -49,17 +43,6 @@ def test_search():
 function area
 chứa những chức năng mở rộng
 '''
-
-@app.route("/build_indexing/", methods=['GET', 'POST'])
-def build_indexing():
-    fictions=FictionIndex.query.all()
-    users = UserIndex.query.all()
-    authors = AuthorIndex.query.all()
-    if request.method=='POST':
-        incoming_data = json.loads(request.data.decode('UTF-8'))
-        if incoming_data["query"] == "author":
-            return jsonify(authors)           
-    return jsonify(fictions)
 
 @app.route("/img-cover/<path:link>")
 def img_proxy(link):
@@ -111,12 +94,22 @@ def edit_author(author_id):
 def all_authors():
     authors = Author.query.all()
     top_authors = Author.query.order_by(Author.fiction_count.desc()).limit(12).all()
-    return render_template("authors.html", authors = authors, top_authors=top_authors)
+    return render_template("authors.html", authors = authors, top_authors=top_authors, title="All Authors")
 
+@app.route("/u/<int:user_id>/following/")
+def following_author(user_id):
+    following = Author.query.join(Author.follower).filter_by(user_id=user_id)
+    top_authors = Author.query.order_by(Author.fiction_count.desc()).limit(12).all()
+    return render_template("authors.html", authors = following, top_authors=top_authors, title="Following")
 
 @app.route("/fictions")
 def fictions():
-    fictions = Fiction.query.all()
+    fictions = Fiction.query.filter_by(status="published")
+    return  render_template("fictions.html", fictions = fictions)
+
+@app.route("/u/<int:user_id>/liked")
+def liked_fiction(user_id):
+    fictions = Fiction.query.join(Fiction.like).filter_by(user_id=current_user.id)
     return  render_template("fictions.html", fictions = fictions)
 
 
@@ -183,18 +176,8 @@ def specific_fiction_name(fiction_name):
     return  render_template("viewer.html", fiction = fiction)
 
 
-@app.route("/chapter/<int:chapter_id>/", methods=['GET', 'POST'])
+@app.route("/chapter/<int:chapter_id>/")
 def chapter_viewer(chapter_id):
-    if request.method == 'POST':
-        if request.data == b'':
-            itemdelete = Bookmark.query.filter_by(chapter_id=chapter_id).delete()
-            db.session.commit()
-            return "remove bookmark successfully"
-        else:
-            newitem = Bookmark(user_id=current_user.id, chapter_id=chapter_id)
-            db.session.add(newitem)
-            db.session.commit()
-            return "added bookmark successfully"
     chapter = Chapter.query.filter_by(id=chapter_id).first()
     chapter.update_view()
     fiction = Fiction.query.filter_by(id=chapter.fiction).first()
@@ -240,6 +223,21 @@ API SESSION
 Contain interaction with the request from client
 '''
 
+@app.route ("/api/bookmark/", methods=['POST'])
+def bookmark_api():
+    if request.method == 'POST':
+        incoming_data= json.loads(request.data.decode('UTF-8'))
+        if incoming_data['value'] == "remove":
+            item = Bookmark.query.filter_by(chapter_id=incoming_data['chapter'], user_id=current_user.id).delete()
+            db.session.commit()
+            return "remove bookmark successfully"
+        else:
+            newitem = Bookmark(user_id=current_user.id, chapter_id=incoming_data['chapter'])
+            db.session.add(newitem)
+            db.session.commit()
+            return "added bookmark successfully"
+    return "message received"
+
 
 @app.route("/editor/<int:fiction_id>/new-chapter/", methods=['GET', 'POST'])
 def new_chapter(fiction_id):
@@ -257,6 +255,20 @@ def new_chapter(fiction_id):
     db.session.commit()
     db.session.refresh(new_chapter)
     return redirect(url_for('edit_chapter', chapter_id=new_chapter.id))
+
+
+@app.route("/build_indexing/", methods=['GET', 'POST'])
+def build_indexing():
+    fictions=FictionIndex.query.all()
+    users = UserIndex.query.all()
+    authors = AuthorIndex.query.all()
+    if request.method=='POST':
+        incoming_data = json.loads(request.data.decode('UTF-8'))
+        if incoming_data["query"] == "author":
+            return jsonify(authors)           
+    return jsonify(fictions)
+
+
 
 @app.route("/new-author/")
 def new_author():
@@ -441,10 +453,3 @@ def user(username):
     all_authors = Author.query.all()
     return render_template('dash.html', user=user, fictions=fictions, all_fictions=all_fictions, all_authors=all_authors)
 
-
-@app.route('/u/<user_name>/<int:post_id>')
-def view_post(user_name, post_id):
-    post = Post.query.filter_by(id=post_id).first()
-    owner = User.query.filter_by(user_name=user_name).first()
-    owningauthors = Author.query.filter_by(user_id=owner.id).first()
-    return render_template('post.html', post=post, owner = owner, owning = owningauthors, user=owner)

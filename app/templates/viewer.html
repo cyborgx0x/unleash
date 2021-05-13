@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}{{ fiction.name }} by {{ fiction.author.name }}{% endblock %}
+{% block title %}{{ fiction.name }}{% endblock %}
 {% block content%}
 
 <div class="row">
@@ -13,14 +13,16 @@
                     </span>
                     {{ fiction.author.name }}
                 </a>
+                {% if current_user.is_anonymous %}
+                {% else %}
                 <a type="button" class="btn" data-bs-toggle="dropdown">
                     Tùy chọn 
                 </a>
                 <div class="dropdown-menu dropdown-menu-demo dropdown-menu-arrow bg-dark text-white">
                     <a href="{{url_for("edit_specific_post", fiction_id=fiction.id)}}" class="dropdown-item">Quản lý tác phẩm</a>
                     <a href="{{fiction.mediafire_link}}" class="dropdown-item" target="_blank">Tải về</a>
-                    <a href="#donate" class="dropdown-item">Tặng thịt 🥩</a>
                 </div>
+                {% endif %}
             </div>
             {% include "_fiction.html"  %}
             

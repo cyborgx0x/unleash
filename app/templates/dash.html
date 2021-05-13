@@ -3,15 +3,11 @@
 {% block layoutleft %}
 <div  style="margin:5px">
     <div class="bg-dark text-white">
-        <button class="dropdown-item" onclick="showMedia(this)" value='bookmark-list'>Danh sách bookmark</button>
-        <button class="dropdown-item" onclick="showMedia(this)" value='author-following'>Tác giả đã theo dõi</button>
-        <button class="dropdown-item" onclick="showMedia(this)" value='like-fiction'>Tác phẩm yêu thích</button>
+        <button class="dropdown-item" onclick="showMedia(this)" value='your-fiction'>Quản lý tác phẩm</button>
+        <button class="dropdown-item" onclick="showMedia(this)" value='author-manage'>Quản lý tác giả</button>
         <button class="dropdown-item" onclick="showMedia(this)" value='user-activity'>Lịch sử hoạt động</button>
         <button class="dropdown-item" onclick="showMedia(this)" value="user-media">Quản lý media</button>
-        <button class="dropdown-item" onclick="showMedia(this)" value='user-posts'>Danh sách bài viết</button>
-        <button class="dropdown-item" onclick="showMedia(this)" value='your-fiction'>Quản lý tác phẩm</button>
         <button class="dropdown-item" onclick="showMedia(this)" value='general-configuration'>Cài đặt chung</button>
-        <button class="dropdown-item" onclick="showMedia(this)" value='author-manage'>Quản lý tác giả</button>
     </div>
 </div>
 {% endblock %}
@@ -24,25 +20,7 @@
             <div class="tab-pane" id="user-activity">
                 {% include "_recent.html"%}
             </div>
-            <div class="tab-pane" id="author-following">
-                Fiction đang theo dõi: {{user.author_following | count}} 
-                Tác giả đang theo dõi: {{user.fiction_following | count}}
-            </div>
-            <div class="tab-pane" id="like-fiction">
-                <div>
-                    <h1>All your liked fiction</h1>
-                    <div class='row row-deck'>
-                        
-                            {% for fiction in fictions %}
-                            <div class="col-md-4">
-                              {% include '_fiction.html' %}
-                            </div>
-                            {% endfor %}
-                          
-                          
-                    </div>
-                </div>
-            </div>
+            
             <div class="tab-pane" id="user-media">
                 <div>
                     {% for media in user.media %}
@@ -72,21 +50,8 @@
                     {% endfor %}
                 </div>
             </div>
-            <div class="tab-pane" id="user-posts">
-                {% for post in user.post %}
-                <a href="{{url_for('view_post', user_name=user.user_name, post_id=post.id)}}">
-                    {{post.title}} - {{post.post_type}} - {{post.template}}
-                </a>
-                <hr>
-                {% endfor %}
-            </div>
-            <div class="tab-pane show active" id="bookmark-list">
-                Bookmark List
-                {% block bookmark %}
-                {{super()}}
-                {% endblock %}
-            </div>
-            <div class="tab-pane" id="your-fiction">
+
+            <div class="tab-pane show active" id="your-fiction">
                 <a href="{{url_for('new_fiction')}}" type="button" class="btn">Tạo tác phẩm mới</a>
                 <h2> Click vào link để edit tác phẩm </h2>
                 {% for fiction in all_fictions %}
@@ -124,12 +89,11 @@
         <h3 class="m-0 mb-1" style="height: 30; color:white;"><a
                 href="{{url_for('user', username=user.user_name)}}">{{user.user_name}}</a></h3>
         <div class="text-muted" style="height: 30; color:white;">Lần online gần nhất: {{user.last_seen}}</div>
-        <div class="mt-3">
-            <span class="badge bg-blue">
-               Số bài viết: {{user.post | count}} 
-            </span>
+        <a href="/u/{{user.id}}/following">Tác giả đang theo dõi</a>
+        <a href="/u/{{user.id}}/liked">Tác phẩm đã yêu thích</a>
 
-                
+        <div class="mt-3">
+
             <span class="badge bg-purple">
                 Đang theo dõi: {{user.following | count}} 
             </span>

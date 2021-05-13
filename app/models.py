@@ -6,7 +6,6 @@ import json
 from flask_login import UserMixin
 from sqlalchemy import MetaData, Text
 from werkzeug.security import check_password_hash, generate_password_hash
-
 from app import db, login
 
 meta = MetaData()
@@ -43,6 +42,7 @@ class Fiction(db.Model):
     history = db.relationship('History', backref ='fiction')
     follower = db.relationship('FictionFollowing', backref ='fiction')
     quote = db.relationship('Quote')
+
 
     def cutText(self):
         try: 
@@ -148,24 +148,6 @@ class Quote(db.Model):
     img = db.Column(db.Text)
 
 
-class Post(db.Model):
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    title = db.Column(db.Unicode(300))
-    content = db.Column(db.Text)
-    post_type = db.Column(db.Unicode(300))
-    template = db.Column(db.Unicode(200))
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    history = db.relationship('History', backref ='post')
-
-    def cutText(self):
-        text = json.loads(self.content)
-        return text
-    def getFiction(self, id):
-        fic = Fiction.query.filter_by(id=id).first()
-        return fic
-    def getMedia(self, id):
-        getdata = Media.query.filter_by(id=id).first()
-        return getdata
 
 class Media(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -214,7 +196,6 @@ class User(UserMixin, db.Model):
     password_hash = db.Column(db.String(128))
     like = db.relationship('Like', backref ='user')
     bookmark = db.relationship('Bookmark', backref ='user')
-    post = db.relationship('Post', backref ='user')
     media = db.relationship('Media', backref ='user')
     author = db.relationship('Author', backref ='user')
     history = db.relationship('History', backref ='user')
@@ -222,8 +203,8 @@ class User(UserMixin, db.Model):
     follower = db.relationship('UserFollowing', foreign_keys='[UserFollowing.user_following_id]', backref ='user_follower')
     author_following = db.relationship('AuthorFollowing', foreign_keys='[AuthorFollowing.user_id]', backref ='user_following')
     fiction_following = db.relationship('FictionFollowing', foreign_keys='[FictionFollowing.user_id]', backref ='user_following')
-    def __repr__(self):
-        return '<User {}>'.format(self.user_name)
+
+
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
     def check_password(self, password):
@@ -239,10 +220,8 @@ class User(UserMixin, db.Model):
 
 
 class Bookmark(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
     chapter_id = db.Column(db.Integer, db.ForeignKey('chapter.id'), primary_key=True)
-    time = db.Column(db.DateTime, default = datetime.utcnow)
 
 
 class History(db.Model):
@@ -252,7 +231,6 @@ class History(db.Model):
     fiction_id = db.Column(db.Integer, db.ForeignKey('fiction.id'))
     author_id = db.Column(db.Integer, db.ForeignKey('author.id'))
     quote_id = db.Column(db.Integer, db.ForeignKey('quote.id'))
-    post_id = db.Column(db.Integer, db.ForeignKey('post.id'))
     media_id = db.Column(db.Integer, db.ForeignKey('media.id'))
     time = db.Column(db.DateTime, default = datetime.utcnow)
     content = db.Column(db.String(300))
@@ -295,3 +273,4 @@ class UserIndex(User):
 class AuthorIndex(Author):
     id:int
     name: str
+
