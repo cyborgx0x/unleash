@@ -102,6 +102,7 @@
                     'GET',
                     {},
                     function(response) {
+                        console.log(response)
                         document.getElementById('avatar').src=response.data.url
                     }
                     ); 
