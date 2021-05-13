@@ -90,7 +90,7 @@
             <img src="#" alt="" style="width:100%;height:auto" class="avatar avatar-xl mb-3 avatar-rounded">
         </span>
         <h3 class="m-0 mb-1" style="height: 30; color:white;"><a
-                href="{{url_for('user', username=user.user_name)}}">{{user.user_name}}</a></h3>
+                {{user.name}}</h3>
         <div class="text-muted" style="height: 30; color:white;">Lần online gần nhất: {{user.last_seen}}</div>
         <a href="/u/{{user.id}}/following">Tác giả đang theo dõi</a>
         <a href="/u/{{user.id}}/liked">Tác phẩm đã yêu thích</a>
