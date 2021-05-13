@@ -87,6 +87,12 @@
                 </ul>
             </div>
             <div class="tab-pane" id="fiction-configuration">
+                <script>
+                    function saveContent(context) {
+                        console.log(context.options[context.options.selectedIndex].value)
+                        axios.post('', {type:context.name, value:context.options[context.options.selectedIndex].value})
+                    }
+                </script>
                 <h1>Cài đặt chung</h1>
                 <span>Run the testing before change status</span>
                 <label for="fiction-status">Lựa chọn trạng thái</label>
@@ -188,9 +194,7 @@
             })
         })
     }
-    function saveContent(context) {
-        console.log(context.options[context.options.selectedIndex].value)
-    }
+
 </script>
 {% endblock %}
 {% block layoutright %}

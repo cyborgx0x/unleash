@@ -18,7 +18,7 @@ from app.models import (Author, Chapter, Fiction, FictionIndex, History, Like, M
 
 @app.route("/")
 def index():
-    top_view_fictions = Fiction.query.filter_by(status="published").order_by(Fiction.view.desc()).limit(20).all()
+    top_view_fictions = Fiction.query.filter_by(status="public").order_by(Fiction.view.desc()).limit(20).all()
     top_authors = Author.query.order_by(Author.fiction_count.desc()).limit(12).all()
 
     return  render_template("home.html", top_view_fictions = top_view_fictions, top_authors=top_authors)
@@ -107,7 +107,7 @@ def following_author(user_id):
 
 @app.route("/fictions")
 def fictions():
-    fictions = Fiction.query.filter_by(status="published")
+    fictions = Fiction.query.filter_by(status="public")
     return  render_template("fictions.html", fictions = fictions)
 
 @app.route("/u/<int:user_id>/liked")
@@ -170,6 +170,10 @@ def edit_specific_post(fiction_id):
             fiction.author_id = incoming_data["value"]
             db.session.commit()
             return "Đã cập nhật tác giả"
+        elif incoming_data["type"] == "fiction-status":
+            fiction.status = incoming_data["value"]
+            db.session.commit()
+            return "Đã đăng tác phẩm"
     return  render_template("editor.html", fiction = fiction, authors=authors)
 
 
