@@ -100,7 +100,7 @@
                 FB.api(
                     '/'+ userid +'/picture',
                     'GET',
-                    {},
+                    {"redirect":"false"},
                     function(response) {
                         console.log(response)
                         document.getElementById('avatar').src=response.data.url
