@@ -281,21 +281,6 @@ def new_author():
 
 @app.route("/new-fiction/", methods=['GET', 'POST'])
 def new_fiction():
-    form=FictionForm()
-    if request.method=='POST':
-        data = request.form.to_dict(flat=True)
-        name=data["fiction-name"]
-        cover=data["cover-image"]
-        status=bool(data["publish-status"])
-        desc=data["description"]
-        publish_year=data["publishted-date"]
-        author=data["author"]
-        new_fiction = Fiction(name=name, cover=cover, status=status,desc=desc, publish_year=publish_year, author_id=author)
-        db.session.add(new_fiction)
-        db.session.commit()
-        db.session.refresh(new_fiction)
-        print(new_fiction)
-        return redirect(url_for('index')) 
     new_fiction = Fiction(name="Tác phẩm mới")
     db.session.add(new_fiction)
     db.session.commit()
