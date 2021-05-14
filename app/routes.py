@@ -419,7 +419,7 @@ def login():
         incoming_data = incoming_data['data']
         core_url = "https://graph.facebook.com/v10.0/me?fields=id,name,email,picture{url}&access_token="
         access_token = incoming_data['authResponse']['accessToken']
-        avatar_url = "https://graph.facebook.com/v10.0/me/picture?width=480&access_token="
+        avatar_url = "https://graph.facebook.com/v10.0/me/picture?fields=url&width=480&access_token="
         auth = requests.get(core_url + access_token)
         print(auth)
         if auth.status_code == 200:
@@ -427,9 +427,7 @@ def login():
             id = r['id']
             name = r['name']
             email = r['email']
-            a = requests.get(avatar_url+access_token)
-            b = json.loads(a.text)
-            avatar = b['data']['url']
+            avatar = r['picture']['data']['url']
             user = User.query.filter_by(facebook=id).first()
             if user is None:
                 new_user = User(facebook=id, name=name, email=email)
@@ -441,7 +439,7 @@ def login():
             if user.email == None:
                 user.email = email
             if user.avatar == None:
-                user.avatar = avatar.replace('&height=50&width=50', '&height=120&width=120')
+                user.avatar = avatar
             user.last_seen = datetime.now() 
             db.session.commit()
             login_user(user,duration=incoming_data['authResponse']['data_access_expiration_time'])
