@@ -399,6 +399,12 @@ def delete_author(author_id):
 User Session
 Contain route about user authentication, profile, configuration and dashboard
 '''
+@app.route('/authorized', methods=['GET','POST'])
+def authorized():
+    access_token = request.args.get("access_token")
+    return access_token
+
+
 
 @app.route('/login', methods=['GET','POST'])
 def login():
