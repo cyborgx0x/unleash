@@ -190,7 +190,7 @@ class User(UserMixin, db.Model):
     facebook = db.Column(db.String(50))
     name = db.Column(db.Unicode(256))
     user_name = db.Column('user_name', db.String(64))
-    avatar = db.Column(db.String(64))
+    avatar = db.Column(db.String(200))
     about_me = db.Column(db.String(140))
     last_seen = db.Column (db.DateTime, default = datetime.utcnow)
     email = db.Column('email', db.String(120))
@@ -213,9 +213,6 @@ class User(UserMixin, db.Model):
     @login.user_loader
     def load_user(id):
         return User.query.get(int(id))
-    def avatar(self, size):
-        digest = md5(self.email.lower().encode('utf-8')).hexdigest()
-        return 'https://www.gravatar.com/avatar/{}?d=identicon&s={}'.format(digest, size)
 
 
 
