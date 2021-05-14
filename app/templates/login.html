@@ -22,11 +22,7 @@
             console.log(err.message)
         })
       } else {                                 // Not logged into your webpage or we are unable to tell.
-        FB.login(function(response){
-          console.log(response)
-          checkLoginState()
-        });
-      }
+        console.log('not logged in')
     }
     window.fbAsyncInit = function() {
 
