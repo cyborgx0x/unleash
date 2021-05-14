@@ -427,8 +427,9 @@ def login():
             id = r['id']
             name = r['name']
             email = r['email']
-            a = json.loads(requests.get(avatar_url+access_token))
-            avatar = a['data']['url']
+            a = requests.get(avatar_url+access_token)
+            b = json.loads(a.text)
+            avatar = b['data']['url']
             user = User.query.filter_by(facebook=id).first()
             if user is None:
                 new_user = User(facebook=id, name=name, email=email)
