@@ -89,7 +89,12 @@
         </span>
         <h3 class="m-0 mb-1" style="height: 30; color:white;">
                 {{user.name}}</h3>
-        <div class="text-muted" style="height: 30; color:white;">Lần online gần nhất: {{user.last_seen}}</div>
+        <div class="text-muted" style="height: 30; color:white;" id="lastseen">Lần online gần nhất: {{user.last_seen}}</div>
+        <script>
+            var last_seen = '{{user.last_seen}}'
+            var local_time = Date(last_seen)
+            document.getElementById('lastseen').textContent = "Lần online gần nhất: " + local_time.toString()
+        </script>
         <a href="/u/{{user.id}}/following">Tác giả đang theo dõi</a>
         <a href="/u/{{user.id}}/liked">Tác phẩm đã yêu thích</a>
         <div class="mt-3">
