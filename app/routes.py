@@ -409,9 +409,12 @@ def authorized():
 
 @app.route('/login', methods=['GET','POST'])
 def login():
+    code = request.args.get("access_token")
+    print(code)
     if current_user.is_authenticated:
         return redirect(url_for('index'))
     if request.method == "POST":
+
         incoming_data = json.loads(request.data.decode('UTF-8'))
         incoming_data = incoming_data['data']
         core_url = "https://graph.facebook.com/v10.0/me?fields=id%2Cname&access_token="
