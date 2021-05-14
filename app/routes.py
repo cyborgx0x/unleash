@@ -438,8 +438,7 @@ def login():
                 return "added" 
             if user.email == None:
                 user.email = email
-            if user.avatar == None:
-                user.avatar = avatar
+            user.avatar = avatar
             user.last_seen = datetime.now() 
             db.session.commit()
             login_user(user,duration=incoming_data['authResponse']['data_access_expiration_time'])
