@@ -430,9 +430,9 @@ def login():
                 db.session.commit()
                 db.session.refresh(new_user)
                 login_user(new_user,duration=incoming_data['authResponse']['data_access_expiration_time'])
-                return redirect('https://dreamer.asia/') 
+                return "added" 
             login_user(user,duration=incoming_data['authResponse']['data_access_expiration_time'])
-            return redirect('https://dreamer.asia/') 
+            return "signed"
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(user_name=form.username.data).first()

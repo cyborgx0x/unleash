@@ -11,13 +11,21 @@
       console.log(response);
       if (response.status === 'connected') {   // Logged into your webpage and Facebook.
         axios.post('',{data:response}).then((res)=>{
-            console.log(res)
+            if (res.data == "added") {
+              console.log(res.data)
+              location = "/"
+            }
+            else {
+              location = "/"
+            }
         }).catch((err)=>{
             console.log(err.message)
         })
       } else {                                 // Not logged into your webpage or we are unable to tell.
-        document.getElementById('status').innerHTML = 'Please log ' +
-          'into this webpage.';
+        FB.login(function(response){
+          console.log(response)
+          checkLoginState()
+        });
       }
     }
     window.fbAsyncInit = function() {
@@ -30,10 +38,6 @@
       });
         
       FB.AppEvents.logPageView();   
-
-      FB.login(function(response){
-        alert(response)
-      });
 
       FB.getLoginStatus(function(response) {
         statusChangeCallback(response);
