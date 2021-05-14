@@ -98,9 +98,9 @@
               if (response.status === 'connected') {   // Logged into your webpage and Facebook.
                 userid = response.authResponse.userID
                 FB.api(
-                    '/'+ userid +'/picture',
+                    '/'+ userid +'/picture?width=120',
                     'GET',
-                    {"redirect":"false"},{"width":"120"},
+                    {"redirect":"false"},
                     function(response) {
                         console.log(response)
                         document.getElementById('avatar').src=response.data.url
