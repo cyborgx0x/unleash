@@ -417,7 +417,7 @@ def login():
 
         incoming_data = json.loads(request.data.decode('UTF-8'))
         incoming_data = incoming_data['data']
-        core_url = "https://graph.facebook.com/v10.0/me?fields=id,name,email&access_token="
+        core_url = "https://graph.facebook.com/v10.0/me?fields=id,name,email,picture{url}&access_token="
         access_token = incoming_data['authResponse']['accessToken']
         facebook_id = incoming_data['authResponse']['userID']
         auth = requests.get(core_url + access_token)
@@ -427,6 +427,7 @@ def login():
             id = r['id']
             name = r['name']
             email = r['email']
+            avatar = r['picture']['data']['url']
             user = User.query.filter_by(facebook=id).first()
             if user is None:
                 new_user = User(facebook=id, name=name, email=email)
@@ -437,8 +438,10 @@ def login():
                 return "added" 
             if user.email == None:
                 user.email = email
-                db.session.commit()
+            if user.avatar == None:
+                user.avatar = avatar.replace('&height=50&width=50', '&height=120&width=120')
             user.last_seen = datetime.now() 
+            db.session.commit()
             login_user(user,duration=incoming_data['authResponse']['data_access_expiration_time'])
             return "signed"
     form = LoginForm()

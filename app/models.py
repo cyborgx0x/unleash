@@ -190,6 +190,7 @@ class User(UserMixin, db.Model):
     facebook = db.Column(db.String(50))
     name = db.Column(db.Unicode(256))
     user_name = db.Column('user_name', db.String(64))
+    avatar = db.Column(db.String(64))
     about_me = db.Column(db.String(140))
     last_seen = db.Column (db.DateTime, default = datetime.utcnow)
     email = db.Column('email', db.String(120))
