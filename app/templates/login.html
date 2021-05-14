@@ -2,6 +2,11 @@
 {% block title %}Login{% endblock %}
 {% block layoutcenter %}
 <script>
+  function checkLoginState() {               // Called when a person is finished with the Login Button.
+    FB.getLoginStatus(function(response) {   // See the onlogin handler
+      statusChangeCallback(response);
+    });
+  }
     function statusChangeCallback(response) {
       console.log(response);
       if (response.status === 'connected') {   // Logged into your webpage and Facebook.
