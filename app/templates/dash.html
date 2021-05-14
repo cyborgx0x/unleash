@@ -85,57 +85,13 @@
 <div class="card">
     <div class="card-body p-4 text-center bg-dark text-white">
         <span class="avatar avatar-xl mb-3 avatar-rounded" height="1.2rem">
-            <img src="#" alt="" style="width:100%;height:auto" class="avatar avatar-xl mb-3 avatar-rounded" id="avatar">
+            <img src="https://platform-lookaside.fbsbx.com/platform/profilepic/?asid={{user.facebook}}&width=120" alt="" style="width:100%;height:auto" class="avatar avatar-xl mb-3 avatar-rounded" id="avatar">
         </span>
         <h3 class="m-0 mb-1" style="height: 30; color:white;">
                 {{user.name}}</h3>
         <div class="text-muted" style="height: 30; color:white;">Lần online gần nhất: {{user.last_seen}}</div>
         <a href="/u/{{user.id}}/following">Tác giả đang theo dõi</a>
         <a href="/u/{{user.id}}/liked">Tác phẩm đã yêu thích</a>
-        <script>
-            function statusChangeCallback(response) {
-              console.log(response);
-              if (response.status === 'connected') {   // Logged into your webpage and Facebook.
-                userid = response.authResponse.userID
-                FB.api(
-                    '/'+ userid +'/picture?width=120',
-                    'GET',
-                    {"redirect":"false"},
-                    function(response) {
-                        console.log(response)
-                        document.getElementById('avatar').src=response.data.url
-                    }
-                    ); 
-              } else {                                 // Not logged into your webpage or we are unable to tell.
-                document.getElementById('status').innerHTML = 'Please log ' +
-                  'into this webpage.';
-              }
-            }
-            window.fbAsyncInit = function() {
-              FB.init({
-                appId      : '2918322345050469',
-                cookie     : true,
-                xfbml      : true,
-                version    : 'v10.0'
-              });
-         
-              FB.AppEvents.logPageView();   
-              FB.getLoginStatus(function(response) {
-                statusChangeCallback(response);
-            });
-            };
-          
-            (function(d, s, id){
-               var js, fjs = d.getElementsByTagName(s)[0];
-               if (d.getElementById(id)) {return;}
-               js = d.createElement(s); js.id = id;
-               js.src = "https://connect.facebook.net/en_US/sdk.js";
-               fjs.parentNode.insertBefore(js, fjs);
-             }(document, 'script', 'facebook-jssdk'));
-            
-        
-             
-          </script>       
         <div class="mt-3">
             
             <span class="badge bg-purple">
