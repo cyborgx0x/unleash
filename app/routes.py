@@ -14,7 +14,7 @@ from app.form import (AuthorForm, ChapterForm, FictionForm, LoginForm,
                       Quiz_answer, RegistrationForm)
 from app.models import (Author, Chapter, Fiction, FictionIndex, History, Like, Media,
                         Quote, User, Bookmark, AuthorFollowing, UserIndex, AuthorIndex)
-
+from datetime import datetime
 
 @app.route("/")
 def index():
@@ -438,6 +438,7 @@ def login():
             if user.email == None:
                 user.email = email
                 db.session.commit()
+            user.last_seen = datetime.now() 
             login_user(user,duration=incoming_data['authResponse']['data_access_expiration_time'])
             return "signed"
     form = LoginForm()
