@@ -5,11 +5,12 @@
 <div class="row row-cards">
 
   <div class="col-md-8">
-    <div style="margin:5px;background-color:none; overflow:hidden; width:100%;">
       {% for fiction in top_view_fictions %}
-        {% include '_homeitem.html' %}
+      <div class="col-6 col-md-2">
+
+        {% include '_fiction.html'  %}   
+        </div>
       {% endfor %}
-    </div>
   </div>
   <div class="col-md-4">
     <div class="row row-cards">
