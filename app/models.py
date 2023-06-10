@@ -188,7 +188,8 @@ class User(UserMixin, db.Model):
     'users', meta
     id = db.Column('id', db.Integer, primary_key=True)
     facebook = db.Column(db.String(50))
-    name = db.Column(db.Unicode(256))
+    first_name = db.Column(db.Unicode(256))
+    last_name = db.Column(db.Unicode(256))
     user_name = db.Column('user_name', db.String(64))
     avatar = db.Column(db.String(200))
     about_me = db.Column(db.String(140))
