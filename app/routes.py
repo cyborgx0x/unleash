@@ -1,20 +1,53 @@
+import ast
 import json
 import re
+from datetime import datetime
 
-from flask import (Flask, Markup, flash, jsonify, redirect, render_template,
-                   request, send_file, url_for, session)
+import requests
+from flask import (
+    Flask,
+    Markup,
+    flash,
+    jsonify,
+    redirect,
+    render_template,
+    request,
+    send_file,
+    session,
+    url_for,
+)
 from flask_login import current_user, login_required, login_user, logout_user
-from img_crop import return_img
 from werkzeug.datastructures import ImmutableMultiDict
 from werkzeug.urls import url_parse
-import ast
-import requests
+
 from app import app, db
-from app.form import (AuthorForm, ChapterForm, FictionForm, LoginForm,
-                      Quiz_answer, RegistrationForm)
-from app.models import (Author, Chapter, Fiction, FictionIndex, History, Like, Media,
-                        Quote, User, Bookmark, AuthorFollowing, UserIndex, AuthorIndex)
-from datetime import datetime
+from app.form import (
+    AuthorForm,
+    ChapterForm,
+    FictionForm,
+    LoginForm,
+    Quiz_answer,
+    RegistrationForm,
+)
+from app.models import (
+    Author,
+    AuthorFollowing,
+    AuthorIndex,
+    Bookmark,
+    Chapter,
+    Fiction,
+    FictionIndex,
+    History,
+    Like,
+    Media,
+    Quote,
+    User,
+    UserIndex,
+)
+from img_crop import return_img
+
+from .permissions import check_permission
+
 
 @app.route("/")
 def index():
@@ -63,33 +96,39 @@ def author_page(author_name):
     return render_template("author.html", author = author, fictions =fictions)
 
 @app.route("/editor/author/<int:author_id>", methods=['GET', 'POST'])
+@login_required
+# @check_permission
 def edit_author(author_id):
-    author = Author.query.filter_by(id=author_id).first()
+    info_permission = False
+    metadata_permission = False
+    try:
+        author:Author = Author.query.filter_by(id=author_id).first()
+        if author.created_by == current_user.id:
+            info_permission = True
+        if current_user.is_admin or current_user.is_mod:
+            metadata_permission = True
+    except Exception as e:
+        print(e.with_traceback)
+        return "Yêu cầu không hợp lệ", 400
+    if not info_permission and not metadata_permission:
+        return "Have No Permission", 403
     if request.method == 'POST':
         incoming_data= json.loads(request.data.decode('UTF-8'))
-        print(json.dumps(incoming_data))
         if incoming_data["type"] == "content":
-            return jsonify(author.about)
-        elif incoming_data["type"] == "upload":
-            author.about = json.dumps(incoming_data["value"])
-            db.session.commit()
-            return "success 🔥🔥🔥"
-        elif incoming_data["type"] == "author_name":
-            author.name = incoming_data["value"]
-            db.session.commit()
-            return "success 🔥🔥🔥"
-        elif incoming_data["type"] == "author_birth_year":
-            author.birth_year = incoming_data["value"]
-            db.session.commit()
-            return "success 🔥🔥🔥"
-        elif incoming_data["type"] == "author_page":
-            author.author_page = incoming_data["value"]
-            db.session.commit()
-            return "success 🔥🔥🔥"
-        elif incoming_data["type"] == "author_img":
-            author.img = incoming_data["value"]
-            db.session.commit()
-            return "success 🔥🔥🔥"
+            return author.about
+        content_map = dict(
+            upload="about", 
+            author_name="name",
+            author_birth_year="birth_year",
+            author_page="author_page",
+            author_img="img",
+        )
+        upload_data= content_map.get(incoming_data["type"])
+        author.__setattr__(upload_data, incoming_data["value"])
+        db.session.commit()
+        FIRE = "🔥" * 3
+        return f"{upload_data} updated {FIRE}"
+    
     return render_template("author_editor.html", author = author)
 
 
@@ -279,7 +318,7 @@ def build_indexing():
 
 @app.route("/new-author/")
 def new_author():
-    new_author = Author(name="Tên Tác Giả", user_id=current_user.id)
+    new_author = Author(name="Tên Tác Giả", created_by=current_user.id)
     db.session.add(new_author)
     db.session.commit()
     db.session.refresh(new_author)
@@ -480,7 +519,7 @@ def register():
 def user(id):
     user = User.query.filter_by(id=id).first_or_404()
     fictions = Fiction.query.join(Fiction.like).filter_by(user_id=current_user.id)
-    all_fictions = Fiction.query.all()
-    all_authors = Author.query.all()
+    all_fictions = Fiction.query.filter_by(created_by=current_user.id)
+    all_authors = Author.query.filter_by(created_by=current_user.id)
     return render_template('dash.html', user=user, fictions=fictions, all_fictions=all_fictions, all_authors=all_authors)
 

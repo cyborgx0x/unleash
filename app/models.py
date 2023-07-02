@@ -1,11 +1,13 @@
+import ast
+import json
 from dataclasses import dataclass
 from datetime import datetime
 from hashlib import md5
-import ast
-import json
+
 from flask_login import UserMixin
-from sqlalchemy import MetaData, Text
+from sqlalchemy import JSON, Boolean, MetaData, Text
 from werkzeug.security import check_password_hash, generate_password_hash
+
 from app import db, login
 
 meta = MetaData()
@@ -42,7 +44,7 @@ class Fiction(db.Model):
     history = db.relationship('History', backref ='fiction')
     follower = db.relationship('FictionFollowing', backref ='fiction')
     quote = db.relationship('Quote')
-
+    created_by = db.Column(db.Integer, db.ForeignKey('user.id'))
 
     def cutText(self):
         try: 
@@ -77,6 +79,8 @@ class Chapter(db.Model):
     bookmark = db.relationship('Bookmark', backref ='chapter')
     chapter_order = db.Column(db.Integer)
     history = db.relationship('History', backref ='chapter')
+    created_by = db.Column(db.Integer, db.ForeignKey('user.id'))
+
     def update_view(self):
         if self.view_count:
             self.view_count=self.view_count+1
@@ -110,24 +114,19 @@ class Author(db.Model):
     name = db.Column(db.String(160))
     birth_year = db.Column(db.Integer)
     author_page = db.Column(db.String(160))
-    about = db.Column(db.Text)
+    about = db.Column(JSON)
     view = db.Column(db.Integer)
     fiction = db.relationship('Fiction', backref ='author')
     media = db.relationship('Media', backref ='author')
     email = db.Column('email', db.String(120))
     img = db.Column(db.String(240))
     fiction_count = db.Column(db.Integer)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    created_by = db.Column(db.Integer, db.ForeignKey('user.id'))
+    # user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     history = db.relationship('History', backref ='author')
     follower = db.relationship('AuthorFollowing', backref ='author')
 
 
-    def cutText(self):
-        try: 
-            text = json.loads(self.about)
-            return text
-        except: 
-            return {"author":"content"}
     def set_count(self, fiction_number):
         self.fiction_count = fiction_number
         print("update completed")
@@ -201,11 +200,14 @@ class User(UserMixin, db.Model):
     media = db.relationship('Media', backref ='user')
     author = db.relationship('Author', backref ='user')
     history = db.relationship('History', backref ='user')
+    fictions = db.relationship('Fiction', backref ='creator')
+    author = db.relationship('Author', backref ='creator')
     following = db.relationship('UserFollowing', foreign_keys='[UserFollowing.user_id]', backref ='user_following')
     follower = db.relationship('UserFollowing', foreign_keys='[UserFollowing.user_following_id]', backref ='user_follower')
     author_following = db.relationship('AuthorFollowing', foreign_keys='[AuthorFollowing.user_id]', backref ='user_following')
     fiction_following = db.relationship('FictionFollowing', foreign_keys='[FictionFollowing.user_id]', backref ='user_following')
-
+    is_admin = db.Column(Boolean, default=False)
+    is_mod = db.Column(Boolean, default=False)
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
