@@ -14,7 +14,7 @@
         axios.post('', {type:"content"})
         .then((response) => {
             try {
-                let data = JSON.parse(response.data);
+                let data = response.data;
                 const editor = new EditorJS({data: data, tools:{header:Header}});
                 let saveButton = document.getElementById('saveButton');
                 saveButton.addEventListener('click', function(e)  {editor.save().then((output)=>{

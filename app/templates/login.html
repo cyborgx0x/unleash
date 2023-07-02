@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 {% block title %}Login{% endblock %}
 {% block layoutcenter %}
-<script>
+<!-- <script>
   function checkLoginState() {               // Called when a person is finished with the Login Button.
     FB.getLoginStatus(function(response) {   // See the onlogin handler
       statusChangeCallback(response);
@@ -51,7 +51,7 @@
     
 
      
-  </script>
+  </script> -->
   
   <div id="status"></div>
   <div id="fb-root"></div>
@@ -59,8 +59,8 @@
 
 <div class="card" style="padding-left: 20px; padding-top:10px;padding-right:10px">
     <h1>Log In</h1>
-    <fb:login-button scope="public_profile,email" onlogin="checkLoginState();">
-    </fb:login-button>
+    <!-- <fb:login-button scope="public_profile,email" onlogin="checkLoginState();">
+    </fb:login-button> -->
     <form action="" method ="post" novalidate>
         {{ form.hidden_tag() }}
         {{ form.username.label }}
