@@ -44,7 +44,7 @@ from app.models import (
     User,
     UserIndex,
 )
-from img_crop import return_img
+from .img_crop import return_img
 
 from .permissions import check_permission
 
