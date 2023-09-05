@@ -1,14 +1,12 @@
-FROM python:latest
-ENV PYTHONUNBUFFERED 1
+FROM python
+
 RUN mkdir /code
-
-COPY app /code/app
-ADD main.py /code/main.py
-ADD configuration.py /code/configuration.py
-ADD requirements.txt /code/
-ADD .env /code/.env
-
 WORKDIR /code
+COPY . /code
+ADD requirements.txt /code/
 RUN pip install -r requirements.txt
 
-CMD [ "gunicorn --bind 0.0.0.0:8000 main:app --log-file" ] 
+
+WORKDIR /code
+EXPOSE 5000
+CMD ["gunicorn", "main:app", "--bind", "0.0.0.0:5000"]

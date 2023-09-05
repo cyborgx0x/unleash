@@ -14,15 +14,14 @@
     <div class="col-md-4">
         
         <div style="display:flex">
-            <a type="button" class="btn dropdown" data-bs-toggle="dropdown" >
-                ⚙ Tùy chọn
-            </a>
-            <div class="dropdown-menu dropdown-menu-demo dropdown-menu-arrow bg-dark text-white">
-                <a href="{{url_for('edit_author', author_id=author.id)}}" class="dropdown-item">Chỉnh sửa tác giả 🔥</a> 
-                <a href="#" class="dropdown-item">
-                    Xác nhận sở hữu ✔
+            {% if author.created_by == current_user.id %}
+                <a type="button" class="btn dropdown" data-bs-toggle="dropdown" >
+                    ⚙ Tùy chọn
                 </a>
-            </div>
+                <div class="dropdown-menu dropdown-menu-demo dropdown-menu-arrow bg-dark text-white">
+                    <a href="{{url_for('edit_author', author_id=author.id)}}" class="dropdown-item">Chỉnh sửa tác giả 🔥</a> 
+                </div>
+            {% endif %}
         </div>
         <div class="card" style="margin:5px">
             
@@ -87,7 +86,7 @@
             <div class="card-body" id="authorInformation" onload="loadAbout(this)">
                 <div class="main-content">
                     📄 Tiểu sử tác giả: 
-                    {% set elements = author.cutText() %}
+                    {% set elements = author.about %}
                         {% include "_content.html" %}
 
                 </div>

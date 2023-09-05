@@ -5,75 +5,90 @@
 <div class="row">
     <div class="col-lg-8 ">
         <div class="row">
-        <div class="col-md-4">
-            <div  style="margin:5px">
-                <a href="/author/{{ fiction.author.name }}" class="btn">
-                    <span class="avatar">
-                        <img src="{{ fiction.author.img }}" alt="" style="width:100%;height:auto">
-                    </span>
-                    {{ fiction.author.name }}
-                </a>
-                {% if current_user.is_anonymous %}
-                {% else %}
-                <a type="button" class="btn" data-bs-toggle="dropdown">
-                    Tùy chọn 
-                </a>
-                <div class="dropdown-menu dropdown-menu-demo dropdown-menu-arrow bg-dark text-white">
-                    <a href="{{url_for("edit_specific_post", fiction_id=fiction.id)}}" class="dropdown-item">Quản lý tác phẩm</a>
-                    <a href="{{fiction.mediafire_link}}" class="dropdown-item" target="_blank">Tải về</a>
-                </div>
-                {% endif %}
-            </div>
-            {% include "_fiction.html"  %}
-            
-        </div>
-            <div class="col-md-8">
-            <div class="alert alert-success" role="alert">
-                <h4 class="alert-heading"> Thông tin tác phẩm {{fiction.name}} </h4>
-                <strong>Tác giả: {{fiction.author.name}}</strong>
-                <p>Trạng thái: {{ fiction.status }}</p>
-                <p>Xuất bản: {{ fiction.publish_year}}</p>
-                <p>Chương mới nhất: {{ fiction.chapter | last }}</p>
-
-                <p class="mb-0">Số chương <b>{{ fiction.chapter | count }}</b></p>
-            </div>
-            <div style="margin-top: 30px; background: white">
-                <div class="card-header">Lời tựa của tác giả</div>
-                <div class="card-body">
-                    <div class="main-content" id="detailInfomation">
-                        {% set elements = fiction.cutText() %}
-                        {% include "_content.html" %}
+            <div class="col-md-4">
+                <div style="margin:5px">
+                    <a href="/author/{{ fiction.author.name }}" class="btn">
+                        <span class="avatar">
+                            <img src="{{ fiction.author.img }}" alt="" style="width:100%;height:auto">
+                        </span>
+                        {{ fiction.author.name }}
+                    </a>
+                    {% if current_user.is_anonymous %}
+                    {% else %}
+                    <a type="button" class="btn" data-bs-toggle="dropdown">
+                        Tùy chọn
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-demo dropdown-menu-arrow bg-dark text-white">
+                        <a href="{{url_for("edit_specific_post", fiction_id=fiction.id)}}" class="dropdown-item">Quản lý
+                            tác phẩm</a>
+                        <a href="{{fiction.mediafire_link}}" class="dropdown-item" target="_blank">Tải về</a>
                     </div>
-                    
+                    {% endif %}
+                </div>
+                {% include "_fiction.html"  %}
+
+            </div>
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h1>
+                            {{fiction.name}}
+                        </h1>
+                    </div>
+                    <div class="card-body">
+                        <h2>
+                            {{fiction.author.name}}
+                        </h2>
+                        <span>
+                            {{ fiction.status }}
+                        </span>
+                        <span>
+                            {{ fiction.publish_year}}
+                        </span>
+                        <span>
+                            {{ fiction.chapter | last }}
+                        </span>
+                        <p class="mb-0">Số chương <b>{{ fiction.chapter | count }}</b></p>
+    
+                    </div>
+                </div>
+                <div style="margin-top: 30px; background: white">
+                    <div class="card-header">Lời tựa của tác giả</div>
+                    <div class="card-body">
+                        <div class="main-content" id="detailInfomation">
+                            {% set elements = fiction.cutText() %}
+                            {% include "_content.html" %}
+                        </div>
+
+                    </div>
                 </div>
             </div>
         </div>
-        </div>
-        
+
     </div>
 
     <div class="col-lg-4">
-        
+
         <div class="card">
             <div class="card-header">Danh sách chương </div>
             <div class="card-body" style="overflow: hidden;">
 
                 {% for chapter in fiction.chapter %}
-                {% include '_chapter_list.html'  %}   
-                    
+                {% include '_chapter_list.html'  %}
+
                 {% endfor %}
             </div>
         </div>
 
         <div class="card">
             <div class="card-header">
-               
-                    Được trích dẫn 
-               
+
+                Được trích dẫn
+
             </div>
             {% for quote in fiction.quote %}
-            
-            
+
+
             <div class="card-body">
                 <h5 class="card-title">{{ quote.quote }}</h5>
                 <img src="{{quote.img}}" alt="" class="card-img-top">
@@ -82,7 +97,7 @@
 
         </div>
 
-        
+
     </div>
 </div>
 
