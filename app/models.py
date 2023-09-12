@@ -44,6 +44,7 @@ class Fiction(db.Model):
     history = db.relationship('History', backref ='fiction')
     follower = db.relationship('FictionFollowing', backref ='fiction')
     quote = db.relationship('Quote')
+    task = db.relationship('Task')
     created_by = db.Column(db.Integer, db.ForeignKey('user.id'))
 
     def cutText(self):
@@ -61,8 +62,15 @@ class Fiction(db.Model):
 
     def __repr__(self):
         return '{}>'.format(self.name)
+    
+    def get_chapter(self):
+        ...
 
-
+class Task(db.Model):
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    fiction = db.Column(db.Integer, db.ForeignKey('fiction.id'))
+    def get_data(self):
+        ...
     
 @dataclass
 class Chapter(db.Model):
@@ -217,7 +225,7 @@ class User(UserMixin, db.Model):
     def load_user(id):
         return User.query.get(int(id))
 
-
+    
 
 
 class Bookmark(db.Model):

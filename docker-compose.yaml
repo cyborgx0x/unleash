@@ -7,18 +7,9 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=123456
       - POSTGRES_DB=unleash
-    volumes_from:
-      - data
-    depends_on:
-      - data
-    expose:
-      - "8000"
-  data:
-    restart: always
-    image: postgres
-    volumes:
-      - /var/lib/postgresql
-    command: "true"
+    ports:
+      - "5432:5432"
+
   nginx:
     restart: always
     build: ./nginx/

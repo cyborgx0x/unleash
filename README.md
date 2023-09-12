@@ -18,3 +18,11 @@ This Project devide the elements as following:
 - Clone the repo
 - Install All dependencies
 - You are set! Currently this project is not require anything special. But it soons be changed in the future!
+
+
+# RUN The Training 
+
+celery -A run_celery:celery worker --loglevel=info
+
+
+# RUN 

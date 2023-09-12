@@ -2,7 +2,7 @@
 
 <head>
 
-  <title>{% block title %}| Dreamer House{% endblock %} </title>
+  <title>{% block title %}| Unleash{% endblock %} </title>
   <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
@@ -16,46 +16,63 @@
   <script src="{{url_for('static', filename='lunr.stemmer.support.js')}}"></script>
   <script src="{{url_for('static', filename='lunr.vi.js')}}"></script>
   <script src="{{url_for('static', filename='tabler.min.js')}}"></script>
- 
-  
+
+
 
   <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
   <link href="https://vjs.zencdn.net/7.11.4/video-js.css" rel="stylesheet" />
+  <script type="text/javascript">
+    var __atsmarttag = {
+      pub_id: '4437377013567551337'
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//static.accesstrade.vn/js/atsmarttag.min.js?v=1.1.0';
+      script.type = 'text/javascript';
+      script.async = true;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName("body")[0]).appendChild(script);
+    })();
+  </script>
   {% block style %}
   <style>
-
     :root {
       --reaction: #ff0000;
       --white: #ffffff;
     }
-    .blog-title{
+
+    .blog-title {
       margin: 0;
       padding-top: 1rem;
       padding-left: 1rem;
     }
+
     .card:hover {
-      box-shadow: 0 0 11px rgba(41, 27, 27, 0.2); 
+      box-shadow: 0 0 11px rgba(41, 27, 27, 0.2);
     }
+
     .crop {
       object-fit: cover;
       width: 100%;
       height: auto;
       display: grid;
       color: var(--white);
-      background-color:tomato;
+      background-color: tomato;
       transition: transform 500ms ease;
     }
+
     .crop:hover {
       transform: scale(1.05);
     }
-    .navbar-nav  {
+
+    .navbar-nav {
       flex-direction: inherit;
     }
+
     .nav-item {
       padding: 3px;
     }
 
-    .blend-over{
+    .blend-over {
       position: absolute;
       padding: 5px;
       font-weight: bolder;
@@ -68,11 +85,13 @@
     .crop:hover .blend-over {
       transform: scale(1);
     }
-    .blend-over > h2 > a:hover{
+
+    .blend-over>h2>a:hover {
       text-decoration: none !important;
       color: white
     }
-    .blend-over:hover{
+
+    .blend-over:hover {
       display: grid;
       position: absolute;
       padding: 5px;
@@ -80,56 +99,65 @@
       background: #0e2e5647;
       color: white;
     }
-
-    
-    </style>
+  </style>
 
 
-    {% endblock %} 
+  {% endblock %}
 </head>
 
 
-<body >
+<body>
   <div class="wrapper">
- 
+
     <header class="navbar navbar-expand-md navbar-dark navbar-overlap d-print-none">
-      <div class="container-xl" >
+      <div class="container-xl">
         <div class="navbar-expand-md">
 
           <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-menu">
             <span class="navbar-toggler-icon"></span>
           </button>
           <h1 class="navbar-brand navbar-brand-autodark d-none-navbar-horizontal pe-0 pe-md-3">
-            <a href="{{ url_for('index')}}" style="text-decoration: none !important;" >
-              Dreamer House
+            <a href="{{ url_for('index')}}" style="text-decoration: none !important;">
+              Unleash
             </a>
           </h1>
 
         </div>
-        
+
         <div class="navbar-nav order-md-last">
-   
-          
-          <ul class="navbar-nav" >
+
+
+          <ul class="navbar-nav">
             {% block nav %}
             <li class="nav-link">
               <a href="#" class="text-white">
-                <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M10 5a2 2 0 0 1 4 0a7 7 0 0 1 4 6v3a4 4 0 0 0 2 3h-16a4 4 0 0 0 2 -3v-3a7 7 0 0 1 4 -6" /><path d="M9 17v1a3 3 0 0 0 6 0v-1" /></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24"
+                  stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                  <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                  <path d="M10 5a2 2 0 0 1 4 0a7 7 0 0 1 4 6v3a4 4 0 0 0 2 3h-16a4 4 0 0 0 2 -3v-3a7 7 0 0 1 4 -6" />
+                  <path d="M9 17v1a3 3 0 0 0 6 0v-1" />
+                </svg>
               </a>
             </li>
             <li class="nav-link">
               <button type="button" data-bs-toggle="dropdown" style="padding-left: 10px; padding-right:0px" class="btn">
-              <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M13 7a2 2 0 0 1 2 2v12l-5 -3l-5 3v-12a2 2 0 0 1 2 -2h6z" /><path d="M9.265 4a2 2 0 0 1 1.735 -1h6a2 2 0 0 1 2 2v12l-1 -.6" /></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24"
+                  stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                  <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                  <path d="M13 7a2 2 0 0 1 2 2v12l-5 -3l-5 3v-12a2 2 0 0 1 2 -2h6z" />
+                  <path d="M9.265 4a2 2 0 0 1 1.735 -1h6a2 2 0 0 1 2 2v12l-1 -.6" />
+                </svg>
               </button>
               <div class="dropdown-menu dropdown-menu-demo dropdown-menu-arrow bg-dark text-white">
 
                 {% if current_user.is_anonymous %}
-                <span class="badge bg-red"><a href="{{url_for('login')}}" class="dropdown-item" >To using bookmark you need to login</a></span>
-                
+                <span class="badge bg-red"><a href="{{url_for('login')}}" class="dropdown-item">To using bookmark you
+                    need to login</a></span>
+
                 {% else %}
                 {% block bookmark %}
                 {% for bookmark in current_user.bookmark %}
-                  
+
                 <a href="{{url_for('chapter_viewer', chapter_id=bookmark.chapter_id)}}" class="dropdown-item">
                   {{ bookmark.chapter.name }}
                 </a>
@@ -139,35 +167,35 @@
               </div>
             </li>
 
-            {% endblock %} 
+            {% endblock %}
           </ul>
-          
-          <ul class='navbar-nav'>
-            
-              {% if current_user.is_anonymous %}
-              <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('login') }}">Login</a>
-              </li>
-              {% else %}
-              <li class="nav-item">
-              <a class="nav-link" href="{{ url_for('user', id=current_user.id) }}">Dashboard</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
 
-              </li>
-              {% endif %}
-            
+          <ul class='navbar-nav'>
+
+            {% if current_user.is_anonymous %}
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('login') }}">Login</a>
+            </li>
+            {% else %}
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('user', id=current_user.id) }}">Dashboard</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
+
+            </li>
+            {% endif %}
+
           </ul>
 
         </div>
         <div class="collapse navbar-collapse" id="navbar-menu">
           <div class="d-flex flex-column flex-md-row flex-fill align-items-stretch align-items-md-center">
             <div class="container-xl">
-              
+
 
               <ul class="navbar-nav">
-                
+
                 <li class="nav-item">
                   <a class="nav-link" href="{{ url_for('fictions') }}">
                     <span class="nav-link-title">
@@ -189,7 +217,7 @@
                     </span>
                   </a>
                 </li>
-                
+
               </ul>
 
             </div>
@@ -210,11 +238,11 @@
     </ul>
     {% endif %}
     {% endwith %}
-    <div class="content"> 
-      
+    <div class="content">
+
       <div class="container-xl">
-     
-        {% block search%} 
+
+        {% block search%}
         {% include "_search.html" %}
         {% endblock %}
 
@@ -222,17 +250,17 @@
         {% block editor %}{% endblock %}
       </div>
     </div>
-    
-<footer style="position: absolute; bottom:1px;">
-  <ul class="navbar-nav" >
-    <li class="nav-item">
-      <a href="/privacy-policy"> Privacy and Policy</a>
-    </li>
-    <li class="nav-item">
-      <a href="/TOS">TOS</a>
-    </li>
-  </ul>
-</footer>
+
+    <footer style="position: absolute; bottom:1px;">
+      <ul class="navbar-nav">
+        <li class="nav-item">
+          <a href="/privacy-policy"> Privacy and Policy</a>
+        </li>
+        <li class="nav-item">
+          <a href="/TOS">TOS</a>
+        </li>
+      </ul>
+    </footer>
 </body>
 
 </html>

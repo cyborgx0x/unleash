@@ -2,6 +2,23 @@
 {% block title %}Khám Phá{% endblock %}
 {% block content %}
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+{% include 'components/slider.html'  %} 
+<hr>
+{% include 'components/post_card.html'  %} 
+<hr>
+<div class="card text-center">
+  <div class="card-header">
+    Mới cập nhật
+  </div>
+  <div class="card-body">
+    {% set post_list = top_view_fictions %}
+    {% include 'components/post_list.html'  %} 
+  </div>
+  <div class="card-footer text-body-secondary">
+    <h2><a href="/fictions">Xem thêm</a></h2>
+  </div>
+</div>
+
 <div class="row row-deck">
 
   <div class="col-md-8">

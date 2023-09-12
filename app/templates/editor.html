@@ -4,7 +4,7 @@
 {% block layoutleft %}
 <div  style="margin:5px">
     <div class="bg-dark text-white">
-        <a class="dropdown-item" href="/u/{{current_user.user_name}}#your-fiction"> 
+        <a class="dropdown-item" href="/u/{{current_user.id}}#your-fiction"> 
             <!-- Download SVG icon from http://tabler-icons.io/i/arrow-back-up -->
 	        <button class=btn>
                 <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 13l-4 -4l4 -4m-4 4h11a4 4 0 0 1 0 8h-1" /></svg>   
@@ -59,6 +59,8 @@
                     <input type="text" name="tag-manage" id="tag-manage" value="{{fiction.tag}}" class="form-control">
                     <label for="link-download">Link tải sách</label>
                     <input type="text" name="link-download" id="link-download" value="{{fiction.mediafire_link}}" class="form-control">
+                    <label for="link-tiki">Tiki Link</label>
+                    <input type="text" name="link-tiki" id="link-tiki" value="{{fiction.tiki_link}}" class="form-control">
                     <label for="book-cover">Bìa sách</label>
                     <input type="text" name="book-cover" id="book-cover" value="{{fiction.cover}}" class="form-control">
                     <label for="short-desc">Mô tả ngắn</label>

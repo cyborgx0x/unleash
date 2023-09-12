@@ -224,6 +224,10 @@ def edit_specific_post(fiction_id):
             fiction.short_desc = incoming_data["value"]
             db.session.commit()
             return "Mô tả ngắn được cập nhật"
+        elif incoming_data["type"] == "link-tiki":
+            fiction.tiki_link = incoming_data["value"]
+            db.session.commit()
+            return "Đã cập nhật link Tiki"
         elif incoming_data["type"] == "fiction-author":
             fiction.author_id = incoming_data["value"]
             db.session.commit()
