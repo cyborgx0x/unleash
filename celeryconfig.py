@@ -1,4 +1,5 @@
 from celery import Celery
+from datetime import timedelta
 
 # Define the Celery app and configure it
 app = Celery('recommendation_training', broker='redis://localhost:6379/0', include=['your_training_module'])

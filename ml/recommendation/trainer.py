@@ -1,4 +1,3 @@
-
 from sqlalchemy import create_engine
 from surprise import SVD, Dataset, Reader, accuracy
 import pandas as pd
@@ -7,9 +6,20 @@ from surprise.model_selection import train_test_split
 
 
 def train_recommendation_model(database_url, table_name, model_file="trained_model.pkl"):
+    """
+    Train a recommendation model and save it to a file.
+
+    Args:
+        database_url (str): The URL of the database to query.
+        table_name (str): The name of the table to query.
+        model_file (str): The path to the file to save the trained model to.
+
+    Returns:
+        None.
+    """
     # Create a SQLAlchemy database connection
     engine = create_engine(database_url)
-    
+
     # Query the data from the database
     query = f"SELECT user_id, item_id, rating FROM {table_name}"
     df = pd.read_sql(query, engine)
@@ -34,5 +44,6 @@ def train_recommendation_model(database_url, table_name, model_file="trained_mod
         pickle.dump(algo, f)
 
     print("Model trained and saved successfully.")
+
 
 train_recommendation_model("sqlite:///sample.db", "ratings", "trained_model.pkl")

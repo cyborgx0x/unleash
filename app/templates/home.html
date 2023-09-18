@@ -2,10 +2,10 @@
 {% block title %}Khám Phá{% endblock %}
 {% block content %}
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-{% include 'components/slider.html'  %} 
-<hr>
-{% include 'components/post_card.html'  %} 
-<hr>
+<!-- {% include 'components/slider.html'  %}  -->
+<!-- <hr> -->
+<!-- {% include 'components/post_card.html'  %}  -->
+<!-- <hr> -->
 <div class="card text-center">
   <div class="card-header">
     Mới cập nhật
@@ -19,7 +19,7 @@
   </div>
 </div>
 
-<div class="row row-deck">
+<div class="row row-card">
 
   <div class="col-md-8">
       {% for fiction in top_view_fictions %}
