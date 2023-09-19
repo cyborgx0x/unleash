@@ -9,8 +9,9 @@ from sqlalchemy import JSON, Boolean, MetaData, Text
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from app import db, login
-
+from ml.recommendation.recommender import load_recommendation_model, make_recommendations
 meta = MetaData()
+loaded_model = load_recommendation_model()
 
 @dataclass
 class Fiction(db.Model):
@@ -26,7 +27,7 @@ class Fiction(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.Unicode(300))
     status = db.Column(db.Unicode(300), default ="draft")
-    view = db.Column(db.Integer)
+    view = db.Column(db.Integer, default=0)
     desc = db.Column(db.Text)
     cover = db.Column(db.Text)
     publish_year = db.Column(db.Integer)
@@ -53,6 +54,12 @@ class Fiction(db.Model):
             return file
         except:
             return 'nội dung chứa ký tự không hợp lệ'
+    def update_view(self):
+        try: 
+            self.view += 1
+        except:
+            self.view = 1
+        db.session.commit()
     def set_count(self, chapter_count):
         self.chapter_count = chapter_count
         print("update completed")    
@@ -65,7 +72,11 @@ class Fiction(db.Model):
     
     def get_chapter(self):
         ...
-
+    def get_status(self):
+        if self.status == "public":
+            return "Đã xuất bản"
+        else:
+            return "Đang nháp"
 class Task(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     fiction = db.Column(db.Integer, db.ForeignKey('fiction.id'))
@@ -225,7 +236,36 @@ class User(UserMixin, db.Model):
     def load_user(id):
         return User.query.get(int(id))
 
-    
+    def get_recommend_authors(self):
+        '''
+        ## Return
+
+        Trả về Query các Author được recommend cho user.
+        
+        ## Thuật toán
+        Gọi hàm từ module ML. 
+        
+        '''
+        recommendations = make_recommendations(loaded_model, self.id)
+        id_list = [item[0] for item in recommendations]
+        q = db.session.query(Author).filter(Author.id.in_(id_list)).all()
+        return q
+
+    def get_recommend_fictions(self):
+        '''
+        ## Return
+        
+        Trả về query các fiction phù hợp với người dùng
+
+        ## Thuật toán
+
+        Sử dụng kết hợp dựa theo những fiction mà user đã 
+        - rating: rating được tính từ 1-5  (SVD)
+        - views: lịch sử đọc của người dùng
+        - content: fiction phù hợp với nội dung người dùng thích
+
+        '''
+
 
 
 class Bookmark(db.Model):

@@ -59,9 +59,13 @@ def index():
         .all()
     )
     top_authors = Author.query.order_by(Author.fiction_count.desc()).limit(12).all()
+    if current_user.is_authenticated:
 
+        recommend_authors = current_user.get_recommend_authors()
+    else: 
+        recommend_authors = top_authors
     return render_template(
-        "home.html", top_view_fictions=top_view_fictions, top_authors=top_authors
+        "home.html", top_view_fictions=top_view_fictions, top_authors=top_authors, recommend_authors=recommend_authors
     )
 
 
@@ -177,6 +181,7 @@ def liked_fiction(user_id):
 @app.route("/fiction/<int:fiction_id>/", methods=["GET", "POST"])
 def specific_post(fiction_id):
     fiction = Fiction.query.filter_by(id=fiction_id).first()
+    fiction.update_view()
     return render_template("viewer.html", fiction=fiction)
 
 

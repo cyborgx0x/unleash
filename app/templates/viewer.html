@@ -33,15 +33,30 @@
                     <div class="card-header">
                         <h1>
                             {{fiction.name}}
+                            <span class="status status-blue">{{fiction.view}} view</span>
                         </h1>
                     </div>
                     <div class="card-body">
-                        <h2>
-                            {{fiction.author.name}}
-                        </h2>
-                        <span>
-                            {{ fiction.status }}
-                        </span>
+                        <div class="datagrid">
+                            <div class="datagrid-item">
+                              <div class="datagrid-title">Author</div>
+                              <div class="datagrid-content">
+                                <div class="d-flex align-items-center">
+                                    <span class="avatar avatar-xs me-2 rounded" style="background-image: url({{fiction.author.img}})"></span>
+                                    {{fiction.author.name}}
+                                  </div>
+                              </div>
+                              <div class="datagrid-item">
+                                <div class="datagrid-title">Trạng thái</div>
+                                <div class="datagrid-content">{{ fiction.get_status() }}</div>
+                              </div>
+                              
+                            </div>
+                            
+                            
+                          </div>
+                          
+                        
                         <span>
                             {{ fiction.publish_year}}
                         </span>

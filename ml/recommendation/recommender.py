@@ -51,6 +51,6 @@ def make_recommendations(model, user_id, num_recommendations=10):
 if __name__ == "__main__":
     loaded_model = load_recommendation_model()
 
-    user_id = "1"
+    user_id = "2"
     recommendations = make_recommendations(loaded_model, user_id)
-    print(recommendations)
+    print(type(recommendations))

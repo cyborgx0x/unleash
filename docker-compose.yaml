@@ -10,26 +10,28 @@ services:
     ports:
       - "5432:5432"
 
-  # nginx:
-  #   restart: always
-  #   build: ./nginx/
-  #   ports:
-  #     - "80:80"
-  #   volumes:
-  #     - /www/static/
-  #   volumes_from:
-  #     - web
-  #   links:
-  #     - web:web
-  #   depends_on:
-  #     - web
-  # web:
-  #   restart: always
-  #   build: .
-  #   expose:
-  #     - "8000"
-  #   command: gunicorn --bind 0.0.0.0:8000 main:app --log-file -
-  #   volumes:
-  #     - .:/code
-  #   depends_on:
-  #     - db
+  nginx:
+    restart: always
+    build: ./nginx/
+    ports:
+      - "80:80"
+    volumes:
+      - /www/static/
+    volumes_from:
+      - web
+    links:
+      - web:web
+    depends_on:
+      - web
+  web:
+    restart: always
+    build: .
+    expose:
+      - "8000"
+    command: gunicorn --bind 0.0.0.0:8000 main:app --log-file -
+    volumes:
+      - .:/code
+    depends_on:
+      - db
+    ports:
+      - "8000:8000"
