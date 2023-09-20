@@ -6,7 +6,7 @@
 <!-- <hr> -->
 <!-- {% include 'components/post_card.html'  %}  -->
 <!-- <hr> -->
-<div class="card text-center">
+<!-- <div class="card text-center">
   <div class="card-header">
     Mới cập nhật
   </div>
@@ -17,17 +17,20 @@
   <div class="card-footer text-body-secondary">
     <h2><a href="/fictions">Xem thêm</a></h2>
   </div>
-</div>
+</div> -->
 
-<div class="row row-card">
+<div class="row row-cards">
 
   <div class="col-md-8">
+    <div class="row row-cards">
+
       {% for fiction in top_view_fictions %}
-      <div class="col-6 col-md-2">
+      <div class="col-6 col-md-4">
 
         {% include '_fiction.html'  %}   
         </div>
       {% endfor %}
+    </div>
   </div>
   <div class="col-md-4">
     <div class="row row-cards">

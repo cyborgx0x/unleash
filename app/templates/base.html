@@ -50,19 +50,7 @@
       box-shadow: 0 0 11px rgba(41, 27, 27, 0.2);
     }
 
-    .crop {
-      object-fit: cover;
-      width: 100%;
-      height: auto;
-      display: grid;
-      color: var(--white);
-      background-color: tomato;
-      transition: transform 500ms ease;
-    }
 
-    .crop:hover {
-      transform: scale(1.05);
-    }
 
     .navbar-nav {
       flex-direction: inherit;
@@ -72,33 +60,7 @@
       padding: 3px;
     }
 
-    .blend-over {
-      position: absolute;
-      padding: 5px;
-      font-weight: bolder;
-      background: #0e2e5647;
-      width: 100%;
-      transition: transform 500ms ease;
-      transform: scale(0);
-    }
-
-    .crop:hover .blend-over {
-      transform: scale(1);
-    }
-
-    .blend-over>h2>a:hover {
-      text-decoration: none !important;
-      color: white
-    }
-
-    .blend-over:hover {
-      display: grid;
-      position: absolute;
-      padding: 5px;
-      font-weight: bolder;
-      background: #0e2e5647;
-      color: white;
-    }
+    
   </style>
 
 
@@ -251,7 +213,7 @@
       </div>
     </div>
 
-    <footer style="position: absolute; bottom:1px;">
+    <footer class="fixed-bottom"> 
       <ul class="navbar-nav">
         <li class="nav-item">
           <a href="/privacy-policy"> Privacy and Policy</a>
