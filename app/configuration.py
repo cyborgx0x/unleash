@@ -11,7 +11,7 @@ DB_HOST = os.environ.get("DB_HOST", "db")
 DB_PORT = os.environ.get("DB_PORT", "5432")
 DB_TABLE = os.environ.get("DB_TABLE", "unleash")
 
-if DB_USERNAME == None:
+if DB_USERNAME == "root":
     q = "sqlite:////tmp/test.db"
 else:
     q = f"postgresql://{DB_USERNAME}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_TABLE}"
