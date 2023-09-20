@@ -1,28 +1,36 @@
-# UNLEASH - Tool for writer
+# UNLEASH - Implementing Recommendation System with a basic CMS 
 
-- Allow users to create new fiction
-- Allow users to effectively manage their fictions.
-- Implement new features to unleash time from managing metadata, collecting ideas,... for users. 
+- CMS Stuffs: Fictions, Authors
+- Recommendation based on User following on Author or User like on Fiction. Will use both Collaborative Filtering and Content Based
 
-## Structure
+## Tasks
 
-This Project devide the elements as following:
+This Project Focus on Following Task
 
-- App: Responsible for rendering content and interact with user
-- ML: Responsible for defining the machine learning/ deep learning model to work with fiction
+- App: Develop a web application where user can interact with fiction and author
+- ML: Train New model, define the prediction function for the app to inference
 - Tasks: Responsible for the Event Distribution Tasks. 
 - Workflows: Responsible for Work flow and deploying option
 
 ## HOW TO RUN this project
 
-- Clone the repo
-- Install All dependencies
-- You are set! Currently this project is not require anything special. But it soons be changed in the future!
+### With docker
+- Install Docker
+- RUN Docker compose
 
+```
+docker compose up
+```
+
+### Without Docker
+
+```
+pip install -r requirements.txt
+# migrate database change
+flask db upgrade
+flask run
+```
 
 # RUN The Training 
 
 celery -A run_celery:celery worker --loglevel=info
-
-
-# RUN 
