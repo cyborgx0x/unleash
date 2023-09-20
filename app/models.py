@@ -16,7 +16,7 @@ from ml.recommendation.recommender import (
 from .extensions import db, login
 
 meta = MetaData()
-loaded_model = load_recommendation_model()
+author_recommendation_model = load_recommendation_model(model_file="cf_author.pickle")
 fiction_recommendation_model = load_recommendation_model(model_file="cf_fiction.pickle")
 
 
@@ -286,7 +286,7 @@ class User(UserMixin, db.Model):
         Gọi hàm từ module ML.
 
         """
-        recommendations = make_recommendations(loaded_model, self.id)
+        recommendations = make_recommendations(author_recommendation_model, self.id)
         id_list = [item[0] for item in recommendations]
         q = db.session.query(Author).filter(Author.id.in_(id_list)).all()
         return q
