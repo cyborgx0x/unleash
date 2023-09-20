@@ -15,7 +15,6 @@ Jinja2
 lxml
 Mako
 MarkupSafe
-mysql-connector
 python-dateutil
 python-dotenv
 python-editor
@@ -33,7 +32,6 @@ python-dotenv
 flask_cors
 numpy
 pillow
-mysqlclient
 Flask-Markdown
 psycopg2-binary
 pandas
