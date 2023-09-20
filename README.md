@@ -14,10 +14,22 @@ This Project Focus on Following Task
 
 ## HOW TO RUN this project
 
-- Clone the repo
-- Install All dependencies
-- You are set! Currently this project is not require anything special. But it soons be changed in the future!
+### With docker
+- Install Docker
+- RUN Docker compose
 
+```
+docker compose up
+```
+
+### Without Docker
+
+```
+pip install -r requirements.txt
+# migrate database change
+flask db upgrade
+flask run
+```
 
 # RUN The Training 
 
