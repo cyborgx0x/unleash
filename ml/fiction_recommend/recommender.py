@@ -1,7 +1,17 @@
+from app import db
+from app.models import Like
+from sqlalchemy import literal
+import pandas as pd
+
 def get_recommendations(user_id, algo):
     """
     Get recommendations for a specific user
     """
+    q = db.session.query(Like.user_id, Like.fiction_id, literal(1).label("like"))
+    like = q.all()
+
+    data = pd.DataFrame(like, columns=["user_id", "fiction_id", "like"])
+
     # Create a list of all fiction IDs
     fiction_ids = list(set(data["fiction_id"]))
 

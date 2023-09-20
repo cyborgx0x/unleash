@@ -8,124 +8,142 @@ from flask_login import UserMixin
 from sqlalchemy import JSON, Boolean, MetaData, Text
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from app import db, login
-from ml.recommendation.recommender import load_recommendation_model, make_recommendations
+from ml.recommendation.recommender import (
+    load_recommendation_model,
+    make_recommendations,
+)
+
+from .extensions import db, login
+
 meta = MetaData()
 loaded_model = load_recommendation_model()
+fiction_recommendation_model = load_recommendation_model(model_file="cf_fiction.pickle")
+
 
 @dataclass
 class Fiction(db.Model):
-    'fiction', meta
+    "fiction", meta
     id: int
     name: str
     desc: str
     cover: str
     tag: str
 
-
     __tablename__ = "fiction"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.Unicode(300))
-    status = db.Column(db.Unicode(300), default ="draft")
+    status = db.Column(db.Unicode(300), default="draft")
     view = db.Column(db.Integer, default=0)
     desc = db.Column(db.Text)
     cover = db.Column(db.Text)
     publish_year = db.Column(db.Integer)
     page_count = db.Column(db.Integer)
-    author_id = db.Column(db.Integer, db.ForeignKey('author.id'))
+    author_id = db.Column(db.Integer, db.ForeignKey("author.id"))
     tiki_link = db.Column(db.Text)
     mediafire_link = db.Column(db.Text)
     slug = db.Column(db.String(160))
     version = db.Column(db.Integer)
-    chapter = db.relationship('Chapter')
+    chapter = db.relationship("Chapter")
     short_desc = db.Column(db.String(160))
     tag = db.Column(db.Unicode(300))
-    like = db.relationship('Like', backref ='fiction')
-    media = db.relationship('Media', backref='fiction')
-    history = db.relationship('History', backref ='fiction')
-    follower = db.relationship('FictionFollowing', backref ='fiction')
-    quote = db.relationship('Quote')
-    task = db.relationship('Task')
-    created_by = db.Column(db.Integer, db.ForeignKey('user.id'))
+    like = db.relationship("Like", backref="fiction")
+    media = db.relationship("Media", backref="fiction")
+    history = db.relationship("History", backref="fiction")
+    follower = db.relationship("FictionFollowing", backref="fiction")
+    quote = db.relationship("Quote")
+    task = db.relationship("Task")
+    created_by = db.Column(db.Integer, db.ForeignKey("user.id"))
+
+    @property
+    def chapter_count(self):
+        return len(self.chapter)
 
     def cutText(self):
-        try: 
+        try:
             file = json.loads(self.desc)
             return file
         except:
-            return 'nội dung chứa ký tự không hợp lệ'
+            return "nội dung chứa ký tự không hợp lệ"
+
     def update_view(self):
-        try: 
+        try:
             self.view += 1
         except:
             self.view = 1
         db.session.commit()
+
     def set_count(self, chapter_count):
         self.chapter_count = chapter_count
-        print("update completed")    
+        print("update completed")
+
     def set_view(self, total_view):
         self.view = total_view
-        print("update completed")    
+        print("update completed")
 
     def __repr__(self):
-        return '{}>'.format(self.name)
-    
+        return "{}>".format(self.name)
+
     def get_chapter(self):
         ...
+
     def get_status(self):
         if self.status == "public":
             return "Đã xuất bản"
         else:
             return "Đang nháp"
+
+
 class Task(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    fiction = db.Column(db.Integer, db.ForeignKey('fiction.id'))
+    fiction = db.Column(db.Integer, db.ForeignKey("fiction.id"))
+
     def get_data(self):
         ...
-    
+
+
 @dataclass
 class Chapter(db.Model):
-    id:int
+    id: int
     name: str
     content: str
-    
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(160))
     content = db.Column(db.Text)
     view_count = db.Column(db.Integer)
-    fiction = db.Column(db.Integer, db.ForeignKey('fiction.id'))
-    bookmark = db.relationship('Bookmark', backref ='chapter')
+    fiction = db.Column(db.Integer, db.ForeignKey("fiction.id"))
+    bookmark = db.relationship("Bookmark", backref="chapter")
     chapter_order = db.Column(db.Integer)
-    history = db.relationship('History', backref ='chapter')
-    created_by = db.Column(db.Integer, db.ForeignKey('user.id'))
+    history = db.relationship("History", backref="chapter")
+    created_by = db.Column(db.Integer, db.ForeignKey("user.id"))
 
     def update_view(self):
         if self.view_count:
-            self.view_count=self.view_count+1
+            self.view_count = self.view_count + 1
         else:
             self.view_count = 1
         print(self.id, self.name, self.view_count)
         db.session.commit()
+
     def update_chapter_count_zero(self, count):
         self.view_count = count
         db.session.commit()
+
     def cutText(self):
-        try: 
+        try:
             file = json.loads(self.content)
             return file
         except:
-            return 'nội dung chứa ký tự không hợp lệ'
+            return "nội dung chứa ký tự không hợp lệ"
+
     def __repr__(self):
-        return '{}>'.format(self.name)
-
-
+        return "{}>".format(self.name)
 
 
 @dataclass
 class Author(db.Model):
     id: int
-    name: str 
+    name: str
     img: str
     about: str
 
@@ -135,36 +153,35 @@ class Author(db.Model):
     author_page = db.Column(db.String(160))
     about = db.Column(JSON)
     view = db.Column(db.Integer)
-    fiction = db.relationship('Fiction', backref ='author')
-    media = db.relationship('Media', backref ='author')
-    email = db.Column('email', db.String(120))
+    fiction = db.relationship("Fiction", backref="author")
+    media = db.relationship("Media", backref="author")
+    email = db.Column("email", db.String(120))
     img = db.Column(db.String(240))
     fiction_count = db.Column(db.Integer)
-    created_by = db.Column(db.Integer, db.ForeignKey('user.id'))
+    created_by = db.Column(db.Integer, db.ForeignKey("user.id"))
     # user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    history = db.relationship('History', backref ='author')
-    follower = db.relationship('AuthorFollowing', backref ='author')
-
+    history = db.relationship("History", backref="author")
+    follower = db.relationship("AuthorFollowing", backref="author")
 
     def set_count(self, fiction_number):
         self.fiction_count = fiction_number
         print("update completed")
+
     def update_fiction_count(self):
-        fiction_number = Fiction.query.filter_by(author_id=self.id).count()  
+        fiction_number = Fiction.query.filter_by(author_id=self.id).count()
         self.fiction_count = fiction_number
-        print (self.name, fiction_number)
+        print(self.name, fiction_number)
         db.session.commit()
 
 
 class Quote(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     quote = db.Column(db.Text)
-    fiction = db.Column(db.Integer, db.ForeignKey('fiction.id'))
-    author_id = db.Column(db.Integer, db.ForeignKey('author.id'))
-    history = db.relationship('History', backref ='quote')
+    fiction = db.Column(db.Integer, db.ForeignKey("fiction.id"))
+    author_id = db.Column(db.Integer, db.ForeignKey("author.id"))
+    history = db.relationship("History", backref="quote")
 
     img = db.Column(db.Text)
-
 
 
 class Media(db.Model):
@@ -172,17 +189,19 @@ class Media(db.Model):
     title = db.Column(db.Unicode(300))
     content = db.Column(db.Text)
     media_type = db.Column(db.Unicode(300))
-    fiction_id = db.Column(db.Integer, db.ForeignKey('fiction.id'))
-    author_id = db.Column(db.Integer, db.ForeignKey('author.id'))
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    history = db.relationship('History', backref ='media')
+    fiction_id = db.Column(db.Integer, db.ForeignKey("fiction.id"))
+    author_id = db.Column(db.Integer, db.ForeignKey("author.id"))
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
+    history = db.relationship("History", backref="media")
 
     def cutText(self):
         text = json.loads(self.content)
         return text
+
     def getUser(self, id):
         user = User.query.filter_by(id=id).first()
         return user
+
     def getAuthor(self, id):
         author = Author.query.filter_by(id=id).first()
         return author
@@ -190,118 +209,145 @@ class Media(db.Model):
     def getFiction(self, id):
         fic = Fiction.query.filter_by(id=id).first()
         return fic
+
     def getMedia(self, id):
         getdata = Media.query.filter_by(id=id).first()
         return getdata
+
     def __repr__(self):
-        return '{}>'.format(self.media_type)
+        return "{}>".format(self.media_type)
+
 
 class Like(db.Model):
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
-    fiction_id = db.Column(db.Integer, db.ForeignKey('fiction.id'), primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), primary_key=True)
+    fiction_id = db.Column(db.Integer, db.ForeignKey("fiction.id"), primary_key=True)
+
 
 @dataclass
 class User(UserMixin, db.Model):
-
-    'users', meta
-    id = db.Column('id', db.Integer, primary_key=True)
+    "users", meta
+    id = db.Column("id", db.Integer, primary_key=True)
     facebook = db.Column(db.String(50))
     first_name = db.Column(db.Unicode(256))
     last_name = db.Column(db.Unicode(256))
-    user_name = db.Column('user_name', db.String(64))
+    user_name = db.Column("user_name", db.String(64))
     avatar = db.Column(db.String(200))
     about_me = db.Column(db.String(140))
-    last_seen = db.Column (db.DateTime, default = datetime.utcnow)
-    email = db.Column('email', db.String(120))
+    last_seen = db.Column(db.DateTime, default=datetime.utcnow)
+    email = db.Column("email", db.String(120))
     password_hash = db.Column(db.String(128))
-    like = db.relationship('Like', backref ='user')
-    bookmark = db.relationship('Bookmark', backref ='user')
-    media = db.relationship('Media', backref ='user')
-    author = db.relationship('Author', backref ='user')
-    history = db.relationship('History', backref ='user')
-    fictions = db.relationship('Fiction', backref ='creator')
-    author = db.relationship('Author', backref ='creator')
-    following = db.relationship('UserFollowing', foreign_keys='[UserFollowing.user_id]', backref ='user_following')
-    follower = db.relationship('UserFollowing', foreign_keys='[UserFollowing.user_following_id]', backref ='user_follower')
-    author_following = db.relationship('AuthorFollowing', foreign_keys='[AuthorFollowing.user_id]', backref ='user_following')
-    fiction_following = db.relationship('FictionFollowing', foreign_keys='[FictionFollowing.user_id]', backref ='user_following')
+    like = db.relationship("Like", backref="user")
+    bookmark = db.relationship("Bookmark", backref="user")
+    media = db.relationship("Media", backref="user")
+    author = db.relationship("Author", backref="user")
+    history = db.relationship("History", backref="user")
+    fictions = db.relationship("Fiction", backref="creator")
+    author = db.relationship("Author", backref="creator")
+    following = db.relationship(
+        "UserFollowing",
+        foreign_keys="[UserFollowing.user_id]",
+        backref="user_following",
+    )
+    follower = db.relationship(
+        "UserFollowing",
+        foreign_keys="[UserFollowing.user_following_id]",
+        backref="user_follower",
+    )
+    author_following = db.relationship(
+        "AuthorFollowing",
+        foreign_keys="[AuthorFollowing.user_id]",
+        backref="user_following",
+    )
+    fiction_following = db.relationship(
+        "FictionFollowing",
+        foreign_keys="[FictionFollowing.user_id]",
+        backref="user_following",
+    )
     is_admin = db.Column(Boolean, default=False)
     is_mod = db.Column(Boolean, default=False)
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
+
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
+
     @login.user_loader
-    def load_user(id):
-        return User.query.get(int(id))
+    def load_user(user_id):
+        return User.query.get(int(user_id))
 
     def get_recommend_authors(self):
-        '''
+        """
         ## Return
 
         Trả về Query các Author được recommend cho user.
-        
+
         ## Thuật toán
-        Gọi hàm từ module ML. 
-        
-        '''
+        Gọi hàm từ module ML.
+
+        """
         recommendations = make_recommendations(loaded_model, self.id)
         id_list = [item[0] for item in recommendations]
         q = db.session.query(Author).filter(Author.id.in_(id_list)).all()
         return q
 
     def get_recommend_fictions(self):
-        '''
+        """
         ## Return
-        
+
         Trả về query các fiction phù hợp với người dùng
 
         ## Thuật toán
 
-        Sử dụng kết hợp dựa theo những fiction mà user đã 
+        Sử dụng kết hợp dựa theo những fiction mà user đã
         - rating: rating được tính từ 1-5  (SVD)
         - views: lịch sử đọc của người dùng
         - content: fiction phù hợp với nội dung người dùng thích
 
-        '''
-
+        """
+        recommendations = make_recommendations(fiction_recommendation_model, self.id)
+        id_list = [item[0] for item in recommendations]
+        q = db.session.query(Fiction).filter(Fiction.id.in_(id_list)).all()
+        return q
 
 
 class Bookmark(db.Model):
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
-    chapter_id = db.Column(db.Integer, db.ForeignKey('chapter.id'), primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), primary_key=True)
+    chapter_id = db.Column(db.Integer, db.ForeignKey("chapter.id"), primary_key=True)
 
 
 class History(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    chapter_id = db.Column(db.Integer, db.ForeignKey('chapter.id'))
-    fiction_id = db.Column(db.Integer, db.ForeignKey('fiction.id'))
-    author_id = db.Column(db.Integer, db.ForeignKey('author.id'))
-    quote_id = db.Column(db.Integer, db.ForeignKey('quote.id'))
-    media_id = db.Column(db.Integer, db.ForeignKey('media.id'))
-    time = db.Column(db.DateTime, default = datetime.utcnow)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
+    chapter_id = db.Column(db.Integer, db.ForeignKey("chapter.id"))
+    fiction_id = db.Column(db.Integer, db.ForeignKey("fiction.id"))
+    author_id = db.Column(db.Integer, db.ForeignKey("author.id"))
+    quote_id = db.Column(db.Integer, db.ForeignKey("quote.id"))
+    media_id = db.Column(db.Integer, db.ForeignKey("media.id"))
+    time = db.Column(db.DateTime, default=datetime.utcnow)
     content = db.Column(db.String(300))
     type = db.Column(db.String(30))
 
+
 class UserFollowing(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    user_following_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    time = db.Column(db.DateTime, default = datetime.utcnow)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
+    user_following_id = db.Column(db.Integer, db.ForeignKey("user.id"))
+    time = db.Column(db.DateTime, default=datetime.utcnow)
+
 
 class AuthorFollowing(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    author_id = db.Column(db.Integer, db.ForeignKey('author.id'))
-    time = db.Column(db.DateTime, default = datetime.utcnow)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
+    author_id = db.Column(db.Integer, db.ForeignKey("author.id"))
+    time = db.Column(db.DateTime, default=datetime.utcnow)
+
 
 class FictionFollowing(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    author_id = db.Column(db.Integer, db.ForeignKey('fiction.id'))
-    time = db.Column(db.DateTime, default = datetime.utcnow)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
+    author_id = db.Column(db.Integer, db.ForeignKey("fiction.id"))
+    time = db.Column(db.DateTime, default=datetime.utcnow)
 
 
 @dataclass
@@ -315,11 +361,11 @@ class FictionIndex(Fiction):
 
 @dataclass
 class UserIndex(User):
-    id:int
+    id: int
     user_name: str
+
 
 @dataclass
 class AuthorIndex(Author):
-    id:int
+    id: int
     name: str
-

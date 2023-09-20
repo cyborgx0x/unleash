@@ -1,22 +1,37 @@
-from .configuration import Config
+from dotenv import load_dotenv
 from flask import Flask
-
 from flask_login import LoginManager
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from flaskext.markdown import Markdown
-from dotenv import load_dotenv
-from app.recommendation import recommendation
+
+
+from app.extensions import db, login
+from app.recommendation.main import recommendation
+
+from .configuration import Config
+
 load_dotenv()
 
-app = Flask(__name__)
-app.config.from_object(Config)
-app.register_blueprint(recommendation)
-db = SQLAlchemy(app)
-migrate = Migrate(app,db)
-login = LoginManager(app)
-login.login_view = 'login'
-Markdown(app)
 
+def register_extensions(app):
+    db.init_app(app)
+    login.init_app(app)
+    login.login_view = "login"
+    migrate = Migrate(app, db)
+
+
+def create_app(config):
+    app = Flask(__name__)
+    app.config.from_object(Config)
+    app.register_blueprint(recommendation)
+
+    Markdown(app)
+    register_extensions(app)
+
+    return app
+
+
+app = create_app(Config)
 
 from app import models, routes

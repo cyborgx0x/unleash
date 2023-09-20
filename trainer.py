@@ -7,28 +7,6 @@ from surprise import SVD, Dataset, Reader
 from app import app, db
 from app.models import Like
 
-
-class Trainer:
-    """
-    ## Abstract
-
-    Cung cấp phương thức làm việc khi train model gợi ý fiction phù hợp với người dùng
-
-    # Phương pháp
-
-    - Gợi ý dựa trên ACF
-    - Gợi ý dựa trên Content Based
-
-    Chuẩn bị:
-    - Dataset
-    """
-
-    data = ...
-
-    def train(self):
-        ...
-
-
 def content_based_recommendation():
     """
     ## Train mô hình gợi ý dựa trên nội dung của truyện

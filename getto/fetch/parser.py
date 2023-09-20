@@ -32,6 +32,7 @@ class Parser:
         return ''    
     def get_data(self):
         return {key:self.select_element(value) for (key,value) in self.selector.items()}
+    
 def get_url(link, comparing):
     chapter_list_source = requests.get(link).text
     r = BeautifulSoup(chapter_list_source, 'lxml')
