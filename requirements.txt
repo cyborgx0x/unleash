@@ -36,3 +36,4 @@ Flask-Markdown
 psycopg2-binary
 pandas
 surprise
+git+https://github.com/maxcountryman/flask-login.git
