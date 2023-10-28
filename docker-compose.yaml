@@ -1,4 +1,4 @@
-version: '2'
+version: "3.7"
 services:
   db:
     restart: always
@@ -10,7 +10,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - PGDATA:/var/lib/postgresql/data/pgdat
+      - PGDATA:/var/lib/postgresql/data/pgdata
   nginx:
     restart: always
     build: ./nginx/
@@ -24,16 +24,25 @@ services:
       - web:web
     depends_on:
       - web
-  web:
+  web-core:
+    image: web-core
     restart: always
     build: .
+    expose:
+      - "8000"
+    command: flask db upgrade
+    depends_on:
+      - db
+  web:
+    restart: always
+    image: web-core
     expose:
       - "8000"
     command: gunicorn --bind 0.0.0.0:8000 main:app --log-file -
     volumes:
       - .:/code
     depends_on:
-      - db
+      - web-core
     ports:
       - "8000:8000"
 volumes:
