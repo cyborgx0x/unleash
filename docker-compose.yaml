@@ -16,6 +16,8 @@ services:
       - "8080:80"
     volumes:
       - /www/static/
+    volumes_from:
+      - "web"
     depends_on:
       - web
   web-core:
