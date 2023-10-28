@@ -235,7 +235,7 @@ class User(UserMixin, db.Model):
     about_me = db.Column(db.String(140))
     last_seen = db.Column(db.DateTime, default=datetime.utcnow)
     email = db.Column("email", db.String(120))
-    password_hash = db.Column(db.String(128))
+    password_hash = db.Column(db.String(256))
     like = db.relationship("Like", backref="user")
     bookmark = db.relationship("Bookmark", backref="user")
     media = db.relationship("Media", backref="user")
