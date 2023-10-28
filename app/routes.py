@@ -6,7 +6,6 @@ from datetime import datetime
 import requests
 from flask import (
     Flask,
-    Markup,
     flash,
     jsonify,
     redirect,
@@ -18,7 +17,6 @@ from flask import (
 )
 from flask_login import current_user, login_required, login_user, logout_user
 from werkzeug.datastructures import ImmutableMultiDict
-from werkzeug.urls import url_parse
 
 from app import app, db
 from app.form import (
@@ -44,10 +42,9 @@ from app.models import (
     User,
     UserIndex,
 )
+
 from .img_crop import return_img
-
 from .permissions import check_permission
-
 
 
 @app.route("/")
@@ -60,12 +57,14 @@ def index():
     )
     top_authors = Author.query.order_by(Author.fiction_count.desc()).limit(12).all()
     if current_user.is_authenticated:
-
         recommend_authors = current_user.get_recommend_authors()
-    else: 
+    else:
         recommend_authors = top_authors
     return render_template(
-        "home.html", top_view_fictions=top_view_fictions, top_authors=top_authors, recommend_authors=recommend_authors
+        "home.html",
+        top_view_fictions=top_view_fictions,
+        top_authors=top_authors,
+        recommend_authors=recommend_authors,
     )
 
 
@@ -111,14 +110,15 @@ def author_page(author_name):
     fictions = Fiction.query.filter_by(author_id=author.id)
     return render_template("author.html", author=author, fictions=fictions)
 
-@app.route("/editor/author/<int:author_id>", methods=['GET', 'POST'])
+
+@app.route("/editor/author/<int:author_id>", methods=["GET", "POST"])
 @login_required
 # @check_permission
 def edit_author(author_id):
     info_permission = False
     metadata_permission = False
     try:
-        author:Author = Author.query.filter_by(id=author_id).first()
+        author: Author = Author.query.filter_by(id=author_id).first()
         if author.created_by == current_user.id:
             info_permission = True
         if current_user.is_admin or current_user.is_mod:
@@ -128,24 +128,24 @@ def edit_author(author_id):
         return "Yêu cầu không hợp lệ", 400
     if not info_permission and not metadata_permission:
         return "Have No Permission", 403
-    if request.method == 'POST':
-        incoming_data= json.loads(request.data.decode('UTF-8'))
+    if request.method == "POST":
+        incoming_data = json.loads(request.data.decode("UTF-8"))
         if incoming_data["type"] == "content":
             return author.about
         content_map = dict(
-            upload="about", 
+            upload="about",
             author_name="name",
             author_birth_year="birth_year",
             author_page="author_page",
             author_img="img",
         )
-        upload_data= content_map.get(incoming_data["type"])
+        upload_data = content_map.get(incoming_data["type"])
         author.__setattr__(upload_data, incoming_data["value"])
         db.session.commit()
         FIRE = "🔥" * 3
         return f"{upload_data} updated {FIRE}"
-    
-    return render_template("author_editor.html", author = author)
+
+    return render_template("author_editor.html", author=author)
 
 
 @app.route("/authors/")
@@ -529,6 +529,7 @@ def authorized():
     else:
         return jsonify(dict(message="Signed in Fail")), 400
 
+
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if current_user.is_authenticated:
@@ -541,7 +542,7 @@ def login():
             return redirect(url_for("login"))
         login_user(user, remember=form.remember_me.data)
         next_page = request.args.get("next")
-        if not next_page or url_parse(next_page).netloc != "":
+        if not next_page:
             next_page = url_for("index")
         return redirect(next_page)
     return render_template("login.html", title="Sign In", form=form)
@@ -580,5 +581,10 @@ def user(id):
     fictions = Fiction.query.join(Fiction.like).filter_by(user_id=current_user.id)
     all_fictions = Fiction.query.filter_by(created_by=current_user.id)
     all_authors = Author.query.filter_by(created_by=current_user.id)
-    return render_template('dash.html', user=user, fictions=fictions, all_fictions=all_fictions, all_authors=all_authors)
-
+    return render_template(
+        "dash.html",
+        user=user,
+        fictions=fictions,
+        all_fictions=all_fictions,
+        all_authors=all_authors,
+    )

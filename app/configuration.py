@@ -10,7 +10,7 @@ POSTGRES_PASSWORD = os.environ.get("POSTGRES_PASSWORD")
 POSTGRES_DB = os.environ.get("POSTGRES_DB")
 
 if os.environ.get("DB") == "POSTGRES":
-    q = f"postgresql://{POSTGRES_USER}:{POSTGRES_PASSWORD}@db:5432/POSTGRES_DB"
+    q = f"postgresql://{POSTGRES_USER}:{POSTGRES_PASSWORD}@db:5432/{POSTGRES_DB}"
 else:
     q = "sqlite:///unleash.db"
 

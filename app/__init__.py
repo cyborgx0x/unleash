@@ -3,7 +3,6 @@ from flask import Flask
 from flask_login import LoginManager
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
-from flaskext.markdown import Markdown
 
 
 from app.extensions import db, login
@@ -26,7 +25,6 @@ def create_app(config):
     app.config.from_object(Config)
     app.register_blueprint(recommendation)
 
-    Markdown(app)
     register_extensions(app)
 
     return app
