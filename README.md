@@ -37,4 +37,4 @@ celery -A main.celery_app worker -l INFO -P eventlet
 celery -A main.celery_app beat -l INFO 
 
 docker build -t calssiq/unleash:0.1 .
-docker push -t calssiq/unleash:0.1 .
+docker push calssiq/unleash:0.1 .
