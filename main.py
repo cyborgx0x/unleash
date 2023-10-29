@@ -11,9 +11,9 @@ def make_shell_context():
 
 app.config.from_mapping(
     CELERY=dict(
-        broker_url="redis://127.0.0.1:6379/0",
+        broker_url="redis://redis:6379/0",
         # broker_url="amqp://guest:guest@127.0.0.1:5672/",
-        result_backend="redis://127.0.0.1:6379/0",
+        result_backend="redis://redis:6379/0",
         task_ignore_result=True,
     ),
 )
