@@ -1,7 +1,4 @@
-alembic
 beautifulsoup4
-certifi
-chardet
 click
 Flask
 Flask-Migrate
@@ -9,8 +6,6 @@ Flask-SQLAlchemy
 Flask-WTF
 gunicorn
 html5lib
-idna
-itsdangerous
 Jinja2
 lxml
 Mako
@@ -22,9 +17,6 @@ requests
 six
 soupsieve
 SQLAlchemy
-urllib3
-webencodings
-Werkzeug
 WTForms
 flask-login
 email-validator
@@ -37,3 +29,5 @@ psycopg2-binary
 pandas
 surprise
 git+https://github.com/maxcountryman/flask-login.git
+celery[redis]
+eventlet

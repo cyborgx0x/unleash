@@ -63,12 +63,13 @@ def train_recommendation_model(model_type):
     algo.fit(trainset)
     return algo
 
+def train():
 
-with app.app_context():
-    author_model = train_recommendation_model(model_type="author")
-    fiction_model = train_recommendation_model(model_type="fiction")
-    with open("cf_fiction.pickle", "wb") as f:
-        pickle.dump(fiction_model, f)
-    with open("cf_author.pickle", "wb") as f:
-        pickle.dump(fiction_model, f)
-    print("Model trained and saved successfully.")
+    with app.app_context():
+        author_model = train_recommendation_model(model_type="author")
+        fiction_model = train_recommendation_model(model_type="fiction")
+        with open("cf_fiction.pickle", "wb") as f:
+            pickle.dump(fiction_model, f)
+        with open("cf_author.pickle", "wb") as f:
+            pickle.dump(author_model, f)
+        print("Model trained and saved successfully.")

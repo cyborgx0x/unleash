@@ -1,10 +1,10 @@
-from celery import Celery
 
-# Create a Celery instance
-celery = Celery('recommendation_training')
+from celery import Celery, Task
 
-# Load the Celery configuration from the celeryconfig.py file
-celery.config_from_object('celeryconfig')
 
-if __name__ == '__main__':
-    celery.start()
+def celery_init_app(app) -> Celery:
+    celery_app = Celery(app.name)
+    celery_app.config_from_object(app.config["CELERY"])
+    celery_app.set_default()
+    app.extensions["celery"] = celery_app
+    return celery_app

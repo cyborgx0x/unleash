@@ -1,10 +1,27 @@
 from app import app, db
-from app.models import Fiction, User, Author
+from app.models import Author, Fiction, User
+from celery_tasks import *
+from run_celery import celery_init_app
+
 
 @app.shell_context_processor
 def make_shell_context():
-    return {'db': db, 'Fiction': Fiction, 'User':User,  'Author': Author}
+    return {"db": db, "Fiction": Fiction, "User": User, "Author": Author}
 
-if __name__=="__main__":
+
+app.config.from_mapping(
+    CELERY=dict(
+        broker_url="redis://127.0.0.1:6379/0",
+        # broker_url="amqp://guest:guest@127.0.0.1:5672/",
+        result_backend="redis://127.0.0.1:6379/0",
+        task_ignore_result=True,
+    ),
+)
+celery_app = celery_init_app(app)
+celery_app.conf.beat_schedule = {
+    "add-every-hour": {"task": "celery_tasks.train_recommendation", "schedule": 3600},
+}
+
+if __name__ == "__main__":
     print("starting flask")
     app.run()

@@ -1,9 +1,6 @@
 from dotenv import load_dotenv
 from flask import Flask
-from flask_login import LoginManager
 from flask_migrate import Migrate
-from flask_sqlalchemy import SQLAlchemy
-
 
 from app.extensions import db, login
 from app.recommendation.main import recommendation
@@ -24,12 +21,11 @@ def create_app(config):
     app = Flask(__name__)
     app.config.from_object(Config)
     app.register_blueprint(recommendation)
-
     register_extensions(app)
-
     return app
 
 
 app = create_app(Config)
 
-from app import models, routes
+from app.models import *
+from app.routes import *

@@ -33,4 +33,5 @@ flask run
 
 # RUN The Training 
 
-celery -A run_celery:celery worker --loglevel=info
+celery -A main.celery_app worker -l INFO -P eventlet
+celery -A main.celery_app beat -l INFO 

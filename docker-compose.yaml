@@ -9,41 +9,48 @@ services:
       - "5432:5432"
     volumes:
       - PGDATA:/var/lib/postgresql/data
-  nginx:
+  # nginx:
+  #   restart: always
+  #   build: ./nginx/
+  #   ports:
+  #     - "8080:80"
+  #   volumes:
+  #     - /www/static/
+  #   volumes_from:
+  #     - "web"
+  #     - "frontend"
+  #   depends_on:
+  #     - web
+  # frontend:
+  #   build: ./unleash-ui-pwa/
+  #   volumes:
+  #     - /app/dist/
+  # web-core:
+  #   image: web-core
+  #   build: .
+  #   expose:
+  #     - "8000"
+  #   command: flask db upgrade
+  #   depends_on:
+  #     - db
+  redis:
     restart: always
-    build: ./nginx/
-    ports:
-      - "8080:80"
-    volumes:
-      - /www/static/
-    volumes_from:
-      - "web"
-      - "frontend"
-    depends_on:
-      - web
-  frontend:
-    build: ./unleash-ui-pwa/
-    volumes:
-      - /app/dist/
-  web-core:
-    image: web-core
-    build: .
+    image: redis
     expose:
-      - "8000"
-    command: flask db upgrade
-    depends_on:
-      - db
-  web:
-    restart: always
-    image: web-core
-    volumes:
-      - .:/code
-    expose:
-      - "8000"
-    command: gunicorn --bind 0.0.0.0:8000 main:app --log-file -
-    depends_on:
-      - web-core
+      - "6379"
     ports:
-      - "8000:8000"
+      - "6379:6379"
+  # web:
+  #   restart: always
+  #   image: web-core
+  #   volumes:
+  #     - .:/code
+  #   expose:
+  #     - "8000"
+  #   command: gunicorn --bind 0.0.0.0:8000 main:app --log-file -
+  #   depends_on:
+  #     - web-core
+  #   ports:
+  #     - "8000:8000"
 volumes:
   PGDATA:
