@@ -1,6 +1,5 @@
-{% extends "base.html" %}
-{% block title %}Khám Phá{% endblock %}
-{% block content %}
+{% extends "base.html" %} {% block title %}Khám Phá{% endblock %} {% block
+content %}
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <!-- {% include 'components/slider.html'  %}  -->
 <!-- <hr> -->
@@ -20,51 +19,51 @@
 </div> -->
 
 <div class="row row-cards">
-
   <div class="col-md-8">
     <div class="row row-cards">
-
       {% for fiction in top_view_fictions %}
-      <div class="col-6 col-md-4">
-
-        {% include '_fiction.html'  %}   
-        </div>
+      <div class="col-6 col-md-4">{% include '_fiction.html' %}</div>
       {% endfor %}
     </div>
   </div>
   <div class="col-md-4">
     <div class="row row-cards">
       <span class="badge bg-cyan">Tác giả được đề xuất</span>
-        {% for author in recommend_authors %} 
-            {% include '_homeitemrectangle.html'  %}
-        {% endfor %}
+      {% for author in recommend_authors %} {% include '_homeitemrectangle.html'
+      %} {% endfor %}
     </div>
   </div>
   <script>
-    function changeState(context) {  
-        if (context.value=="follow") {
-            context.value="followed"
-            context.textContent = "Đã theo dõi 💁‍♂️"
-            uploadData(context)
-        }
-        else {
-            context.value="follow"
-            context.textContent = "Theo dõi 💎💎💎"
-            uploadData(context)
-        }
+    function changeState(context) {
+      if (context.value == "follow") {
+        context.value = "followed";
+        context.textContent = "Đã theo dõi 💁‍♂️";
+        uploadData(context);
+      } else {
+        context.value = "follow";
+        context.textContent = "Theo dõi 💎💎💎";
+        uploadData(context);
+      }
     }
     function uploadData(context) {
-        let data = {type:"author-follow", value:context.value, author:context.name}
-        console.log(data)
-        axios.post('/api/following/author/', {data:data}).then((res)=>{
-            console.log(res)
-            context.previousSibling.previousSibling.innerHTML = res.data
-            console.log(context.previousSibling)
-        }).catch((err)=>{
-            context.textContent = "Đã có lỗi xảy ra"
-            context.disabled = true
+      let data = {
+        type: "author-follow",
+        value: context.value,
+        author: context.name,
+      };
+      console.log(data);
+      axios
+        .post("/api/following/author/", { data: data })
+        .then((res) => {
+          console.log(res);
+          context.previousSibling.previousSibling.innerHTML = res.data;
+          console.log(context.previousSibling);
         })
-                
+        .catch((err) => {
+          context.textContent = "Đã có lỗi xảy ra";
+          context.disabled = true;
+        });
     }
   </script>
-{% endblock %}
+  {% endblock %}
+</div>

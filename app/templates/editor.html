@@ -68,9 +68,9 @@
                     <label for="fiction-author">Lựa chọn Tác giả</label>
                 </div>
                 
-                <select name="fiction-author" id="fiction-author" class="form-control" aria-label="Fiction Author">
+                <select name="fiction-author" id="fiction-author" class="form-control" aria-label="Fiction Author" >
                     {% for author in authors %}
-                    {% if author.id == fiction.author.id %}
+                    {% if (author.id == fiction.author.id)%}
                         <option value="{{fiction.author.id}}" selected >{{fiction.author.name}}</option>
                         {% else %}
                         <option value="{{author.id}}">{{author.name}}</option>
@@ -213,17 +213,18 @@
         <script>
             
             function exportFiction(context){
-                setTimeout(sendMessage(context,"Đang kiểm tra thông tin cần thiết"),3000)
-                setTimeout(sendMessage(context,"Tiêu đề tác phẩm ✅"),3000)
-                setTimeout(sendMessage(context,"Bìa sách ✅"),3000)
-                setTimeout(sendMessage(context,"Tác giả ✅"),3000)
-                setTimeout(sendMessage(context,"Mô tả ngắn ✅"),3000)
-                setTimeout(sendMessage(context,"Lời tựa ✅"),3000)
-                setTimeout(sendMessage(context,"Đang tạo danh sách chương ✅"),3000)
-                setTimeout(sendMessage(context,"Đã tạo xong, tệp đã được lưu vào drive 🔥"),3000)
-                setTimeout(sendMessage(context,"Link sẽ có sẵn ở mục Tải tại trang tác phẩm ✅"),3000)
-                setTimeout(sendMessage(context,"Bạn có thể bấm nút để tải về ✅"),3000)
-                context.textContent = "🔽 Download"
+                setTimeout(()=>sendMessage(context,"Đang kiểm tra thông tin cần thiết"),1000)
+                setTimeout(()=>sendMessage(context,"Tiêu đề tác phẩm ✅"),2000)
+                setTimeout(()=>sendMessage(context,"Bìa sách ✅"),3000)
+                setTimeout(()=>sendMessage(context,"Tác giả ✅"),4000)
+                setTimeout(()=>sendMessage(context,"Mô tả ngắn ✅"),5000)
+                setTimeout(()=>sendMessage(context,"Lời tựa ✅"),6000)
+                setTimeout(()=>sendMessage(context,"Đang tạo danh sách chương ✅"),7000)
+                setTimeout(()=>sendMessage(context,"Đã tạo xong, tệp đã được lưu vào drive 🔥"),8000)
+                setTimeout(()=>sendMessage(context,"Link sẽ có sẵn ở mục Tải tại trang tác phẩm ✅"),9000)
+                setTimeout(()=>sendMessage(context,"Bạn có thể bấm nút để tải về ✅"),10000)
+                setTimeout(()=>context.textContent = "🔽 Download",10000)
+                
             }
             function sendMessage(context,message) {
                 context.previousElementSibling.textContent = message

@@ -367,7 +367,7 @@ def new_author():
 
 @app.route("/new-fiction/", methods=["GET", "POST"])
 def new_fiction():
-    new_fiction = Fiction(name="Tác phẩm mới")
+    new_fiction = Fiction(name="Tác phẩm mới", created_by=current_user.id)
     db.session.add(new_fiction)
     db.session.commit()
     db.session.refresh(new_fiction)

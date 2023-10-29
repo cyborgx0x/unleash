@@ -1,66 +1,132 @@
-{% extends "layout.html" %}
-{% block title %} Edit {{author.name}}{% endblock %}
+{% extends "layout.html" %} {% block title %} Edit {{author.name}}{% endblock %}
 {% block layoutleft %}
-<div  style="margin:5px">
-    <div class="bg-dark text-white">
-        <a class="dropdown-item" href="/u/{{current_user.user_name}}#author-manage"> 
-            <!-- Download SVG icon from http://tabler-icons.io/i/arrow-back-up -->
-	        <button class=btn>
-                <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 13l-4 -4l4 -4m-4 4h11a4 4 0 0 1 0 8h-1" /></svg>   
-                Trang quản lý
-            </button>
-        </a>
-        <a class="dropdown-item" href="{{url_for('author_page', author_name=author.name)}}">Về trang tác giả</a>
-        <button class="dropdown-item" onclick="showMedia(this)" value="author-basic">Chỉnh sửa thông tin</button>
-        <button class="dropdown-item" onclick="showMedia(this)" value="author-description">Chỉnh sửa tiểu sử</button>
-        <a href="#" class="dropdown-item">Thêm Media 📷</a> 
-        <button class="dropdown-item" onclick="showMedia(this)" value="chapter_statistic">Thông tin thống kê</button>
-        <!-- <a href="/author/{{author.id}}/delete" class="dropdown-item">Delete this author</a>  -->
-    </div>
+<div style="margin: 5px">
+  <div class="bg-dark text-white">
+    <a class="dropdown-item" href="/u/{{current_user.id}}#author-manage">
+      <!-- Download SVG icon from http://tabler-icons.io/i/arrow-back-up -->
+      <button class="btn">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="icon"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          stroke-width="2"
+          stroke="currentColor"
+          fill="none"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+          <path d="M9 13l-4 -4l4 -4m-4 4h11a4 4 0 0 1 0 8h-1" />
+        </svg>
+        Trang quản lý
+      </button>
+    </a>
+    <a
+      class="dropdown-item"
+      href="{{url_for('author_page', author_name=author.name)}}"
+      >Về trang tác giả</a
+    >
+    <button
+      class="dropdown-item"
+      onclick="showMedia(this)"
+      value="author-basic"
+    >
+      Chỉnh sửa thông tin
+    </button>
+    <button
+      class="dropdown-item"
+      onclick="showMedia(this)"
+      value="author-description"
+    >
+      Chỉnh sửa tiểu sử
+    </button>
+    <a href="#" class="dropdown-item">Thêm Media 📷</a>
+    <button
+      class="dropdown-item"
+      onclick="showMedia(this)"
+      value="chapter_statistic"
+    >
+      Thông tin thống kê
+    </button>
+    <!-- <a href="/author/{{author.id}}/delete" class="dropdown-item">Delete this author</a>  -->
+  </div>
 </div>
-{% endblock %}
-{% block layoutcenter %}
-<div class="card"> 
-    <div class="card-body">
-        <div class="tab-content" id="tab-content">
-            <div class="tab-pane show active" id="author-basic">
-                <div class="alert" role="alert" id="alert-theme">
-                    <h4 class="alert-heading"  id="alert-information"> Mỗi mục đều riêng biệt. Khi chỉnh sửa xong vui lòng nhấn enter </h4>
-                </div>
-                <div class="form-group">
-                    <label for="author_name">Tên tác giả</label>
-                    <input type="text" class="form-control" name="author_name" id="author_name" value="{{author.name}}" onchange="uploadData(this)">
-                    <label for="author_birth_year">Năm sinh</label>
-                    <input type="text" class="form-control" name="author_birth_year" id="author_birth_year" value="{{author.birth_year}}" onchange="uploadData(this)">
-                    <label for="author_page">Trang web</label>
-                    <input type="text" class="form-control" name="author_page" id="author_page" value="{{author.author_page}}" onchange="uploadData(this)">
-                    <label for="author_img">Ảnh cá nhân</label>
-                    <input type="text" class="form-control" name="author_img" id="author_img" value="{{author.img}}" onchange="uploadData(this)">
-                </div>
-                <script>
-                    function uploadData(context) {
-                        console.log(context)
-                        let alert = context.parentNode.previousElementSibling
-                        data = {
-                            type: context.name,
-                            value:context.value
-                        }
-                        axios.post('', data).then((res)=>{
-                            alert.className = "alert alert-success"
-                            alert.firstElementChild.textContent = res.data
-                        }).catch((err)=>{
-                            alert.className = "alert alert-danger"
-                            alert.firstElementChild.textContent = err.message
-                        })
-                    }
-                </script>
-            </div>
-            <div class="tab-pane" id="author-description">
-                <!-- <button type="button" class="btn btn-danger" onclick="loadEditor(this)" name="init-button" value="init">Load Editor</button> -->
-                {% include "_editorjs.html"%}
-            </div>
-        
+{% endblock %} {% block layoutcenter %}
+<div class="card">
+  <div class="card-body">
+    <div class="tab-content" id="tab-content">
+      <div class="tab-pane show active" id="author-basic">
+        <div class="alert" role="alert" id="alert-theme">
+          <h4 class="alert-heading" id="alert-information">
+            Mỗi mục đều riêng biệt. Khi chỉnh sửa xong vui lòng nhấn enter
+          </h4>
         </div>
+        <div class="form-group">
+          <label for="author_name">Tên tác giả</label>
+          <input
+            type="text"
+            class="form-control"
+            name="author_name"
+            id="author_name"
+            value="{{author.name}}"
+            onchange="uploadData(this)"
+          />
+          <label for="author_birth_year">Năm sinh</label>
+          <input
+            type="text"
+            class="form-control"
+            name="author_birth_year"
+            id="author_birth_year"
+            value="{{author.birth_year}}"
+            onchange="uploadData(this)"
+          />
+          <label for="author_page">Trang web</label>
+          <input
+            type="text"
+            class="form-control"
+            name="author_page"
+            id="author_page"
+            value="{{author.author_page}}"
+            onchange="uploadData(this)"
+          />
+          <label for="author_img">Ảnh cá nhân</label>
+          <input
+            type="text"
+            class="form-control"
+            name="author_img"
+            id="author_img"
+            value="{{author.img}}"
+            onchange="uploadData(this)"
+          />
+        </div>
+        <script>
+          function uploadData(context) {
+            console.log(context);
+            let alert = context.parentNode.previousElementSibling;
+            data = {
+              type: context.name,
+              value: context.value,
+            };
+            axios
+              .post("", data)
+              .then((res) => {
+                alert.className = "alert alert-success";
+                alert.firstElementChild.textContent = res.data;
+              })
+              .catch((err) => {
+                alert.className = "alert alert-danger";
+                alert.firstElementChild.textContent = err.message;
+              });
+          }
+        </script>
+      </div>
+      <div class="tab-pane" id="author-description">
+        <!-- <button type="button" class="btn btn-danger" onclick="loadEditor(this)" name="init-button" value="init">Load Editor</button> -->
+        {% include "_editorjs.html"%}
+      </div>
     </div>
+  </div>
 </div>
 {% endblock %}
