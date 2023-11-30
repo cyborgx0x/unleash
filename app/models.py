@@ -54,6 +54,16 @@ class Fiction(db.Model):
     task = db.relationship("Task")
     created_by = db.Column(db.Integer, db.ForeignKey("user.id"))
 
+    def update_description(self):
+        '''
+        Based on the content of all the chapter, automatic summary and create a description
+        '''
+        
+    def update_tag(self):
+        '''
+        Based on the data of the fiction, extract keyword and classify the text
+        '''
+
     @property
     def chapter_count(self):
         return len(self.chapter)
