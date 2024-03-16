@@ -5,8 +5,8 @@ from loader import load_recommendation_model, make_recommendations
 
 app = FastAPI()
 
-author_recommendation_model = load_recommendation_model(model_file="cf_author.pickle")
-fiction_recommendation_model = load_recommendation_model(model_file="cf_fiction.pickle")
+author_recommendation_model = load_recommendation_model(model_file="models/cf_author.pickle")
+fiction_recommendation_model = load_recommendation_model(model_file="models/cf_fiction.pickle")
 
 
 @app.get("/fiction-recommendations/{user_id}", response_model=List[int])
