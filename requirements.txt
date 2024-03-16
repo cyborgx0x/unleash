@@ -27,7 +27,7 @@ pillow
 Flask-Markdown
 psycopg2-binary
 pandas
-surprise
+scikit-surprise
 git+https://github.com/maxcountryman/flask-login.git
 celery[redis]
 eventlet
