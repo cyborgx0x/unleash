@@ -33,7 +33,7 @@ flask run
 
 # RUN The Training 
 
-celery -A main.celery_app worker -l INFO -P eventlet
+celery -A main.celery_app worker -l INFO 
 celery -A main.celery_app beat -l INFO 
 
 docker build -t calssiq/unleash:0.1 .
