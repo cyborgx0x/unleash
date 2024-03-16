@@ -21,7 +21,9 @@ class Fiction(db.Model):
     desc: str
     cover: str
     tag: str
-
+    publish_year: int
+    status: str
+    view: int
     __tablename__ = "fiction"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.Unicode(300))

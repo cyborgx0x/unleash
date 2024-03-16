@@ -56,10 +56,10 @@ def index():
         .all()
     )
     top_authors = Author.query.order_by(Author.fiction_count.desc()).limit(12).all()
-    if current_user.is_authenticated:
-        recommend_authors = current_user.get_recommend_authors()
-    else:
-        recommend_authors = top_authors
+    return jsonify(
+        top_view_fictions=top_view_fictions,
+        top_authors=top_authors,
+    )
     return render_template(
         "home.html",
         top_view_fictions=top_view_fictions,
@@ -182,6 +182,7 @@ def liked_fiction(user_id):
 def specific_post(fiction_id):
     fiction = Fiction.query.filter_by(id=fiction_id).first()
     fiction.update_view()
+    return jsonify(fiction=fiction, chapter=fiction.chapter, author=fiction.author)
     return render_template("viewer.html", fiction=fiction)
 
 
