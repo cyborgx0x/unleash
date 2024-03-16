@@ -1,13 +1,12 @@
 from app import app, db
 from app.models import Author, Fiction, User
-from celery_tasks import *
+
 from run_celery import celery_init_app
 
 
 @app.shell_context_processor
 def make_shell_context():
     return {"db": db, "Fiction": Fiction, "User": User, "Author": Author}
-
 
 app.config.from_mapping(
     CELERY=dict(
@@ -19,7 +18,7 @@ app.config.from_mapping(
 )
 celery_app = celery_init_app(app)
 celery_app.conf.beat_schedule = {
-    "add-every-hour": {"task": "celery_tasks.train_recommendation", "schedule": 3600},
+    "add-every-hour": {"task": "app.tasks.train_recommendation", "schedule": 3600},
 }
 
 if __name__ == "__main__":
