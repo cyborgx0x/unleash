@@ -4,7 +4,6 @@ from flask_migrate import Migrate
 
 from app.extensions import db, login
 from app.recommendation.main import recommendation
-from flask_cors import CORS
 
 from .configuration import Config
 
@@ -23,8 +22,7 @@ def create_app(config):
     app.config.from_object(Config)
     app.register_blueprint(recommendation)
     register_extensions(app)
-    allowed_origins = ["http://localhost:5173", "http://localhost", "https://unleash.asia"]
-    CORS(app, resources={r"/*": {"origins": allowed_origins}})
+
     return app
 
 

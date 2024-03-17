@@ -2,6 +2,7 @@ import ast
 import json
 import re
 from datetime import datetime
+from flask_cors import CORS
 
 import requests
 from flask import (
@@ -46,6 +47,13 @@ from app.models import (
 from .img_crop import return_img
 from .permissions import check_permission
 
+allowed_origins = [
+    "http://localhost:5173",
+    "http://localhost",
+    "https://unleash.asia",
+    "http://localhost:5000",
+]
+CORS(app, resources={r"/*": {"origins": allowed_origins}})
 
 @app.route("/")
 def index():
@@ -247,8 +255,9 @@ def edit_specific_post(fiction_id):
 
 @app.route("/fiction/<fiction_name>/")
 def specific_fiction_name(fiction_name):
-    fiction = Fiction.query.filter_by(name=fiction_name).first()
-    return render_template("viewer.html", fiction=fiction)
+    fiction = Fiction.query.filter_by(id=fiction_name).first()
+    fiction.update_view()
+    return jsonify(fiction=fiction, chapter=fiction.chapter, author=fiction.author)
 
 
 @app.route("/chapter/<int:chapter_id>/")
