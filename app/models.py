@@ -109,7 +109,8 @@ class Chapter(db.Model):
     id: int
     name: str
     content: str
-
+    view_count: int
+    
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(160))
     content = db.Column(db.Text)

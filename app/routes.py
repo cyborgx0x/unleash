@@ -2,7 +2,6 @@ import ast
 import json
 import re
 from datetime import datetime
-from flask_cors import CORS
 
 import requests
 from flask import (
@@ -16,6 +15,7 @@ from flask import (
     session,
     url_for,
 )
+from flask_cors import CORS
 from flask_login import current_user, login_required, login_user, logout_user
 from werkzeug.datastructures import ImmutableMultiDict
 
@@ -55,6 +55,7 @@ allowed_origins = [
 ]
 CORS(app, resources={r"/*": {"origins": allowed_origins}})
 
+
 @app.route("/")
 def index():
     top_view_fictions = (
@@ -64,16 +65,12 @@ def index():
         .all()
     )
     top_authors = Author.query.order_by(Author.fiction_count.desc()).limit(12).all()
+
     return jsonify(
         top_view_fictions=top_view_fictions,
         top_authors=top_authors,
     )
-    return render_template(
-        "home.html",
-        top_view_fictions=top_view_fictions,
-        top_authors=top_authors,
-        recommend_authors=recommend_authors,
-    )
+
 
 
 @app.route("/privacy-policy")
@@ -115,8 +112,8 @@ def img_proxy(link):
 @app.route("/author/<author_name>", methods=["GET", "POST"])
 def author_page(author_name):
     author = Author.query.filter_by(name=author_name).first()
-    fictions = Fiction.query.filter_by(author_id=author.id)
-    return render_template("author.html", author=author, fictions=fictions)
+    fictions = Fiction.query.filter_by(author_id=author.id).all()
+    return jsonify(author=author, fictions=fictions)
 
 
 @app.route("/editor/author/<int:author_id>", methods=["GET", "POST"])
@@ -176,8 +173,8 @@ def following_author(user_id):
 
 @app.route("/fictions")
 def fictions():
-    fictions = Fiction.query.filter_by(status="public")
-    return render_template("fictions.html", fictions=fictions)
+    fictions = Fiction.query.filter_by(status="public").all()
+    return jsonify(fictions)
 
 
 @app.route("/u/<int:user_id>/liked")
@@ -190,7 +187,10 @@ def liked_fiction(user_id):
 def specific_post(fiction_id):
     fiction = Fiction.query.filter_by(id=fiction_id).first()
     fiction.update_view()
-    return jsonify(fiction=fiction, chapter=fiction.chapter, author=fiction.author)
+    quotes = []
+    return jsonify(
+        fiction=fiction, chapter=fiction.chapter, author=fiction.author, quotes=quotes
+    )
     return render_template("viewer.html", fiction=fiction)
 
 
@@ -267,10 +267,8 @@ def chapter_viewer(chapter_id):
     fiction = Fiction.query.filter_by(id=chapter.fiction).first()
     chapters = Chapter.query.filter_by(fiction=fiction.id).order_by(
         Chapter.chapter_order.asc()
-    )
-    return render_template(
-        "chapter.html", chapter=chapter, fiction=fiction, chapters=chapters
-    )
+    ).all()
+    return jsonify(chapter=chapter, fiction=fiction, chapters=chapters)
 
 
 @app.route("/editor/<int:chapter_id>/edit", methods=["GET", "POST"])
