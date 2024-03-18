@@ -14,12 +14,25 @@ class AuthorsAPI(MethodView):
     def get(self):
         query = Author.query  # Start with all authors
 
-        # If a 'name' query parameter is provided, use 'like' for partial matching
-        if "name" in request.args:
+        # Extract page and page_size from query parameters
+        page = request.args.get("page", 1, type=int)
+        page_size = request.args.get("page_size", 10, type=int)
+
+        # Check if an 'ids' query parameter is provided for fetching specific authors by IDs
+        if "ids" in request.args:
+            ids_str = request.args.get("ids")
+            try:
+                ids = [int(id) for id in ids_str.split(",")]
+                query = query.filter(Author.id.in_(ids))
+            except ValueError:
+                return jsonify({"error": "Invalid ID format"}), 400
+
+        # Partial name matching
+        elif "name" in request.args:
             name_search = "%{}%".format(request.args.get("name"))
             query = query.filter(Author.name.like(name_search))
 
-        # Example sorting logic (adjust as needed, e.g., by 'name', 'view', etc.)
+        # Sorting logic
         sort_by = request.args.get("sort_by", "id")  # Default sorting is by 'id'
         order = request.args.get("order", "asc").lower()
 
@@ -30,9 +43,20 @@ class AuthorsAPI(MethodView):
                 else query.order_by(getattr(Author, sort_by))
             )
 
-        authors = [author.serialize() for author in query.all()]
+        # Apply pagination
+        pagination = query.paginate(page=page, per_page=page_size, error_out=False)
+        authors = [author.serialize() for author in pagination.items]
 
-        return jsonify(authors)
+        # Return paginated results along with pagination metadata
+        return jsonify(
+            {
+                "authors": authors,
+                "total": pagination.total,
+                "pages": pagination.pages,
+                "page": page,
+                "per_page": page_size,
+            }
+        )
 
     def post(self):
         data = request.json
