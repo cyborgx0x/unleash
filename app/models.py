@@ -1,4 +1,3 @@
-from dataclasses import dataclass
 from datetime import datetime
 
 from flask_login import UserMixin
@@ -10,17 +9,8 @@ from .extensions import db, login
 meta = MetaData()
 
 
-@dataclass
 class Fiction(db.Model):
     "fiction", meta
-    id: int
-    name: str
-    desc: str
-    cover: str
-    tag: str
-    publish_year: int
-    status: str
-    view: int
     __tablename__ = "fiction"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.Unicode(300))
@@ -81,12 +71,7 @@ class Task(db.Model):
     fiction = db.Column(db.Integer, db.ForeignKey("fiction.id"))
 
 
-@dataclass
 class Chapter(db.Model):
-    id: int
-    name: str
-    content: str
-    view_count: int
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(160))
@@ -120,12 +105,7 @@ class Chapter(db.Model):
         db.session.commit()
 
 
-@dataclass
 class Author(db.Model):
-    id: int
-    name: str
-    img: str
-    about: str
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(160))
@@ -185,7 +165,6 @@ class Like(db.Model):
     fiction_id = db.Column(db.Integer, db.ForeignKey("fiction.id"), primary_key=True)
 
 
-@dataclass
 class User(UserMixin, db.Model):
     "users", meta
     id = db.Column("id", db.Integer, primary_key=True)
@@ -272,24 +251,3 @@ class FictionFollowing(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
     author_id = db.Column(db.Integer, db.ForeignKey("fiction.id"))
     time = db.Column(db.DateTime, default=datetime.utcnow)
-
-
-@dataclass
-class FictionIndex(Fiction):
-    id: int
-    name: str
-    desc: str
-    cover: str
-    tag: str
-
-
-@dataclass
-class UserIndex(User):
-    id: int
-    user_name: str
-
-
-@dataclass
-class AuthorIndex(Author):
-    id: int
-    name: str
