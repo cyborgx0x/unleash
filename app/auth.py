@@ -84,7 +84,7 @@ def api_login():
 @auth_bp.route("/logout", methods=["POST"])
 @jwt_required()
 def logout():
-    jti = get_jwt_identity()["jti"]  # Get the unique identifier for the token
+    # jti = get_jwt_identity()["jti"]  # Get the unique identifier for the token
     # Here you would mark the token as revoked in your database or cache
     return jsonify({"message": "Successfully logged out"}), 200
 

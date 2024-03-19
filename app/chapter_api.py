@@ -10,13 +10,22 @@ class ChaptersAPI(MethodView):
     def dispatch_request(self, *args, **kwargs):
         return super(ChaptersAPI, self).dispatch_request(*args, **kwargs)
 
-    def get(self):
-        chapters = Chapter.query.all()
+    def get(self, fiction_id=None):
+        # If a fiction_id is provided, filter chapters by that ID; otherwise, fetch all chapters
+        if fiction_id:
+            chapters = Chapter.query.filter_by(fiction=fiction_id).all()
+        else:
+            chapters = Chapter.query.all()
         return jsonify([chapter.serialize() for chapter in chapters])
 
     def post(self):
         data = request.json
-        if not data or "name" not in data or "content" not in data:
+        if (
+            not data
+            or "name" not in data
+            or "content" not in data
+            or "fiction_id" not in data
+        ):
             return jsonify({"error": "Missing required fields"}), 400
 
         new_chapter = Chapter(
@@ -41,7 +50,16 @@ class SpecificChapterAPI(MethodView):
 
     def get(self, chapter_id):
         chapter = Chapter.query.filter_by(id=chapter_id).first_or_404()
-        return jsonify(chapter.serialize())
+        if not chapter:
+            return jsonify(chapter={}, fiction=[], chapters=[])
+
+        fiction = chapter.fiction_r
+        chapters = Chapter.query.filter_by(fiction=fiction.id).all()
+        return jsonify(
+            chapter=chapter.serialize(),
+            fiction=fiction.serialize(),
+            chapters=[chapter.serialize() for chapter in chapters],
+        )
 
     # Add POST logic if needed for specific chapters
 

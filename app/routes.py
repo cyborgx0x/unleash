@@ -20,9 +20,10 @@ from .author_api import AuthorsAPI, SpecificAuthorAPI
 from .chapter_api import ChaptersAPI, SpecificChapterAPI
 from .common import *
 from .fiction_api import FictionsAPI, SpecificFictionAPI
-
+from .bookmark_api import BookmarkAPI
 allowed_origins = [
     "http://localhost:5173",
+    "http://127.0.0.1:5173",
     "http://localhost",
     "https://unleash.asia",
     "http://localhost:5000",
@@ -54,3 +55,4 @@ app.add_url_rule(
     "/authors/<int:author_id>/",
     view_func=SpecificAuthorAPI.as_view("specific_author_api"),
 )
+app.add_url_rule('/bookmarks/chapter/<int:chapter_id>/', view_func=BookmarkAPI.as_view('bookmark_api'), methods=['GET'])

@@ -75,18 +75,9 @@ class SpecificFictionAPI(MethodView):
     def get(self, fiction_id):
         fiction = Fiction.query.filter_by(id=fiction_id).first_or_404()
         fiction.update_view()
-        quotes = []  # Populate this list as required by your application logic.
-        if fiction.author:
-            author = fiction.author.serialize()
-        else:
-            author = None
+
         return jsonify(
-            fiction=fiction.serialize(),  # Assuming you have a serialize method for your model
-            chapters=[
-                chapter.serialize() for chapter in fiction.chapters
-            ],  # Adjust if necessary
-            author=author,
-            quotes=quotes,
+            fiction.serialize(),  # Assuming you have a serialize method for your model
         )
 
     def post(self, fiction_id):
