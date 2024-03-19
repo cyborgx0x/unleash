@@ -1,6 +1,3 @@
-[submodule "athena"]
-	path = athena
-	url = https://github.com/cyborgx0x/athena
 [submodule "unleash-ui-pwa"]
 	path = unleash-ui-pwa
 	url = https://github.com/cyborgx0x/unleash-ui-pwa.git
