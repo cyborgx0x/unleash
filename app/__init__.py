@@ -22,6 +22,7 @@ def create_app(config):
     app.config.from_object(Config)
     app.register_blueprint(recommendation)
     register_extensions(app)
+
     return app
 
 

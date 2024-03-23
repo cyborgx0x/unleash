@@ -1,8 +1,8 @@
-"""empty message
+"""init
 
-Revision ID: 93d2c882ae8f
+Revision ID: de4091fafbd9
 Revises: 
-Create Date: 2023-09-21 00:00:53.077111
+Create Date: 2024-03-19 12:10:51.348200
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '93d2c882ae8f'
+revision = 'de4091fafbd9'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -28,7 +28,7 @@ def upgrade():
     sa.Column('about_me', sa.String(length=140), nullable=True),
     sa.Column('last_seen', sa.DateTime(), nullable=True),
     sa.Column('email', sa.String(length=120), nullable=True),
-    sa.Column('password_hash', sa.String(length=128), nullable=True),
+    sa.Column('password_hash', sa.String(length=256), nullable=True),
     sa.Column('is_admin', sa.Boolean(), nullable=True),
     sa.Column('is_mod', sa.Boolean(), nullable=True),
     sa.PrimaryKeyConstraint('id')
@@ -38,12 +38,12 @@ def upgrade():
     sa.Column('name', sa.String(length=160), nullable=True),
     sa.Column('birth_year', sa.Integer(), nullable=True),
     sa.Column('author_page', sa.String(length=160), nullable=True),
+    sa.Column('about', sa.JSON(), nullable=True),
     sa.Column('view', sa.Integer(), nullable=True),
     sa.Column('email', sa.String(length=120), nullable=True),
     sa.Column('img', sa.String(length=240), nullable=True),
     sa.Column('fiction_count', sa.Integer(), nullable=True),
     sa.Column('created_by', sa.Integer(), nullable=True),
-    sa.Column('about', sa.JSON(), nullable=True),
     sa.ForeignKeyConstraint(['created_by'], ['user.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
@@ -70,7 +70,7 @@ def upgrade():
     sa.Column('name', sa.Unicode(length=300), nullable=True),
     sa.Column('status', sa.Unicode(length=300), nullable=True),
     sa.Column('view', sa.Integer(), nullable=True),
-    sa.Column('desc', sa.Text(), nullable=True),
+    sa.Column('desc', sa.JSON(), nullable=True),
     sa.Column('cover', sa.Text(), nullable=True),
     sa.Column('publish_year', sa.Integer(), nullable=True),
     sa.Column('page_count', sa.Integer(), nullable=True),
@@ -89,7 +89,7 @@ def upgrade():
     op.create_table('chapter',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('name', sa.String(length=160), nullable=True),
-    sa.Column('content', sa.Text(), nullable=True),
+    sa.Column('content', sa.JSON(), nullable=True),
     sa.Column('view_count', sa.Integer(), nullable=True),
     sa.Column('fiction', sa.Integer(), nullable=True),
     sa.Column('chapter_order', sa.Integer(), nullable=True),

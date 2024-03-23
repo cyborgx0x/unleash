@@ -31,3 +31,4 @@ scikit-surprise
 git+https://github.com/maxcountryman/flask-login.git
 celery[redis]
 eventlet
+flask_jwt_extended

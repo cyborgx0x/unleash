@@ -1,8 +1,4 @@
-import ast
-import json
-from dataclasses import dataclass
 from datetime import datetime
-from hashlib import md5
 
 from flask_login import UserMixin
 from sqlalchemy import JSON, Boolean, MetaData, Text
@@ -13,21 +9,14 @@ from .extensions import db, login
 meta = MetaData()
 
 
-@dataclass
 class Fiction(db.Model):
     "fiction", meta
-    id: int
-    name: str
-    desc: str
-    cover: str
-    tag: str
-
     __tablename__ = "fiction"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.Unicode(300))
     status = db.Column(db.Unicode(300), default="draft")
     view = db.Column(db.Integer, default=0)
-    desc = db.Column(db.Text)
+    desc = db.Column(JSON)
     cover = db.Column(db.Text)
     publish_year = db.Column(db.Integer)
     page_count = db.Column(db.Integer)
@@ -36,7 +25,7 @@ class Fiction(db.Model):
     mediafire_link = db.Column(db.Text)
     slug = db.Column(db.String(160))
     version = db.Column(db.Integer)
-    chapter = db.relationship("Chapter")
+    chapters = db.relationship("Chapter", backref="fiction_r")
     short_desc = db.Column(db.String(160))
     tag = db.Column(db.Unicode(300))
     like = db.relationship("Like", backref="fiction")
@@ -47,26 +36,24 @@ class Fiction(db.Model):
     task = db.relationship("Task")
     created_by = db.Column(db.Integer, db.ForeignKey("user.id"))
 
-    def update_description(self):
-        """
-        Based on the content of all the chapter, automatic summary and create a description
-        """
-
-    def update_tag(self):
-        """
-        Based on the data of the fiction, extract keyword and classify the text
-        """
-
-    @property
-    def chapter_count(self):
-        return len(self.chapter)
-
-    def cutText(self):
-        try:
-            file = json.loads(self.desc)
-            return file
-        except:
-            return "nội dung chứa ký tự không hợp lệ"
+    def serialize(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "desc": self.desc,
+            "cover": self.cover,
+            "tag": self.tag,
+            "publish_year": self.publish_year,
+            "status": self.status,
+            "view": self.view,
+            "page_count": self.page_count,
+            "author_id": self.author_id,
+            "tiki_link": self.tiki_link,
+            "mediafire_link": self.mediafire_link,
+            "slug": self.slug,
+            "version": self.version,
+            "short_desc": self.short_desc,
+        }
 
     def update_view(self):
         try:
@@ -75,42 +62,20 @@ class Fiction(db.Model):
             self.view = 1
         db.session.commit()
 
-    def set_count(self, chapter_count):
-        self.chapter_count = chapter_count
-        print("update completed")
-
-    def set_view(self, total_view):
-        self.view = total_view
-        print("update completed")
-
     def __repr__(self):
         return "{}>".format(self.name)
-
-    def get_chapter(self): ...
-
-    def get_status(self):
-        if self.status == "public":
-            return "Đã xuất bản"
-        else:
-            return "Đang nháp"
 
 
 class Task(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     fiction = db.Column(db.Integer, db.ForeignKey("fiction.id"))
 
-    def get_data(self): ...
 
-
-@dataclass
 class Chapter(db.Model):
-    id: int
-    name: str
-    content: str
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(160))
-    content = db.Column(db.Text)
+    content = db.Column(JSON)
     view_count = db.Column(db.Integer)
     fiction = db.Column(db.Integer, db.ForeignKey("fiction.id"))
     bookmark = db.relationship("Bookmark", backref="chapter")
@@ -118,35 +83,29 @@ class Chapter(db.Model):
     history = db.relationship("History", backref="chapter")
     created_by = db.Column(db.Integer, db.ForeignKey("user.id"))
 
+    def serialize(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "content": self.content,  # Consider security/size implications of sending content
+            "view_count": self.view_count,
+            "fiction": self.fiction,
+            "chapter_order": self.chapter_order,
+            # You may choose to include or exclude details about relationships depending on the use case
+            # For instance, 'bookmarks' and 'history' might be summarized or detailed further if necessary
+            # "bookmarks": [bookmark.serialize() for bookmark in self.bookmark] if self.bookmark else [],
+            # "history": [history.serialize() for history in self.history] if self.history else [],
+        }
+
     def update_view(self):
         if self.view_count:
             self.view_count = self.view_count + 1
         else:
             self.view_count = 1
-        print(self.id, self.name, self.view_count)
         db.session.commit()
 
-    def update_chapter_count_zero(self, count):
-        self.view_count = count
-        db.session.commit()
 
-    def cutText(self):
-        try:
-            file = json.loads(self.content)
-            return file
-        except:
-            return "nội dung chứa ký tự không hợp lệ"
-
-    def __repr__(self):
-        return "{}>".format(self.name)
-
-
-@dataclass
 class Author(db.Model):
-    id: int
-    name: str
-    img: str
-    about: str
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(160))
@@ -164,15 +123,20 @@ class Author(db.Model):
     history = db.relationship("History", backref="author")
     follower = db.relationship("AuthorFollowing", backref="author")
 
-    def set_count(self, fiction_number):
-        self.fiction_count = fiction_number
-        print("update completed")
-
-    def update_fiction_count(self):
-        fiction_number = Fiction.query.filter_by(author_id=self.id).count()
-        self.fiction_count = fiction_number
-        print(self.name, fiction_number)
-        db.session.commit()
+    def serialize(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "birth_year": self.birth_year,
+            "author_page": self.author_page,
+            "about": self.about,
+            "view": self.view,
+            "email": self.email,
+            "img": self.img,
+            "fiction_count": self.fiction_count,
+            # Relationships like 'fiction', 'media', 'history', 'follower' can be serialized similarly if needed
+            # Example: "fictions": [fiction.serialize() for fiction in self.fiction] if self.fiction else [],
+        }
 
 
 class Quote(db.Model):
@@ -195,36 +159,12 @@ class Media(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
     history = db.relationship("History", backref="media")
 
-    def cutText(self):
-        text = json.loads(self.content)
-        return text
-
-    def getUser(self, id):
-        user = User.query.filter_by(id=id).first()
-        return user
-
-    def getAuthor(self, id):
-        author = Author.query.filter_by(id=id).first()
-        return author
-
-    def getFiction(self, id):
-        fic = Fiction.query.filter_by(id=id).first()
-        return fic
-
-    def getMedia(self, id):
-        getdata = Media.query.filter_by(id=id).first()
-        return getdata
-
-    def __repr__(self):
-        return "{}>".format(self.media_type)
-
 
 class Like(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), primary_key=True)
     fiction_id = db.Column(db.Integer, db.ForeignKey("fiction.id"), primary_key=True)
 
 
-@dataclass
 class User(UserMixin, db.Model):
     "users", meta
     id = db.Column("id", db.Integer, primary_key=True)
@@ -273,10 +213,6 @@ class User(UserMixin, db.Model):
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
 
-    @login.user_loader
-    def load_user(user_id):
-        return User.query.get(int(user_id))
-
 
 class Bookmark(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), primary_key=True)
@@ -315,24 +251,3 @@ class FictionFollowing(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
     author_id = db.Column(db.Integer, db.ForeignKey("fiction.id"))
     time = db.Column(db.DateTime, default=datetime.utcnow)
-
-
-@dataclass
-class FictionIndex(Fiction):
-    id: int
-    name: str
-    desc: str
-    cover: str
-    tag: str
-
-
-@dataclass
-class UserIndex(User):
-    id: int
-    user_name: str
-
-
-@dataclass
-class AuthorIndex(Author):
-    id: int
-    name: str

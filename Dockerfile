@@ -6,10 +6,8 @@ COPY requirements.txt /code/
 
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY app/ /code/app/
-COPY migrations/ /code/migrations/
-COPY ml/ /code/ml/
-COPY .flaskenv celery_tasks.py cf_author.pickle cf_fiction.pickle main.py run_celery.py trainer.py unleash.db /code/
+COPY . .
+
 
 EXPOSE 5000
 
